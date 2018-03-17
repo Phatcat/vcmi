@@ -47,6 +47,7 @@
 #include "../lib/serializer/CTypeList.h"
 #include "../lib/serializer/Connection.h"
 #include "../lib/serializer/Cast.h"
+#include "../lib/ScriptHandler.h"
 
 #ifndef _MSC_VER
 #include <boost/thread/xtime.hpp>
@@ -1023,10 +1024,15 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 
 		//TODO: should spell override creature`s projectile?
 
+        auto spell = bat.spellID.toSpell();
+
 		battle::Target target;
 		target.emplace_back(defender);
 
-		auto attackedCreatures = SpellID(bonus->subtype).toSpell()->getAffectedStacks(gs->curB, spells::Mode::SPELL_LIKE_ATTACK, attacker, bonus->val, target);
+		spells::BattleCast event(gs->curB, attacker, spells::Mode::SPELL_LIKE_ATTACK, spell);
+		event.setSpellLevel(bonus->val);
+
+		auto attackedCreatures = spell->battleMechanics(&event)->getAffectedStacks(target);
 
 		//TODO: get exact attacked hex for defender
 
@@ -1928,6 +1934,8 @@ void CGameHandler::newTurn()
 void CGameHandler::run(bool resume)
 {
 	LOG_TRACE_PARAMS(logGlobal, "resume=%d", resume);
+
+	serverScripts.reset(new scripting::PoolImpl(this, this));
 
 	using namespace boost::posix_time;
 	for (auto cc : lobby->connections)
@@ -4466,9 +4474,7 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 				if(randSpellcaster)
 					vstd::amax(spellLvl, randSpellcaster->val);
 				parameters.setSpellLevel(spellLvl);
-
-				parameters.target = target;
-				parameters.cast(spellEnv);
+				parameters.cast(spellEnv, target);
 			}
 			break;
 		}
@@ -4568,10 +4574,12 @@ bool CGameHandler::makeCustomAction(BattleAction & ba)
 			}
 
 			spells::BattleCast parameters(gs->curB, h, spells::Mode::HERO, s);
-			parameters.target = ba.getTarget(gs->curB);
 
 			spells::detail::ProblemImpl problem;
-			if(!s->canBeCast(problem, gs->curB, spells::Mode::HERO, h))//todo: should we check aimed cast?
+
+			auto m = s->battleMechanics(&parameters);
+
+			if(!m->canBeCast(problem))//todo: should we check aimed cast?
 			{
 				logGlobal->warn("Spell cannot be cast!");
 				std::vector<std::string> texts;
@@ -4584,7 +4592,7 @@ bool CGameHandler::makeCustomAction(BattleAction & ba)
 			StartAction start_action(ba);
 			sendAndApply(&start_action); //start spell casting
 
-			parameters.cast(spellEnv);
+			parameters.cast(spellEnv, ba.getTarget(gs->curB));
 
 			sendAndApply(&end_action);
 			if (!gs->curB->battleGetStackByID(gs->curB->activeStack))
@@ -4622,18 +4630,19 @@ void CGameHandler::stackEnchantedTrigger(const CStack * st)
 		//this makes effect accumulate for at most 50 turns by default, but effect may be permanent and last till the end of battle
 		battleCast.setEffectDuration(50);
 		battleCast.setSpellLevel(level);
+		spells::Target target;
 
 		if(val > 3)
 		{
 			for(auto s : gs->curB->battleGetAllStacks())
 				if(battleMatchOwner(st, s, true) && s->isValidTarget()) //all allied
-					battleCast.aimToUnit(s);
+					target.emplace_back(s);
 		}
 		else
 		{
-			battleCast.aimToUnit(st);
+			target.emplace_back(st);
 		}
-		battleCast.applyEffects(spellEnv, false, true);
+		battleCast.applyEffects(spellEnv, target, false, true);
 	}
 }
 
@@ -4760,7 +4769,7 @@ void CGameHandler::stackTurnTrigger(const CStack *st)
 				parameters.massive = true;
 				parameters.smart = true;
 				//todo: recheck effect level
-				if(parameters.castIfPossible(spellEnv))
+				if(parameters.castIfPossible(spellEnv, spells::Target(1, spells::Destination())))
 				{
 					cast = true;
 
@@ -4809,8 +4818,7 @@ bool CGameHandler::handleDamageFromObstacle(const CStack * curStack, bool stackI
 						COMPLAIN_RET("Invalid obstacle instance");
 
 					spells::BattleCast battleCast(gs->curB, &caster, spells::Mode::HERO, sp);
-					battleCast.aimToUnit(curStack);
-					battleCast.applyEffects(spellEnv, true);
+					battleCast.applyEffects(spellEnv, spells::Target(1, spells::Destination(curStack)), true);
 
 					if(oneTimeObstacle)
 						removeObstacle(*obstacle);
@@ -5384,7 +5392,16 @@ void CGameHandler::attackCasting(bool ranged, Bonus::BonusType attackMode, const
 			const CSpell * spell = SpellID(spellID).toSpell();
 			spells::AbilityCaster caster(attacker, spellLevel);
 
-			if(!spell->canBeCastAt(gs->curB, spells::Mode::PASSIVE, &caster, defender->getPosition()))
+			spells::Target target;
+			target.emplace_back(defender);
+
+			spells::BattleCast parameters(gs->curB, &caster, spells::Mode::PASSIVE, spell);
+
+			auto m = spell->battleMechanics(&parameters);
+
+			spells::detail::ProblemImpl ingored;
+
+			if(!m->canBeCastAt(ingored, target))
 				continue;
 
 			//check if spell should be cast (probability handling)
@@ -5394,9 +5411,7 @@ void CGameHandler::attackCasting(bool ranged, Bonus::BonusType attackMode, const
 			//casting
 			if(castMe)
 			{
-				spells::BattleCast parameters(gs->curB, &caster, spells::Mode::PASSIVE, spell);
-				parameters.aimToUnit(defender);
-				parameters.cast(spellEnv);
+				parameters.cast(spellEnv, target);
 			}
 		}
 	}
@@ -5446,9 +5461,10 @@ void CGameHandler::handleAfterAttackCasting(bool ranged, const CStack * attacker
 			spells::AbilityCaster caster(attacker, 0);
 
 			spells::BattleCast parameters(gs->curB, &caster, spells::Mode::PASSIVE, spell);
-			parameters.aimToUnit(defender);
+			spells::Target target;
+			target.emplace_back(defender);
 			parameters.setEffectValue(staredCreatures);
-			parameters.cast(spellEnv);
+			parameters.cast(spellEnv, target);
 		}
 	}
 
@@ -5470,9 +5486,11 @@ void CGameHandler::handleAfterAttackCasting(bool ranged, const CStack * attacker
 		spells::AbilityCaster caster(attacker, 0);
 
 		spells::BattleCast parameters(gs->curB, &caster, spells::Mode::PASSIVE, spell);
-		parameters.aimToUnit(defender);
+		spells::Target target;
+		target.emplace_back(defender);
+
 		parameters.setEffectValue(acidDamage * attacker->getCount());
-		parameters.cast(spellEnv);
+		parameters.cast(spellEnv, target);
 	}
 
 
@@ -5907,7 +5925,7 @@ void CGameHandler::runBattle()
 				parameters.setSpellLevel(3);
 				parameters.setEffectDuration(b->val);
 				parameters.massive = true;
-				parameters.castIfPossible(spellEnv);
+				parameters.castIfPossible(spellEnv, spells::Target());
 			}
 		}
 	}
@@ -6723,6 +6741,16 @@ CGameHandler::FinishingBattleHelper::FinishingBattleHelper()
 CRandomGenerator & CGameHandler::getRandomGenerator()
 {
 	return CRandomGenerator::getDefault();
+}
+
+scripting::Pool * CGameHandler::getGlobalContextPool() const
+{
+	return serverScripts.get();
+}
+
+scripting::Pool *  CGameHandler::getContextPool() const
+{
+	return serverScripts.get();
 }
 
 ///ServerSpellCastEnvironment

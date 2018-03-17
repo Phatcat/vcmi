@@ -92,6 +92,8 @@ public:
 	int battleMakeAction(const BattleAction * action) override;//for casting spells by hero - DO NOT use it for moving active stack
 	bool battleMakeTacticAction(BattleAction * action) override; // performs tactic phase actions
 
+	scripting::Pool * getContextPool() const override;
+
 	friend class CCallback;
 	friend class CClient;
 };

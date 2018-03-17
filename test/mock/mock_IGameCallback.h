@@ -87,6 +87,8 @@ public:
 	///useful callback methods
 	void commitPackage(CPackForClient * pack) override;
 	void sendAndApply(CPackForClient * pack) override;
+
+	MOCK_CONST_METHOD0(getGlobalContextPool, scripting::Pool *());
 private:
 	const UpperCallback * upperCallback;
 };
