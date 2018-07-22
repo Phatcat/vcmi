@@ -9,10 +9,12 @@
  */
 #include "StdInc.h"
 #include "CBattleInfoCallback.h"
+
+#include <vcmi/scripting/Service.h>
+
 #include "../CStack.h"
 #include "BattleInfo.h"
 #include "../NetPacks.h"
-#include "../ScriptingService.h"
 #include "../spells/CSpellHandler.h"
 #include "../mapObjects/CGTownInstance.h"
 
@@ -449,15 +451,6 @@ void CBattleInfoCallback::battleGetTurnOrder(std::vector<battle::Units> & out, c
 
 	if(!outputFull() && (maxTurns == 0 || out.size() < maxTurns))
 		battleGetTurnOrder(out, maxUnits, maxTurns, actualTurn + 1, lastMoved);
-}
-
-void CBattleInfoCallback::battleGetStackCountOutsideHexes(bool *ac) const
-{
-	RETURN_IF_NOT_BATTLE();
-	auto accessibility = getAccesibility();
-
-	for(int i = 0; i < accessibility.size(); i++)
-		ac[i] = (accessibility[i] == EAccessibility::ACCESSIBLE);
 }
 
 std::vector<BattleHex> CBattleInfoCallback::battleGetAvailableHexes(const battle::Unit * unit) const
@@ -932,21 +925,21 @@ std::vector<std::shared_ptr<const CObstacleInstance>> CBattleInfoCallback::battl
 	return obstacles;
 }
 
-std::vector<std::shared_ptr<const CObstacleInstance>> CBattleInfoCallback::getAllAffectedObstaclesByStack(const CStack * stack) const
+std::vector<std::shared_ptr<const CObstacleInstance>> CBattleInfoCallback::getAllAffectedObstaclesByStack(const battle::Unit * unit) const
 {
 	std::vector<std::shared_ptr<const CObstacleInstance>> affectedObstacles = std::vector<std::shared_ptr<const CObstacleInstance>>();
 	RETURN_IF_NOT_BATTLE(affectedObstacles);
-	if(stack->alive())
+	if(unit->alive())
 	{
-		affectedObstacles = battleGetAllObstaclesOnPos(stack->getPosition(), false);
-		if(stack->doubleWide())
+		affectedObstacles = battleGetAllObstaclesOnPos(unit->getPosition(), false);
+		if(unit->doubleWide())
 		{
-			BattleHex otherHex = stack->occupiedHex(stack->getPosition());
+			BattleHex otherHex = unit->occupiedHex(unit->getPosition());
 			if(otherHex.isValid())
 				for(auto & i : battleGetAllObstaclesOnPos(otherHex, false))
 					affectedObstacles.push_back(i);
 		}
-		for(auto hex : stack->getHexes())
+		for(auto hex : unit->getHexes())
 			if(hex == ESiegeHex::GATE_BRIDGE)
 				if(battleGetGateState() == EGateState::OPENED || battleGetGateState() == EGateState::DESTROYED)
 					for(int i=0; i<affectedObstacles.size(); i++)

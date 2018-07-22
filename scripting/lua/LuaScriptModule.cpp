@@ -38,6 +38,7 @@ LuaScriptModule::~LuaScriptModule() = default;
 std::string LuaScriptModule::compile(const std::string & name, const std::string & source) const
 {
 	//TODO: pre-compile to byte code
+	//LuaJit bytecode in architecture agnostic, but is not backward compatible and completely incompatible with Lua
 	return source;
 }
 

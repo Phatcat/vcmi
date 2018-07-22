@@ -12,6 +12,7 @@
 
 #include "BattleHex.h"
 
+struct BattleLogMessage;
 struct BattleStackMoved;
 struct BattleUnitsChanged;
 struct SetStackEffect;
@@ -22,6 +23,10 @@ struct CatapultAttack;
 class DLL_LINKAGE IBattleEventRealizer
 {
 public:
+	virtual void complain(const std::string & problem) const = 0;
+	virtual bool describeChanges() const = 0;
+
+	virtual void apply(BattleLogMessage * pack) = 0;
 	virtual void apply(BattleStackMoved * pack) = 0;
 	virtual void apply(BattleUnitsChanged * pack) = 0;
 	virtual void apply(SetStackEffect * pack) = 0;

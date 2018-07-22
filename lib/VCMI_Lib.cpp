@@ -55,6 +55,11 @@ DLL_LINKAGE void loadDLLClasses(bool onlyEssential)
 	VLC->init(onlyEssential);
 }
 
+const ArtifactService * LibClasses::artifactService() const
+{
+	return arth;
+}
+
 const CreatureService * LibClasses::creatureService() const
 {
 	return creh;
@@ -65,7 +70,7 @@ const scripting::Service * LibClasses::scriptingService() const
 	return scriptHandler;
 }
 
-const spells::SpellService * LibClasses::spellService() const
+const spells::Service * LibClasses::spellService() const
 {
 	return spellh;
 }
@@ -222,3 +227,10 @@ LibClasses::~LibClasses()
 {
 	clear();
 }
+
+void LibClasses::update800()
+{
+	vstd::clear_pointer(scriptHandler);
+	scriptHandler = new scripting::ScriptHandler();
+}
+

@@ -133,7 +133,7 @@ public:
 	UnitsFake unitsFake;
 
 	CBattleInfoCallbackTest()
-		:pool(),
+		: pool(),
 		subject(&pool)
 	{
 

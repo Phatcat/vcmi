@@ -11,22 +11,25 @@
 
 #include "ConstTransitivePtr.h"
 
-class CArtifact;
-class CArtifactInstance;
+class Artifact;
+class ArtifactService;
 class Creature;
 class CreatureService;
+
+namespace spells
+{
+	class Spell;
+	class Service;
+}
+
+class CArtifact;
+class CArtifactInstance;
 class CCreature;
 class CHero;
 class CSpell;
 class CSkill;
 class CGameInfoCallback;
 class CNonConstInfoCallback;
-
-namespace spells
-{
-	class Spell;
-	class SpellService;
-}
 
 namespace GameConstants
 {
@@ -935,6 +938,7 @@ public:
 	{}
 
 	DLL_LINKAGE const CArtifact * toArtifact() const;
+	DLL_LINKAGE const Artifact * toArtifact(const ArtifactService * service) const;
 
 	///json serialization helpers
 	static si32 decode(const std::string & identifier);
@@ -1032,7 +1036,7 @@ public:
 	{}
 
 	DLL_LINKAGE const CSpell * toSpell() const; //deprecated
-	DLL_LINKAGE const spells::Spell * toSpell(const spells::SpellService * service) const;
+	DLL_LINKAGE const spells::Spell * toSpell(const spells::Service * service) const;
 
 	ID_LIKE_CLASS_COMMON(SpellID, ESpellID)
 

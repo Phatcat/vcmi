@@ -13,11 +13,12 @@
 				<Option object_output="obj/Debug/x86/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=" --gtest_filter=*Exa*" />
+				<Option parameters=" --gtest_filter=*ERM_BU*" />
 				<Compiler>
 					<Add option="-Og" />
 					<Add option="-Wextra" />
 					<Add option="-g" />
+					<Add directory="mock/" />
 				</Compiler>
 				<Linker>
 					<Add directory="$(#boost.lib32)" />
@@ -33,6 +34,7 @@
 					<Add option="-Og" />
 					<Add option="-Wextra" />
 					<Add option="-g" />
+					<Add directory="mock/" />
 				</Compiler>
 				<Linker>
 					<Add directory="$(#boost.lib64)" />
@@ -91,6 +93,8 @@
 		<Unit filename="battle/CUnitStateMagicTest.cpp" />
 		<Unit filename="battle/CUnitStateTest.cpp" />
 		<Unit filename="battle/battle_UnitTest.cpp" />
+		<Unit filename="erm/ERMPersistenceTest.cpp" />
+		<Unit filename="erm/ERM_BU.cpp" />
 		<Unit filename="erm/ExamplesTest.cpp" />
 		<Unit filename="game/CGameStateTest.cpp" />
 		<Unit filename="googletest/googlemock/src/gmock-all.cc" />
@@ -100,12 +104,16 @@
 		<Unit filename="map/CMapFormatTest.cpp" />
 		<Unit filename="map/MapComparer.cpp" />
 		<Unit filename="map/MapComparer.h" />
+		<Unit filename="mock/BattleFake.cpp" />
+		<Unit filename="mock/BattleFake.h" />
 		<Unit filename="mock/mock_BonusBearer.cpp" />
 		<Unit filename="mock/mock_BonusBearer.h" />
 		<Unit filename="mock/mock_CPSICallback.cpp" />
 		<Unit filename="mock/mock_CPSICallback.h" />
 		<Unit filename="mock/mock_Creature.h" />
 		<Unit filename="mock/mock_CreatureService.h" />
+		<Unit filename="mock/mock_IBattleEventRealizer.h" />
+		<Unit filename="mock/mock_IBattleInfoCallback.h" />
 		<Unit filename="mock/mock_IGameCallback.cpp" />
 		<Unit filename="mock/mock_IGameCallback.h" />
 		<Unit filename="mock/mock_IGameEventCallback.h" />
@@ -132,6 +140,7 @@
 		<Unit filename="rmg/CRmgTemplateTest.cpp" />
 		<Unit filename="scripting/LuaSpellEffectAPITest.cpp" />
 		<Unit filename="scripting/LuaSpellEffectTest.cpp" />
+		<Unit filename="scripting/PoolTest.cpp" />
 		<Unit filename="scripting/ScriptFixture.cpp" />
 		<Unit filename="scripting/ScriptFixture.h" />
 		<Unit filename="spells/AbilityCasterTest.cpp" />
@@ -160,9 +169,9 @@
 		<Unit filename="spells/targetConditions/SpellEffectConditionTest.cpp" />
 		<Unit filename="spells/targetConditions/TargetConditionItemFixture.cpp" />
 		<Unit filename="spells/targetConditions/TargetConditionItemFixture.h" />
-		<Unit filename="testdata/erm/SpellEffectAPITest.verm" />
 		<Unit filename="testdata/erm/std.verm" />
 		<Unit filename="testdata/erm/testy.erm" />
+		<Unit filename="testdata/lua/SpellEffectAPIMoveUnit.lua" />
 		<Unit filename="testdata/lua/SpellEffectAPITest.lua" />
 		<Unit filename="testdata/rmg/1.json" />
 		<Unit filename="vcai/ResourceManagerTest.h" />

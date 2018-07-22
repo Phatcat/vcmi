@@ -10,12 +10,12 @@
 
 #pragma once
 
-#include "../../lib/spells/Magic.h"
+#include <vcmi/spells/Magic.h>
 
 namespace spells
 {
 
-class SpellServiceMock : public SpellService
+class SpellServiceMock : public Service
 {
 public:
 	MOCK_CONST_METHOD1(getSpell, const Spell *(const SpellID &));

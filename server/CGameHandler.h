@@ -12,6 +12,7 @@
 #include "../lib/FunctionList.h"
 #include "../lib/IGameCallback.h"
 #include "../lib/battle/BattleAction.h"
+#include "../lib/ScriptHandler.h"
 #include "CQuery.h"
 
 class CGameHandler;
@@ -252,9 +253,21 @@ public:
 		h & QID;
 		h & states;
 		h & finishingBattle;
+
 		if(version >= 761)
 		{
 			h & getRandomGenerator();
+		}
+
+		if(version >= 800)
+		{
+			//TODO: serialize scripts state
+			JsonNode scriptsState;
+			if(h.saving)
+				serverScripts->serializeState(h.saving, scriptsState);
+			h & scriptsState;
+			if(!h.saving)
+				serverScripts->serializeState(h.saving, scriptsState);
 		}
 	}
 
@@ -289,13 +302,6 @@ public:
 				h & duel;
 			}
 			h & remainingBattleQueriesCount;
-
-			if(version >= 790)
-			{
-				//TODO: serialize scripts state
-				JsonNode scriptsState;
-				h & scriptsState;
-			}
 		}
 	};
 

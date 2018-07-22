@@ -66,13 +66,11 @@ TEST_F(ExamplesTest, TESTY_ERM)
 	JsonNode scriptConfig(JsonNode::JsonType::DATA_STRUCT);
 	scriptConfig["source"].String() = scriptPath;
 
-	ScriptPtr subject = VLC->scriptHandler->loadFromJson(scriptConfig, "test");
+	loadScript(scriptConfig);
 
-	GTEST_ASSERT_NE(subject, nullptr);
+	run();
 
-	std::shared_ptr<Context> ctx = subject->createContext(&environmentMock);
-
-	JsonNode ret = ctx->callGlobal(&applierMock, "FU42", JsonNode());
+	JsonNode ret = context->callGlobal(&applierMock, "FU42", JsonNode());
 
 	JsonNode expected;
 
@@ -103,13 +101,11 @@ TEST_F(ExamplesTest, STD_VERM)
 	JsonNode scriptConfig(JsonNode::JsonType::DATA_STRUCT);
 	scriptConfig["source"].String() = scriptPath;
 
-	ScriptPtr subject = VLC->scriptHandler->loadFromJson(scriptConfig, "test");
+	loadScript(scriptConfig);
 
-	GTEST_ASSERT_NE(subject, nullptr);
+	run();
 
-	std::shared_ptr<Context> ctx = subject->createContext(&environmentMock);
-
-	JsonNode ret = ctx->callGlobal(&applierMock, "FU42", JsonNode());
+	JsonNode ret = context->callGlobal(&applierMock, "FU42", JsonNode());
 
 	JsonNode expected;
 

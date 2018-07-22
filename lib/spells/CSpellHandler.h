@@ -9,7 +9,7 @@
  */
 
 #pragma once
-#include "Magic.h"
+#include <vcmi/spells/Magic.h>
 #include "../JsonNode.h"
 #include "../IHandlerBase.h"
 #include "../ConstTransitivePtr.h"
@@ -18,30 +18,17 @@
 #include "../battle/BattleHex.h"
 #include "../HeroBonus.h"
 
-namespace spells
-{
-	class ISpellMechanicsFactory;
-	class IBattleCast;
-}
-
-class CGObjectInstance;
 class CSpell;
 class IAdventureSpellMechanics;
-class CLegacyConfigParser;
-class CGHeroInstance;
-class CStack;
 class CBattleInfoCallback;
-class BattleInfo;
-struct CPackForClient;
-struct BattleSpellCast;
-class CGameInfoCallback;
-class CRandomGenerator;
-class CMap;
 class AdventureSpellCastParameters;
 class SpellCastEnvironment;
 
 namespace spells
 {
+
+class ISpellMechanicsFactory;
+class IBattleCast;
 
 struct SchoolInfo
 {
@@ -415,7 +402,7 @@ private:
 
 bool DLL_LINKAGE isInScreenRange(const int3 &center, const int3 &pos); //for spells like Dimension Door
 
-class DLL_LINKAGE CSpellHandler: public CHandlerBase<SpellID, CSpell>, public spells::SpellService
+class DLL_LINKAGE CSpellHandler: public CHandlerBase<SpellID, CSpell>, public spells::Service
 {
 public:
 	CSpellHandler();

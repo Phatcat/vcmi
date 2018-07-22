@@ -25,7 +25,7 @@ template <typename Derived>
 class PackForClientProxy
 {
 public:
-	static int toNetpackLight(lua_State * L, std::shared_ptr<typename Derived::Object> object)
+	static int toNetpackLight(lua_State * L, typename Derived::Object object)
 	{
 		lua_settop(L, 0);
 		lua_pushlightuserdata(L, static_cast<CPackForClient *>(object.get()));

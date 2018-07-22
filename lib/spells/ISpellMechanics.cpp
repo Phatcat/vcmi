@@ -147,12 +147,22 @@ BattleStateProxy::BattleStateProxy(IBattleState * battleState_)
 {
 }
 
+bool BattleStateProxy::describeChanges() const
+{
+	return describe;
+}
+
 void BattleStateProxy::complain(const std::string & problem) const
 {
 	if(server)
 		server->complain(problem);
 	else
 		logGlobal->error(problem);
+}
+
+void BattleStateProxy::apply(BattleLogMessage * pack)
+{
+	applyAny(pack);
 }
 
 void BattleStateProxy::apply(BattleStackMoved * pack)
@@ -777,7 +787,7 @@ const scripting::Service * BaseMechanics::scriptingService() const
 	return VLC->scriptingService(); //todo: redirect
 }
 
-const SpellService * BaseMechanics::spellService() const
+const Service * BaseMechanics::spellService() const
 {
 	return VLC->spellService(); //todo: redirect
 }

@@ -23,35 +23,36 @@ namespace scripting
 {
 namespace api
 {
+class TypeRegistry;
 
 class Registar
 {
 public:
 	virtual ~Registar() = default;
 
-	virtual void perform(lua_State * L) const = 0;
+	virtual void perform(lua_State * L, TypeRegistry * typeRegistry) const = 0;
 };
 
-class Registry
+class Registry : public boost::noncopyable
 {
 public:
-	Registry();
-
 	static Registry * get();
 
 	const Registar * find(const std::string & name) const;
 	void add(const std::string & name, std::shared_ptr<Registar> item);
 private:
 	std::map<std::string, std::shared_ptr<Registar>> data;
+
+	Registry();
 };
 
 template<typename T>
 class RegistarT : public Registar
 {
 public:
-	void perform(lua_State * L) const override
+	void perform(lua_State * L, TypeRegistry * typeRegistry) const override
 	{
-		T::registrator(L);
+		T::registrator(L, typeRegistry);
 	}
 };
 
@@ -64,6 +65,31 @@ public:
 		auto r = std::make_shared<RegistarT<T>>();
 		Registry::get()->add(name, r);
 	}
+};
+
+class TypeRegistry : public boost::noncopyable
+{
+public:
+	template<typename T>
+	const char * getKey(const T * t = nullptr)
+	{
+		if(t)
+			return getKeyForType(typeid(*t));
+		else
+			return getKeyForType(typeid(T));
+	}
+
+	static TypeRegistry * get();
+private:
+	size_t nextIndex;
+
+	boost::mutex mutex;//FIXME: remove and make TypeRegistry part of Context
+
+	std::map<std::type_index, std::string> keys;
+
+	TypeRegistry();
+
+	const char * getKeyForType(const std::type_info & type);
 };
 
 }

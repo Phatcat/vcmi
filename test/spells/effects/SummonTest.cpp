@@ -106,7 +106,7 @@ TEST_P(SummonTest, Transform)
 	if(otherSummoned != CreatureID())
 		addOtherSummoned(true);
 
-	setupEmptyBattlefield();
+	battleFake->setupEmptyBattlefield();
 	EXPECT_CALL(*battleFake, getUnitsIf(_)).Times(AtLeast(1));
 
 	EXPECT_CALL(mechanicsMock, getCasterColor()).WillRepeatedly(Return(PlayerColor(5)));
@@ -154,7 +154,7 @@ public:
 	const BattleHex unitPosition = BattleHex(5,5);
 
 	std::shared_ptr<::battle::UnitInfo> unitAddInfo;
-	std::shared_ptr<UnitFake> acquired;
+	std::shared_ptr<battle::UnitFake> acquired;
 
 	StrictMock<CreatureMock> toSummonType;
 
@@ -242,7 +242,7 @@ TEST_P(SummonApplyTest, UpdatesOldUnit)
 {
 	setDefaultExpectaions();
 
-	acquired = std::make_shared<UnitFake>();
+	acquired = std::make_shared<battle::UnitFake>();
 	acquired->addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::STACK_HEALTH, Bonus::CREATURE_ABILITY, unitHealth, 0));
 	acquired->redirectBonusesToFake();
 	acquired->expectAnyBonusSystemCall();

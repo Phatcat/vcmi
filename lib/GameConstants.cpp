@@ -16,11 +16,12 @@
 #include "../Version.h"
 #endif
 
+#include <vcmi/spells/Service.h>
+
 #include "VCMI_Lib.h"
 #include "mapObjects/CObjectClassesHandler.h"
 #include "CArtHandler.h"
 #include "CCreatureHandler.h"
-#include "spells/SpellService.h"
 #include "spells/CSpellHandler.h" //todo: remove
 #include "CSkillHandler.h"
 #include "StringConstants.h"
@@ -51,6 +52,11 @@ namespace GameConstants
 const CArtifact * ArtifactID::toArtifact() const
 {
 	return VLC->arth->artifacts.at(*this);
+}
+
+const Artifact * ArtifactID::toArtifact(const ArtifactService * service) const
+{
+	return service->getArtifact(*this);
 }
 
 si32 ArtifactID::decode(const std::string & identifier)
@@ -101,7 +107,7 @@ const CSpell * SpellID::toSpell() const
 	return VLC->spellh->objects[*this];
 }
 
-const spells::Spell * SpellID::toSpell(const spells::SpellService * service) const
+const spells::Spell * SpellID::toSpell(const spells::Service * service) const
 {
 	return service->getSpell(*this);
 }

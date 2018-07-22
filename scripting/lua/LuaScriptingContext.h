@@ -21,13 +21,14 @@ namespace scripting
 class LuaContext : public ContextBase
 {
 public:
+	static const std::string STATE_FIELD;
+
 	LuaContext(vstd::CLoggerBase * logger_, const Script * source);
 	virtual ~LuaContext();
 
-	void init(const IGameInfoCallback * cb, const CBattleInfoCallback * battleCb);
+	void init(const GameCb * cb, const BattleCb * battleCb);
 
-	//no return, Lua internally throws
-	void error(const std::string & message);
+	void run(const JsonNode & initialState) override;
 
 	//log error and return nil from LuaCFunction
 	int errorRetVoid(const std::string & message);
@@ -36,9 +37,17 @@ public:
 	JsonNode callGlobal(ServerCb * cb, const std::string & name, const JsonNode & parameters) override;
 	JsonNode callGlobal(ServerBattleCb * cb, const std::string & name, const JsonNode & parameters) override;
 
+	void getGlobal(const std::string & name, int & value) override;
+	void getGlobal(const std::string & name, std::string & value) override;
+	void getGlobal(const std::string & name, double & value) override;
+	void getGlobal(const std::string & name, JsonNode & value) override;
+
 	void setGlobal(const std::string & name, int value) override;
 	void setGlobal(const std::string & name, const std::string & value) override;
 	void setGlobal(const std::string & name, double value) override;
+	void setGlobal(const std::string & name, const JsonNode & value) override;
+
+	JsonNode saveState() override;
 
 	void push(const JsonNode & value);
 	void pop(JsonNode & value);
@@ -47,7 +56,6 @@ public:
 
 	void push(const std::string & value);
 	void push(lua_CFunction f, void * opaque);
-	void push(ServerCb * cb);
 
 	std::string toStringRaw(int index);
 
@@ -58,9 +66,8 @@ private:
 
 	const Script * script;
 
-	const IGameInfoCallback * icb;
-	const CBattleInfoCallback * bicb;
-	ServerBattleCb * bacb;
+	const GameCb * icb;
+	const BattleCb * bicb;
 
 	void cleanupGlobals();
 

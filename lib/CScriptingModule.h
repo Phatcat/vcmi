@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#include "ScriptingService.h"
+#include <vcmi/scripting/Service.h>
 
 namespace spells
 {

@@ -23,7 +23,6 @@ local IF_M = function(x, message)
 	local pack = InfoWindow.new()
 
 	local onMatch1 = function (key1, key2)
-		key2 = tonumber(key2)
 
 		if key1 == 'X' then
 			return x[key2]

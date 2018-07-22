@@ -9,11 +9,8 @@
  */
 #pragma once
 
-
 #include "ERMParser.h"
 #include "ERMScriptModule.h"
-
-#include "../../lib/IGameEventsReceiver.h"
 
 class ERMInterpreter;
 
@@ -229,85 +226,6 @@ namespace VERMInterpreter
 
 	typedef boost::variant<char, double, int, std::string> TLiteral;
 
-	//for operator <
-	struct _opLTvis : boost::static_visitor<bool>
-	{
-		const TLiteral & lhs;
-		_opLTvis(const TLiteral & _lhs) : lhs(_lhs)
-		{}
-
-		template<typename OP>
-		bool operator()(OP const & rhs) const
-		{
-			return boost::get<OP>(lhs) < rhs;
-		}
-	};
-
- 	bool operator<(const TLiteral & t1, const TLiteral & t2);
-
-	//for operator <=
-	struct _opLEvis : boost::static_visitor<bool>
-	{
-		const TLiteral & lhs;
-		_opLEvis(const TLiteral & _lhs) : lhs(_lhs)
-		{}
-
-		template<typename OP>
-		bool operator()(OP const & rhs) const
-		{
-			return boost::get<OP>(lhs) <= rhs;
-		}
-	};
-
-	bool operator<=(const TLiteral & t1, const TLiteral & t2);
-
-	//operator >
-	struct _opGTvis : boost::static_visitor<bool>
-	{
-		const TLiteral & lhs;
-		_opGTvis(const TLiteral & _lhs) : lhs(_lhs)
-		{}
-
-		template<typename OP>
-		bool operator()(OP const & rhs) const
-		{
-			return boost::get<OP>(lhs) > rhs;
-		}
-	};
-
-	bool operator>(const TLiteral & t1, const TLiteral & t2);
-
-	//operator >=
-
-	struct _opGEvis : boost::static_visitor<bool>
-	{
-		const TLiteral & lhs;
-		_opGEvis(const TLiteral & _lhs) : lhs(_lhs)
-		{}
-
-		template<typename OP>
-		bool operator()(OP const & rhs) const
-		{
-			return boost::get<OP>(lhs) >= rhs;
-		}
-	};
-
-	bool operator>=(const TLiteral & t1, const TLiteral & t2);
-
-	//operator =
-	struct _opEQvis : boost::static_visitor<bool>
-	{
-		const TLiteral & lhs;
-		_opEQvis(const TLiteral & _lhs) : lhs(_lhs)
-		{}
-
-		template<typename OP>
-		bool operator()(OP const & rhs) const
-		{
-			return boost::get<OP>(lhs) == rhs;
-		}
-	};
-
 	typedef boost::variant<VNIL, boost::recursive_wrapper<VNode>, VSymbol, TLiteral, ERM::Tcommand> VOption; //options in v-expression, VNIl should be the default
 
 	template<typename T, typename SecType>
@@ -403,18 +321,20 @@ namespace VERMInterpreter
 class ERMInterpreter
 {
 /*not so*/ public:
-// 	friend class ScriptScanner;
 
 	std::vector<VERMInterpreter::FileInfo*> files;
 
 	std::map<VERMInterpreter::LinePointer, ERM::TLine> scripts;
 
-	ERM::TLine &retrieveLine(VERMInterpreter::LinePointer linePtr);
+	ERM::TLine & retrieveLine(const VERMInterpreter::LinePointer & linePtr);
 	static ERM::TTriggerBase & retrieveTrigger(ERM::TLine &line);
 
 
 	typedef std::map<VERMInterpreter::TriggerType, std::vector<VERMInterpreter::Trigger> > TtriggerListType;
-	TtriggerListType triggers, postTriggers;
+	TtriggerListType triggers;
+	TtriggerListType postTriggers;
+
+	std::vector<VERMInterpreter::LinePointer> instructions;
 
 	static const std::string triggerSymbol, postTriggerSymbol, defunSymbol;
 
@@ -429,8 +349,6 @@ public:
 
 	ERMInterpreter(vstd::CLoggerBase * logger_);
 	virtual ~ERMInterpreter();
-
-	void executeInstructions(); //called when starting a new game, before most of the map settings are done
 
 	void scanScripts(); //scans for functions, triggers etc.
 

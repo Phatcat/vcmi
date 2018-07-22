@@ -184,6 +184,11 @@ CArtHandler::~CArtHandler()
 		delete art;
 }
 
+const Artifact * CArtHandler::getArtifact(const ArtifactID & artifactID) const
+{
+	return artifacts.at(artifactID.toEnum());
+}
+
 std::vector<JsonNode> CArtHandler::loadLegacyData(size_t dataSize)
 {
 	artifacts.resize(dataSize);

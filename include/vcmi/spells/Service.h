@@ -1,5 +1,5 @@
 /*
- * SpellService.h, part of VCMI engine
+ * spells/Service.h, part of VCMI engine
  *
  * Authors: listed in file AUTHORS in main folder
  *
@@ -14,13 +14,12 @@ class SpellID;
 
 namespace spells
 {
-
 class Spell;
 
-class DLL_LINKAGE SpellService
+class DLL_LINKAGE Service
 {
 public:
-	virtual ~SpellService() = default;
+	virtual ~Service() = default;
 
  	virtual const Spell * getSpell(const SpellID & spellID) const = 0;
 };

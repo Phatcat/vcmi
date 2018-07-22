@@ -115,7 +115,7 @@ public:
 	{
 		using namespace ::battle;
 
-		UnitFake & clone = unitsFake.add(BattleSide::ATTACKER);
+		auto & clone = unitsFake.add(BattleSide::ATTACKER);
 
 		EXPECT_CALL(clone, unitId()).WillRepeatedly(Return(id));
 
@@ -184,7 +184,7 @@ protected:
 
 TEST_F(CloneApplyTest, AddsNewUnit)
 {
-	setupEmptyBattlefield();
+	battleFake->setupEmptyBattlefield();
 	setDefaultExpectations();
 
 	EXPECT_CALL(*battleFake, addUnitBonus(_,_)).Times(AtLeast(1));
@@ -202,7 +202,7 @@ TEST_F(CloneApplyTest, AddsNewUnit)
 
 TEST_F(CloneApplyTest, SetsClonedFlag)
 {
-	setupEmptyBattlefield();
+	battleFake->setupEmptyBattlefield();
 	setDefaultExpectations();
 
 	EXPECT_CALL(*battleFake, addUnitBonus(_,_)).Times(AtLeast(1));
@@ -214,7 +214,7 @@ TEST_F(CloneApplyTest, SetsClonedFlag)
 
 TEST_F(CloneApplyTest, SetsCloneLink)
 {
-	setupEmptyBattlefield();
+	battleFake->setupEmptyBattlefield();
 	setDefaultExpectations();
 
 	EXPECT_CALL(*battleFake, addUnitBonus(_,_)).Times(AtLeast(1));
@@ -227,7 +227,7 @@ TEST_F(CloneApplyTest, SetsCloneLink)
 
 TEST_F(CloneApplyTest, SetsLifetimeMarker)
 {
-	setupEmptyBattlefield();
+	battleFake->setupEmptyBattlefield();
 	setDefaultExpectations();
 
 	EXPECT_CALL(*battleFake, addUnitBonus(_,_)).WillOnce(Invoke(this, &CloneApplyTest::checkCloneLifetimeMarker));

@@ -1,5 +1,5 @@
 /*
- * Magic.h, part of VCMI engine
+ * spells/Magic.h, part of VCMI engine
  *
  * Authors: listed in file AUTHORS in main folder
  *
@@ -11,7 +11,7 @@
 #pragma once
 
 #include "Spell.h"
-#include "SpellService.h"
+#include "Service.h"
 
 /**
  * High-level interface for spells subsystem

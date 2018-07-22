@@ -918,6 +918,14 @@ void CPlayerInterface::battleEnd(const BattleResult *br)
 	battleInt->battleFinished(*br);
 }
 
+void CPlayerInterface::battleLogMessage(const std::vector<MetaString> & lines)
+{
+	EVENT_HANDLER_CALLED_BY_CLIENT;
+	BATTLE_EVENT_POSSIBLE_RETURN;
+
+	battleInt->displayBattleLog(lines);
+}
+
 void CPlayerInterface::battleStackMoved(const CStack * stack, std::vector<BattleHex> dest, int distance)
 {
 	EVENT_HANDLER_CALLED_BY_CLIENT;

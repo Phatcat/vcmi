@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../../lib/CreatureService.h"
+#include <vcmi/CreatureService.h>
 
 class CreatureServiceMock : public CreatureService
 {

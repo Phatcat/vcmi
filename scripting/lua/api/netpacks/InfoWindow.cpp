@@ -11,12 +11,14 @@
 
 #include "InfoWindow.h"
 
+#include "../../LuaStack.h"
+
 #include "../Registry.h"
 
 using scripting::api::netpacks::InfoWindowProxy;
 using scripting::api::RegisterAPI;
 
-VCMI_REGISTER_SCRIPT_API(InfoWindowProxy::Wrapper, "netpacks.InfoWindow")
+VCMI_REGISTER_SCRIPT_API(InfoWindowProxy, "netpacks.InfoWindow")
 
 namespace scripting
 {
@@ -25,9 +27,7 @@ namespace api
 namespace netpacks
 {
 
-const std::string InfoWindowProxy::CLASSNAME = "netpacks.InfoWindow";
-
-const std::vector<InfoWindowProxy::Wrapper::RegType> InfoWindowProxy::REGISTER =
+const std::vector<InfoWindowProxy::RegType> InfoWindowProxy::REGISTER =
 {
 	{
 		"addReplacement",
@@ -43,7 +43,7 @@ const std::vector<InfoWindowProxy::Wrapper::RegType> InfoWindowProxy::REGISTER =
 	},
 };
 
-int InfoWindowProxy::addReplacement(lua_State * L, std::shared_ptr<Object> object)
+int InfoWindowProxy::addReplacement(lua_State * L, std::shared_ptr<InfoWindow> object)
 {
 	int top = lua_gettop(L);
 
@@ -72,7 +72,7 @@ int InfoWindowProxy::addReplacement(lua_State * L, std::shared_ptr<Object> objec
 	return 0;
 }
 
-int InfoWindowProxy::addText(lua_State * L, std::shared_ptr<Object> object)
+int InfoWindowProxy::addText(lua_State * L, std::shared_ptr<InfoWindow> object)
 {
 	int top = lua_gettop(L);
 

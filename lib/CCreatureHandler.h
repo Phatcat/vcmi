@@ -9,6 +9,9 @@
  */
 #pragma once
 
+#include <vcmi/Creature.h>
+#include <vcmi/CreatureService.h>
+
 #include "HeroBonus.h"
 #include "ConstTransitivePtr.h"
 #include "ResourceSet.h"
@@ -16,8 +19,6 @@
 #include "JsonNode.h"
 #include "IHandlerBase.h"
 #include "CRandomGenerator.h"
-#include "Creature.h"
-#include "CreatureService.h"
 
 class CLegacyConfigParser;
 class CCreatureHandler;

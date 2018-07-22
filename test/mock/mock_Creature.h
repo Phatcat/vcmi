@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../../lib/Creature.h"
+#include <vcmi/Creature.h>
 
 class CreatureMock : public Creature
 {

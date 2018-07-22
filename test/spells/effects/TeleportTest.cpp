@@ -53,6 +53,8 @@ protected:
 
 TEST_F(TeleportApplyTest, MovesUnit)
 {
+	battleFake->setupEmptyBattlefield();
+
 	uint32_t unitId = 42;
 	BattleHex initial(1, 1);
 	BattleHex destination(10, 10);

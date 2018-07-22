@@ -11,15 +11,6 @@
 #include "ERMInterpreter.h"
 
 #include <cctype>
-#include "../../lib/mapObjects/CObjectHandler.h"
-#include "../../lib/mapObjects/MapObjects.h"
-#include "../../lib/NetPacks.h"
-#include "../../lib/CHeroHandler.h"
-#include "../../lib/CCreatureHandler.h"
-#include "../../lib/VCMIDirs.h"
-#include "../../lib/IGameCallback.h"
-#include "../../lib/mapObjects/CGHeroInstance.h"
-#include "../../lib/mapObjects/MiscObjects.h"
 
 namespace spirit = boost::spirit;
 using ::scripting::ContextBase;
@@ -51,11 +42,11 @@ namespace ERMConverter
 
 			if(val.val.is_initialized())
 			{
-				return boost::to_string(boost::format("%s[%d]") % val.varsym % val.val.get());
+				return boost::to_string(boost::format("%s['%d']") % val.varsym % val.val.get());
 			}
 			else
 			{
-				return val.varsym;
+				return boost::to_string(boost::format("quick['%s']") % val.varsym);
 			}
 		}
 
@@ -133,7 +124,7 @@ namespace ERMConverter
 		}
 		std::string operator()(int const & flag) const
 		{
-			return boost::to_string(boost::format("ERM.flag[%d]") % flag);
+			return boost::to_string(boost::format("ERM.flag['%d']") % flag);
 		}
 	};
 
@@ -237,12 +228,11 @@ namespace ERMConverter
 
 		ParamIO operator()(TVarpExp const & cmp) const
 		{
-//			ParamIO ret;
-//			ret.isInput = false;
-//
-//			ret.name = "";
-//			return ret;
-			throw EScriptExecError("Not implemented");
+			ParamIO ret;
+			ret.isInput = false;
+
+			ret.name = boost::apply_visitor(LVL2Iexp(EDir::SET), cmp.var);
+			return ret;
 		}
 
 		ParamIO operator()(spirit::unused_type const & cmp) const
@@ -527,9 +517,9 @@ namespace ERMConverter
 
 				(*out) << "\t" << "for __iter = " << startVal <<", " << stopVal << "-1, " << increment << " do " << std::endl;
 				(*out) << "\t\t" << "local x = x or {}" << std::endl;
-				(*out) << "\t\t" << "x[16] = __iter" << std::endl;
+				(*out) << "\t\t" << "x['16'] = __iter" << std::endl;
 				(*out) << "\t\t" << "FU" << funNum << "(x)" << std::endl;
-				(*out) << "\t\t" << "__iter = x[16]" << std::endl;
+				(*out) << "\t\t" << "__iter = x['16']" << std::endl;
 				(*out) << "\t" << "end" << std::endl;
 			}
 			else
@@ -948,7 +938,7 @@ namespace ERMConverter
 
 					int varIndex = getAs<int>(varIndexLit);
 
-					boost::format fmt("%s[%d]");
+					boost::format fmt("%s['%d']");
 					fmt % name % varIndex;
 
 					name = fmt.str();
@@ -1147,6 +1137,22 @@ namespace ERMConverter
 		}
 	};
 
+	void convertInstructions(std::ostream & out, ERMInterpreter * owner)
+	{
+		out << "local function instructions()" << std::endl;
+
+		Line lineConverter(&out);
+
+		for(const LinePointer & lp : owner->instructions)
+		{
+			ERM::TLine & line = owner->retrieveLine(lp);
+
+			boost::apply_visitor(lineConverter, line);
+		}
+
+		out << "end" << std::endl;
+	}
+
 	void convertFunctions(std::ostream & out, ERMInterpreter * owner, const std::vector<VERMInterpreter::Trigger> & triggers)
 	{
 		std::map<std::string, LinePointer> numToBody;
@@ -1155,7 +1161,7 @@ namespace ERMConverter
 
 		for(const VERMInterpreter::Trigger & trigger : triggers)
 		{
-			ERM::TLine firstLine = owner->retrieveLine(trigger.line);
+			ERM::TLine & firstLine = owner->retrieveLine(trigger.line);
 
 			const ERM::TTriggerBase & trig = ERMInterpreter::retrieveTrigger(firstLine);
 
@@ -1199,6 +1205,42 @@ namespace ERMConverter
 			out << "end" << std::endl;
 		}
 	}
+
+	void convertTriggers(std::ostream & out, ERMInterpreter * owner, const VERMInterpreter::TriggerType & type, const std::vector<VERMInterpreter::Trigger> & triggers)
+	{
+		Line lineConverter(&out);
+
+		for(const VERMInterpreter::Trigger & trigger : triggers)
+		{
+			ERM::TLine & firstLine = owner->retrieveLine(trigger.line);
+
+			const ERM::TTriggerBase & trig = ERMInterpreter::retrieveTrigger(firstLine);
+
+			//TODO: identifier
+			//TODO: condition
+
+			std::string name = trig.name;
+
+			out << "ERM.addTrigger({" << std::endl;
+			out << "\tname = '" << trig.name << "'," << std::endl;
+			out << "\tfn = function ()" << std::endl;
+
+			LinePointer lp = trigger.line;
+			++lp;
+
+			for(; lp.isValid(); ++lp)
+			{
+				ERM::TLine curLine = owner->retrieveLine(lp);
+				if(owner->isATrigger(curLine))
+					break;
+
+				boost::apply_visitor(lineConverter, curLine);
+			}
+
+			out << "\tend," << std::endl;
+			out << "})" << std::endl;
+		}
+	}
 }
 
 struct ScriptScanner : boost::static_visitor<>
@@ -1227,6 +1269,11 @@ struct ScriptScanner : boost::static_visitor<>
 					interpreter->triggers[ TriggerType(boost::get<ERM::Ttrigger>(tcmd.cmd).name) ].push_back(trig);
 				}
 				break;
+			case 1: //instruction
+				{
+					interpreter->instructions.push_back(lp);
+				}
+				break;
 			case 3: //post trigger
 				{
 					Trigger trig;
@@ -1235,7 +1282,6 @@ struct ScriptScanner : boost::static_visitor<>
 				}
 				break;
 			default:
-
 				break;
 			}
 		}
@@ -1245,10 +1291,8 @@ struct ScriptScanner : boost::static_visitor<>
 
 void ERMInterpreter::scanScripts()
 {
-	for(std::map< LinePointer, ERM::TLine >::const_iterator it = scripts.begin(); it != scripts.end(); ++it)
-	{
-		boost::apply_visitor(ScriptScanner(this, it->first), it->second);
-	}
+	for(auto p : scripts)
+		boost::apply_visitor(ScriptScanner(this, p.first), p.second);
 }
 
 ERMInterpreter::ERMInterpreter(vstd::CLoggerBase * logger_)
@@ -1313,13 +1357,13 @@ bool ERMInterpreter::isATrigger( const ERM::TLine & line )
 	return false;
 }
 
-ERM::EVOtions ERMInterpreter::getExpType( const ERM::TVOption & opt )
+ERM::EVOtions ERMInterpreter::getExpType(const ERM::TVOption & opt)
 {
 	//MAINTENANCE: keep it correct!
 	return static_cast<ERM::EVOtions>(opt.which());
 }
 
-bool ERMInterpreter::isCMDATrigger( const ERM::Tcommand & cmd )
+bool ERMInterpreter::isCMDATrigger(const ERM::Tcommand & cmd)
 {
 	switch (cmd.cmd.which())
 	{
@@ -1333,13 +1377,12 @@ bool ERMInterpreter::isCMDATrigger( const ERM::Tcommand & cmd )
 	}
 }
 
-ERM::TLine &ERMInterpreter::retrieveLine( LinePointer linePtr )
+ERM::TLine & ERMInterpreter::retrieveLine(const LinePointer & linePtr)
 {
 	return scripts.find(linePtr)->second;
 }
 
-
-ERM::TTriggerBase & ERMInterpreter::retrieveTrigger( ERM::TLine &line )
+ERM::TTriggerBase & ERMInterpreter::retrieveTrigger(ERM::TLine & line)
 {
 	if(line.which() == 1)
 	{
@@ -1362,11 +1405,6 @@ ERM::TTriggerBase & ERMInterpreter::retrieveTrigger( ERM::TLine &line )
 	throw ELineProblem("Given line is not an ERM trigger!");
 }
 
-void ERMInterpreter::executeInstructions()
-{
-	//TODO implement me
-}
-
 int ERMInterpreter::getRealLine(const LinePointer &lp)
 {
 	for(std::map<VERMInterpreter::LinePointer, ERM::TLine>::const_iterator i = scripts.begin(); i != scripts.end(); i++)
@@ -1379,7 +1417,6 @@ int ERMInterpreter::getRealLine(const LinePointer &lp)
 const std::string ERMInterpreter::triggerSymbol = "trigger";
 const std::string ERMInterpreter::postTriggerSymbol = "postTrigger";
 const std::string ERMInterpreter::defunSymbol = "defun";
-
 
 void ERMInterpreter::loadScript(const std::string & name, const std::string & source)
 {
@@ -1397,7 +1434,6 @@ void ERMInterpreter::loadScript(const std::string & name, const std::string & so
 	}
 }
 
-
 std::string ERMInterpreter::convert()
 {
 	std::stringstream out;
@@ -1407,6 +1443,9 @@ std::string ERMInterpreter::convert()
 	out << "local v = ERM.v" << std::endl;
 	out << "local z = ERM.z" << std::endl;
 	out << "local flag = ERM.flag" << std::endl;
+	out << "local quick = ERM.quick" << std::endl;
+
+	ERMConverter::convertInstructions(out, this);
 
 	for(const auto & p : triggers)
 	{
@@ -1418,16 +1457,14 @@ std::string ERMInterpreter::convert()
 		}
 		else
 		{
-
+			ERMConverter::convertTriggers(out, this, tt, p.second);
 		}
 	}
 
 	for(const auto & p : postTriggers)
 		;//TODO
 
-	//TODO: instructions
-
-	//TODO: !?PI
+	out << "ERM.callInstructions(instructions)" << std::endl;
 
 	return out.str();
 }

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Magic.h"
+#include <vcmi/spells/Magic.h>
 
 namespace spells
 {

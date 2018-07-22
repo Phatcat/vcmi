@@ -10,11 +10,12 @@
 
 #pragma once
 
+#include <vcmi/spells/Magic.h>
+
 #include "../HeroBonus.h"
 
 #include "IUnitInfo.h"
 #include "BattleHex.h"
-#include "../spells/Magic.h"
 
 struct MetaString;
 class JsonNode;

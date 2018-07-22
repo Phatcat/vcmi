@@ -11,16 +11,18 @@
 
 #include "LuaSpellEffect.h"
 
+#include <vcmi/scripting/Service.h>
+
 #include "../../lib/spells/effects/Registry.h"
 #include "../../lib/spells/ISpellMechanics.h"
 
 #include "../../lib/battle/Unit.h"
 #include "../../lib/battle/CBattleInfoCallback.h"
-#include "../../lib/ScriptingService.h"
 #include "../../lib/serializer/JsonSerializeFormat.h"
 
 static const std::string APPLICABLE_GENERAL = "applicable";
 static const std::string APPLICABLE_TARGET = "applicableTarget";
+static const std::string APPLY = "apply";
 
 namespace spells
 {
@@ -39,8 +41,6 @@ Effect * LuaSpellEffectFactory::create() const
 {
 	return new LuaSpellEffect(script);
 }
-
-
 
 LuaSpellEffect::LuaSpellEffect(const Script * script_)
 	: script(script_)
@@ -119,9 +119,39 @@ bool LuaSpellEffect::applicable(Problem & problem, const Mechanics * m, const Ef
 	return response.Bool();
 }
 
-void LuaSpellEffect::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
+void LuaSpellEffect::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
 {
+	if(target.empty())
+		return;
 
+	std::shared_ptr<scripting::Context> context = resolveScript(m);
+	if(!context)
+	{
+		battleState->complain("Unable to create scripting context");
+		return;
+	}
+
+	setContextVariables(m, context);
+
+	JsonNode requestP;
+
+	for(auto & dest : target)
+	{
+		JsonNode targetData;
+		targetData.Vector().push_back(JsonUtils::intNode(dest.hexValue.hex));
+
+		if(dest.unitValue)
+			targetData.Vector().push_back(JsonUtils::intNode(dest.unitValue->unitId()));
+		else
+			targetData.Vector().push_back(JsonUtils::intNode(-1));
+
+		requestP.Vector().push_back(targetData);
+	}
+
+	JsonNode request;
+	request.Vector().push_back(requestP);
+
+	context->callGlobal(battleState, APPLY, request);
 }
 
 EffectTarget LuaSpellEffect::filterTarget(const Mechanics * m, const EffectTarget & target) const

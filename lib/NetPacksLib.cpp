@@ -1353,6 +1353,16 @@ void BattleResult::applyGs(CGameState *gs)
 	gs->curB.dellNull();
 }
 
+DLL_LINKAGE void BattleLogMessage::applyGs(CGameState *gs)
+{
+	//nothing
+}
+
+DLL_LINKAGE void BattleLogMessage::applyBattle(IBattleState * battleState)
+{
+	//nothing
+}
+
 DLL_LINKAGE void BattleStackMoved::applyGs(CGameState *gs)
 {
 	applyBattle(gs->curB);

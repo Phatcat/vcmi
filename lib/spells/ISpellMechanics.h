@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Magic.h"
+#include <vcmi/spells/Magic.h>
 #include "../battle/Destination.h"
 #include "../int3.h"
 #include "../GameConstants.h"
@@ -59,11 +59,11 @@ public:
 namespace spells
 {
 
-class DLL_LINKAGE BattleStateProxy : public IBattleEventRealizer
+using ServerBattleCb = ::IBattleEventRealizer;
+
+class DLL_LINKAGE BattleStateProxy : public ServerBattleCb
 {
 public:
-	const bool describe;
-
 	BattleStateProxy(const PacketSender * server_);
 	BattleStateProxy(IBattleState * battleState_);
 
@@ -76,8 +76,11 @@ public:
 			pack->applyBattle(battleState);
 	}
 
-	void complain(const std::string & problem) const;
+	bool describeChanges() const override;
 
+	void complain(const std::string & problem) const override;
+
+	void apply(BattleLogMessage * pack)	override;
 	void apply(BattleStackMoved * pack) override;
 	void apply(BattleUnitsChanged * pack) override;
 	void apply(SetStackEffect * pack) override;
@@ -86,6 +89,7 @@ public:
 	void apply(CatapultAttack * pack) override;
 
 private:
+	const bool describe;
 	const PacketSender * server;
 	IBattleState * battleState;
 };
@@ -218,7 +222,7 @@ public:
 	virtual bool canBeCast(Problem & problem) const = 0;
 	virtual bool canBeCastAt(Problem & problem, const Target & target) const = 0;
 
-	virtual void applyEffects(BattleStateProxy * battleState, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const = 0;
+	virtual void applyEffects(ServerBattleCb * battleState, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const = 0;
 
 	virtual void cast(const PacketSender * server, vstd::RNG & rng, const Target & target) = 0;
 
@@ -270,7 +274,7 @@ public:
 	//Global environment facade
 	virtual const CreatureService * creatureService() const = 0;
 	virtual const scripting::Service * scriptingService() const = 0;
-	virtual const SpellService * spellService() const = 0;
+	virtual const Service * spellService() const = 0;
 
 	virtual const IGameInfoCallback * game() const = 0;
 	virtual const CBattleInfoCallback * battle() const = 0;
@@ -326,7 +330,7 @@ public:
 
 	const CreatureService * creatureService() const override;
 	const scripting::Service * scriptingService() const override;
-	const SpellService * spellService() const override;
+	const Service * spellService() const override;
 
 	const IGameInfoCallback * game() const override;
 	const CBattleInfoCallback * battle() const override;

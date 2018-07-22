@@ -9,9 +9,10 @@
  */
 #pragma once
 
+#include <vcmi/spells/Magic.h>
+
 #include "CObjectHandler.h"
 #include "CArmedInstance.h"
-#include "../spells/Magic.h"
 
 #include "../CArtHandler.h" // For CArtifactSet
 #include "../CRandomGenerator.h"

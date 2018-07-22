@@ -20,7 +20,7 @@ Registry::Registry() = default;
 
 Registry * Registry::get()
 {
-	static std::unique_ptr<Registry> Instance = make_unique<Registry>();
+	static std::unique_ptr<Registry> Instance = std::unique_ptr<Registry>(new Registry());
 	return Instance.get();
 }
 
@@ -37,6 +37,46 @@ const Registar * Registry::find(const std::string & name) const
 	else
 		return iter->second.get();
 }
+
+TypeRegistry::TypeRegistry()
+	: nextIndex(0)
+{
+
+}
+
+TypeRegistry * TypeRegistry::get()
+{
+	static std::unique_ptr<TypeRegistry> Instance = std::unique_ptr<TypeRegistry>(new TypeRegistry());
+	return Instance.get();
+}
+
+const char * TypeRegistry::getKeyForType(const std::type_info & type)
+{
+	std::type_index typeIndex(type);
+
+	boost::unique_lock<boost::mutex> lock(mutex);
+
+	auto iter = keys.find(typeIndex);
+
+	if(iter == std::end(keys))
+	{
+		//there is no guarantee that name is unique, but it is at least somewhat human readable
+		//TODO: consider demangle
+		std::string newKey = type.name();
+		newKey += "_";
+		newKey += std::to_string(nextIndex++);
+
+		keys[typeIndex] = std::move(newKey);
+
+		return keys[typeIndex].c_str();
+	}
+	else
+	{
+		return iter->second.c_str();
+	}
+
+}
+
 
 }
 }

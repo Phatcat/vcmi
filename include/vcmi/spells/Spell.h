@@ -1,5 +1,5 @@
 /*
- * Spell.h, part of VCMI engine
+ * spells/Spell.h, part of VCMI engine
  *
  * Authors: listed in file AUTHORS in main folder
  *

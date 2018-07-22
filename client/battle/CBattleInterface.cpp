@@ -411,7 +411,6 @@ CBattleInterface::CBattleInterface(const CCreatureSet *army1, const CCreatureSet
 	};
 
 	CCS->soundh->setCallback(channel, onIntroPlayed);
-	memset(stackCountOutsideHexes, 1, GameConstants::BFIELD_SIZE *sizeof(bool)); //initialize array with trues
 
 	currentAction = INVALID;
 	selectedAction = INVALID;
@@ -1367,9 +1366,6 @@ void CBattleInterface::spellCast(const BattleSpellCast * sc)
 		if(stack)
 			displayEffect(elem.effect, stack->getPosition());
 	}
-
-	//displaying message in console
-	displayBattleLog(sc->battleLog);
 
 	waitForAnims();
 	//mana absorption
@@ -3703,7 +3699,17 @@ void CBattleInterface::redrawBackgroundWithHexes(const CStack *activeStack)
 	attackableHexes.clear();
 	if (activeStack)
 		occupyableHexes = curInt->cb->battleGetAvailableHexes(activeStack, true, &attackableHexes);
-	curInt->cb->battleGetStackCountOutsideHexes(stackCountOutsideHexes);
+
+	auto fillStackCountOutsideHexes = [&]()
+	{
+		auto accessibility = curInt->cb->getAccesibility();
+
+		for(int i = 0; i < accessibility.size(); i++)
+			stackCountOutsideHexes.at(i) = (accessibility[i] == EAccessibility::ACCESSIBLE);
+	};
+
+	fillStackCountOutsideHexes();
+
 	//prepare background graphic with hexes and shaded hexes
 	blitAt(background, 0, 0, backgroundWithHexes);
 

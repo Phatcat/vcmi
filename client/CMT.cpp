@@ -14,6 +14,8 @@
 
 #include <boost/program_options.hpp>
 
+#include <vcmi/scripting/Service.h>
+
 #include "gui/SDL_Extensions.h"
 #include "CGameInfo.h"
 #include "mapHandler.h"
@@ -48,7 +50,6 @@
 #include "../lib/CModHandler.h"
 #include "../lib/CTownHandler.h"
 #include "../lib/CArtHandler.h"
-#include "../lib/ScriptingService.h"
 #include "../lib/GameConstants.h"
 #include "gui/CGuiHandler.h"
 #include "../lib/logging/CBasicLogConfigurator.h"

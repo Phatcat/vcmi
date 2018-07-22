@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "ScriptingService.h"
+#include <vcmi/scripting/Service.h>
 #include "IHandlerBase.h"
 #include "JsonNode.h"
 
@@ -49,6 +49,8 @@ public:
 	ScriptImpl(const ScriptHandler * owner_);
 	virtual ~ScriptImpl();
 
+	void compile();
+
 	void serializeJson(JsonSerializeFormat & handler);
 	void serializeJsonState(JsonSerializeFormat & handler);
 
@@ -70,11 +72,16 @@ public:
 	PoolImpl(const GameCb * gameCb_, const BattleCb * battleCb_);
 	std::shared_ptr<Context> getContext(const Script * script) override;
 
+	const Services * services() const override;
 	const BattleCb * battle() const override;
 	const GameCb * game() const override;
 	::vstd::CLoggerBase * logger() const override;
+
+	void serializeState(const bool saving, JsonNode & data) override;
 private:
 	std::map<const Script *, std::shared_ptr<Context>> cache;
+
+	JsonNode state;
 
 	const GameCb * gameCb;
 	const BattleCb * battleCb;

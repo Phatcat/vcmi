@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../../../lib/ScriptingService.h"
+#include <vcmi/scripting/Service.h>
 
 namespace scripting
 {
@@ -19,7 +19,7 @@ class PoolMock : public Pool
 {
 public:
 	MOCK_METHOD1(getContext, std::shared_ptr<Context>(const Script *));
-
+	MOCK_METHOD2(serializeState, void(const bool, JsonNode &));
 };
 
 }

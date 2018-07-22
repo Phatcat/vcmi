@@ -1556,6 +1556,8 @@ void CGameHandler::init(StartInfo *si)
 	{
 		states.addPlayer(elem.first);
 	}
+
+	serverScripts.reset(new scripting::PoolImpl(this, this));
 }
 
 static bool evntCmp(const CMapEvent &a, const CMapEvent &b)
@@ -1934,8 +1936,6 @@ void CGameHandler::newTurn()
 void CGameHandler::run(bool resume)
 {
 	LOG_TRACE_PARAMS(logGlobal, "resume=%d", resume);
-
-	serverScripts.reset(new scripting::PoolImpl(this, this));
 
 	using namespace boost::posix_time;
 	for (auto cc : lobby->connections)
@@ -2750,7 +2750,7 @@ void CGameHandler::sendAndApply(NewStructures * pack)
 
 void CGameHandler::save(const std::string & filename)
 {
-	logGlobal->info("Loading from %s", filename);
+	logGlobal->info("Saving to %s", filename);
 	const auto stem	= FileInfo::GetPathStem(filename);
 	const auto savefname = stem.to_string() + ".vsgm1";
 	CResourceHandler::get("local")->createResource(savefname);
@@ -2781,6 +2781,8 @@ void CGameHandler::load(const std::string & filename)
 {
 	logGlobal->info("Loading from %s", filename);
 	const auto stem	= FileInfo::GetPathStem(filename);
+
+	serverScripts.reset(new scripting::PoolImpl(this, this));
 
 	try
 	{
@@ -3956,13 +3958,6 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 
 			int difference = defence.totalValue() - oldDefenceValue;
 
-			MetaString text;
-			stack->addText(text, MetaString::GENERAL_TXT, 120);
-			stack->addNameReplacement(text);
-			text.addReplacement(difference);
-
-			sse.battleLog.push_back(text);
-
 			std::vector<Bonus> buffer;
 			buffer.push_back(bonus1);
 			buffer.push_back(bonus2);
@@ -3970,6 +3965,16 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 			sse.toUpdate.push_back(std::make_pair(ba.stackNumber, buffer));
 			sendAndApply(&sse);
 
+			BattleLogMessage message;
+
+			MetaString text;
+			stack->addText(text, MetaString::GENERAL_TXT, 120);
+			stack->addNameReplacement(text);
+			text.addReplacement(difference);
+
+			message.lines.push_back(text);
+
+			sendAndApply(&message);
 			//don't break - we share code with next case
 		}
 		FALLTHROUGH

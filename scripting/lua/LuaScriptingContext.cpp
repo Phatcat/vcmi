@@ -13,9 +13,15 @@
 
 #include <vstd/StringUtils.h>
 
+#include "LuaStack.h"
+
 #include "api/Registry.h"
 
+#include "api/GameCb.h"
+#include "api/BattleCb.h"
+
 #include "api/ServerCb.h"
+#include "api/BattleServerCb.h"
 
 #include "../../lib/JsonNode.h"
 #include "../../lib/NetPacks.h"
@@ -24,6 +30,8 @@
 namespace scripting
 {
 
+const std::string LuaContext::STATE_FIELD = "DATA";
+
 LuaContext::LuaContext(vstd::CLoggerBase * logger_, const Script * source)
 	: ContextBase(logger_),
 	script(source)
@@ -31,15 +39,27 @@ LuaContext::LuaContext(vstd::CLoggerBase * logger_, const Script * source)
 	L = luaL_newstate();
 
 	luaopen_base(L);
+	popAll();
 
 	luaopen_math(L);
+	popAll();
+
 	luaopen_string(L);
+	popAll();
+
 	luaopen_table(L);
+	popAll();
+
 	luaopen_bit(L);
+	popAll();
 
 	cleanupGlobals();
 
 	registerCore();
+
+	int top = lua_gettop(L);
+	if(top != 0)
+		logger->error("Lua stack at %s unbalanced: %d", BOOST_CURRENT_FUNCTION, top);
 }
 
 LuaContext::~LuaContext()
@@ -75,10 +95,23 @@ void LuaContext::cleanupGlobals()
 	//math.randomseed
 }
 
-void LuaContext::init(const IGameInfoCallback * cb, const CBattleInfoCallback * battleCb)
+void LuaContext::init(const GameCb * cb, const BattleCb * battleCb)
 {
 	icb = cb;
 	bicb = battleCb;
+
+	LuaStack S(L);
+
+	S.push(icb);
+	lua_setglobal(L, "GAME");
+
+	S.push(bicb);
+	lua_setglobal(L, "BATTLE");
+}
+
+void LuaContext::run(const JsonNode & initialState)
+{
+	setGlobal(STATE_FIELD, initialState);
 
 	int ret = luaL_loadbuffer(L, script->getSource().c_str(), script->getSource().size(), script->getName().c_str());
 
@@ -95,15 +128,7 @@ void LuaContext::init(const IGameInfoCallback * cb, const CBattleInfoCallback * 
 	{
 		logger->error("Script '%s' failed to run, error: %s", script->getName(), toStringRaw(-1));
 		popAll();
-		return;
 	}
-}
-
-void LuaContext::error(const std::string & message)
-{
-	//do not log here
-	push(message);
-	lua_error(L);
 }
 
 int LuaContext::errorRetVoid(const std::string & message)
@@ -124,19 +149,17 @@ JsonNode LuaContext::callGlobal(const std::string & name, const JsonNode & param
 
 		logger->error(fmt.str());
 
-		return JsonUtils::stringNode(fmt.str());
+		popAll();
+
+		return JsonNode();
 	}
 
 	int argc = parameters.Vector().size();
 
-	if(argc)
+	for(int idx = 0; idx < argc; idx++)
 	{
-		for(int idx = 0; idx < parameters.Vector().size(); idx++)
-		{
-			push(parameters.Vector()[idx]);
-		}
+		push(parameters.Vector()[idx]);
 	}
-
 
 	if(lua_pcall(L, argc, 1, 0))
 	{
@@ -147,7 +170,9 @@ JsonNode LuaContext::callGlobal(const std::string & name, const JsonNode & param
 
 		logger->error(fmt.str());
 
-		return JsonUtils::stringNode(fmt.str());
+		popAll();
+
+		return JsonNode();
 	}
 
 	JsonNode ret;
@@ -159,12 +184,13 @@ JsonNode LuaContext::callGlobal(const std::string & name, const JsonNode & param
 
 JsonNode LuaContext::callGlobal(ServerCb * cb, const std::string & name, const JsonNode & parameters)
 {
-	push(cb);
+	LuaStack S(L);
+	S.push(cb);
 	lua_setglobal(L, "SERVER");
 
 	auto ret = callGlobal(name, parameters);
 
-	lua_pushnil(L);
+	S.pushNil();
 	lua_setglobal(L, "SERVER");
 
 	return ret;
@@ -172,13 +198,65 @@ JsonNode LuaContext::callGlobal(ServerCb * cb, const std::string & name, const J
 
 JsonNode LuaContext::callGlobal(ServerBattleCb * cb, const std::string & name, const JsonNode & parameters)
 {
-	bacb = cb;
+	LuaStack S(L);
+	S.push(cb);
+	lua_setglobal(L, "BATTLESERVER");
 
 	auto ret = callGlobal(name, parameters);
 
-	bacb = nullptr;
+	S.pushNil();
+	lua_setglobal(L, "BATTLESERVER");
 
 	return ret;
+}
+
+void LuaContext::getGlobal(const std::string & name, int & value)
+{
+	LuaStack S(L);
+
+	lua_getglobal(L, name.c_str());
+
+	lua_Integer temp;
+	if(S.tryGetInteger(-1, temp))
+		value = static_cast<int>(temp);
+	else
+		value = 0;
+	S.balance();
+}
+
+void LuaContext::getGlobal(const std::string & name, std::string & value)
+{
+	LuaStack S(L);
+
+	lua_getglobal(L, name.c_str());
+
+	if(!S.tryGet(-1, value))
+		value.clear();
+
+	S.balance();
+}
+
+void LuaContext::getGlobal(const std::string & name, double & value)
+{
+	LuaStack S(L);
+
+	lua_getglobal(L, name.c_str());
+
+	if(!S.tryGet(-1, value))
+		value = 0.0;
+
+	S.balance();
+}
+
+void LuaContext::getGlobal(const std::string & name, JsonNode & value)
+{
+	LuaStack S(L);
+
+	lua_getglobal(L, name.c_str());
+
+	pop(value);
+
+	S.balance();
 }
 
 void LuaContext::setGlobal(const std::string & name, int value)
@@ -197,6 +275,21 @@ void LuaContext::setGlobal(const std::string & name, double value)
 {
 	lua_pushnumber(L, value);
 	lua_setglobal(L, name.c_str());
+}
+
+void LuaContext::setGlobal(const std::string & name, const JsonNode & value)
+{
+	LuaStack S(L);
+	push(value);
+	lua_setglobal(L, name.c_str());
+	S.balance();
+}
+
+JsonNode LuaContext::saveState()
+{
+	JsonNode data;
+	getGlobal(STATE_FIELD, data);
+	return std::move(data);
 }
 
 void LuaContext::push(const JsonNode & value)
@@ -221,7 +314,6 @@ void LuaContext::push(const JsonNode & value)
 	case JsonNode::JsonType::DATA_STRUCT:
 		{
 			lua_newtable(L);
-
 			for(auto & keyValue : value.Struct())
 			{
 				lua_pushlstring(L, keyValue.first.c_str(), keyValue.first.size());
@@ -241,9 +333,7 @@ void LuaContext::push(const JsonNode & value)
             for(int idx = 0; idx < value.Vector().size(); idx++)
 			{
 				lua_pushinteger(L, idx + 1);
-
 				push(value.Vector()[idx]);
-
 				lua_settable(L, -3);
 			}
 		}
@@ -271,8 +361,47 @@ void LuaContext::pop(JsonNode & value)
 		value.String() = toStringRaw(-1);
 		break;
 	case LUA_TTABLE:
-		value.clear(); //TODO:
-		error("Not implemented");
+		{
+			JsonNode asVector(JsonNode::JsonType::DATA_VECTOR);
+			JsonNode asStruct(JsonNode::JsonType::DATA_STRUCT);
+
+			lua_pushnil(L);  /* first key */
+
+			while(lua_next(L, -2) != 0)
+			{
+				/* 'key' (at index -2) and 'value' (at index -1) */
+
+				JsonNode fieldValue;
+				pop(fieldValue);
+
+				if(lua_type(L, -1) == LUA_TNUMBER)
+				{
+					auto key = lua_tointeger(L, -1);
+
+					if(key > 0)
+					{
+						if(asVector.Vector().size() < key)
+							asVector.Vector().resize(key);
+						--key;
+						asVector.Vector().at(key) = fieldValue;
+					}
+				}
+				else if(lua_isstring(L, -1))
+				{
+					auto key = toStringRaw(-1);
+					asStruct[key] = fieldValue;
+				}
+			}
+
+			if(!asVector.Vector().empty())
+			{
+				std::swap(value, asVector);
+			}
+			else
+			{
+				std::swap(value, asStruct);
+			}
+		}
 		break;
 	default:
 		value.clear();
@@ -293,11 +422,6 @@ void LuaContext::push(lua_CFunction f, void * opaque)
 	lua_pushcclosure(L, f, 1);
 }
 
-void LuaContext::push(ServerCb * cb)
-{
-	api::ServerCbProxy::Wrapper::push(L, cb);
-}
-
 void LuaContext::popAll()
 {
 	lua_settop(L, 0);
@@ -315,7 +439,17 @@ void LuaContext::registerCore()
 	push(&LuaContext::require, this);
 	lua_setglobal(L, "require");
 
-	api::ServerCbProxy::Wrapper::registrator(L);
+	api::ServerCbProxy::registrator(L, api::TypeRegistry::get());
+	lua_settop(L, 0);
+
+	api::BattleServerCbProxy::registrator(L, api::TypeRegistry::get());
+	lua_settop(L, 0);
+
+	api::GameCbProxy::registrator(L, api::TypeRegistry::get());
+	lua_settop(L, 0);
+
+	api::BattleCbProxy::registrator(L, api::TypeRegistry::get());
+	lua_settop(L, 0);
 }
 
 int LuaContext::require(lua_State * L)
@@ -372,7 +506,7 @@ int LuaContext::loadModule()
 			return errorRetVoid("Module not found: "+modulePath);
 		}
 
-		registar->perform(L);
+		registar->perform(L, api::TypeRegistry::get());
 	}
 	else if(scope == "core")
 	{
@@ -420,11 +554,14 @@ int LuaContext::loadModule()
 int LuaContext::print(lua_State * L)
 {
 	//TODO:
+	lua_settop(L, 0);
+	return 0;
 }
 
 int LuaContext::printImpl()
 {
 	//TODO:
+	return 0;
 }
 
 

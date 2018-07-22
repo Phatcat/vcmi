@@ -171,8 +171,20 @@ set(lib_HEADERS
 		../include/vstd/ContainerUtils.h
 		../include/vstd/RNG.h
 		../include/vstd/StringUtils.h
+
 		StdInc.h
 		../Global.h
+
+		../include/vcmi/scripting/Service.h
+		../include/vcmi/spells/Magic.h
+		../include/vcmi/spells/Service.h
+		../include/vcmi/spells/Spell.h
+
+		../include/vcmi/Artifact.h
+		../include/vcmi/ArtifactService.h
+		../include/vcmi/Creature.h
+		../include/vcmi/CreatureService.h
+		../include/vcmi/Services.h
 
 		battle/AccessibilityInfo.h
 		battle/BattleAction.h
@@ -188,6 +200,7 @@ set(lib_HEADERS
 		battle/CUnitState.h
 		battle/Destination.h
 		battle/IBattleEventRealizer.h
+		battle/IBattleInfoCallback.h
 		battle/IBattleState.h
 		battle/IUnitInfo.h
 		battle/ReachabilityInfo.h
@@ -275,7 +288,6 @@ set(lib_HEADERS
 		spells/BonusCaster.h
 		spells/CSpellHandler.h
 		spells/ISpellMechanics.h
-		spells/Magic.h
 		spells/Problem.h
 		spells/ProxyCaster.h
 		spells/TargetCondition.h
@@ -344,7 +356,6 @@ set(lib_HEADERS
 		PathfinderUtil.h
 		ResourceSet.h
 		ScriptHandler.h
-		ScriptingService.h
 		ScopeGuard.h
 		StartInfo.h
 		StringConstants.h

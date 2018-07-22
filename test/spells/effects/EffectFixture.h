@@ -27,6 +27,7 @@
 #include "../../mock/mock_battle_Unit.h"
 #include "../../mock/mock_vstd_RNG.h"
 #include "../../mock/mock_scripting_Pool.h"
+#include "../../mock/BattleFake.h"
 
 
 #include "../../../lib/JsonNode.h"
@@ -51,45 +52,6 @@ using namespace ::scripting;
 class EffectFixture
 {
 public:
-	class UnitFake : public UnitMock
-	{
-	public:
-		void addNewBonus(const std::shared_ptr<Bonus> & b);
-
-		void makeAlive();
-		void makeDead();
-
-		void redirectBonusesToFake();
-
-		void expectAnyBonusSystemCall();
-
-	private:
-		BonusBearerMock bonusFake;
-	};
-
-	class UnitsFake
-	{
-	public:
-		std::vector<std::shared_ptr<UnitFake>> allUnits;
-
-		UnitFake & add(ui8 side);
-
-		battle::Units getUnitsIf(battle::UnitFilter predicate) const;
-
-		void setDefaultBonusExpectations();
-	};
-
-	class BattleFake : public CBattleInfoCallback, public BattleStateMock
-	{
-		std::shared_ptr<PoolMock> pool;
-	public:
-		BattleFake(std::shared_ptr<PoolMock> pool_);
-
-		void setUp();
-
-		scripting::Pool * getContextPool() const override;
-	};
-
 	std::shared_ptr<Effect> subject;
 	ProblemMock problemMock;
 	StrictMock<MechanicsMock> mechanicsMock;
@@ -100,10 +62,10 @@ public:
 	StrictMock<IGameInfoCallbackMock> gameMock;
 	vstd::RNGMock rngMock;
 
-	UnitsFake unitsFake;
+	battle::UnitsFake unitsFake;
 
 	std::shared_ptr<PoolMock> pool;
-	std::shared_ptr<BattleFake> battleFake;
+	std::shared_ptr<battle::BattleFake> battleFake;
 
 	std::shared_ptr<BattleStateProxy> battleProxy;
 
@@ -116,8 +78,6 @@ public:
 	void setupEffect(Registry * registry, const JsonNode & effectConfig);
 
 	void setupDefaultRNG();
-
-	void setupEmptyBattlefield();
 
 protected:
 	void setUp();

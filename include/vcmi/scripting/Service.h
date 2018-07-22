@@ -1,5 +1,5 @@
 /*
- * ScriptingService.h, part of VCMI engine
+ * scripting/Service.h, part of VCMI engine
  *
  * Authors: listed in file AUTHORS in main folder
  *
@@ -15,12 +15,12 @@ class JsonNode;
 class IGameInfoCallback;
 class IGameEventRealizer;
 class IBattleEventRealizer;
-class CBattleInfoCallback;
+class IBattleInfoCallback;
 
 namespace scripting
 {
 
-using BattleCb = ::CBattleInfoCallback;
+using BattleCb = ::IBattleInfoCallback;
 using GameCb = ::IGameInfoCallback;
 using ServerCb = ::IGameEventRealizer;
 using ServerBattleCb = ::IBattleEventRealizer;
@@ -30,6 +30,7 @@ class DLL_LINKAGE Environment
 public:
 	virtual ~Environment() = default;
 
+	virtual const Services * services() const = 0;
 	virtual const BattleCb * battle() const = 0;
 	virtual const GameCb * game() const = 0;
 	virtual ::vstd::CLoggerBase * logger() const = 0;
@@ -40,6 +41,8 @@ class DLL_LINKAGE Context
 public:
 	virtual ~Context() = default;
 
+	virtual void run(const JsonNode & initialState) = 0;
+
 	virtual JsonNode callGlobal(const std::string & name, const JsonNode & parameters) = 0;
 	virtual JsonNode callGlobal(ServerCb * cb, const std::string & name, const JsonNode & parameters) = 0;
 	virtual JsonNode callGlobal(ServerBattleCb * cb, const std::string & name, const JsonNode & parameters) = 0;
@@ -47,6 +50,14 @@ public:
 	virtual void setGlobal(const std::string & name, int value) = 0;
 	virtual void setGlobal(const std::string & name, const std::string & value) = 0;
 	virtual void setGlobal(const std::string & name, double value) = 0;
+	virtual void setGlobal(const std::string & name, const JsonNode & value) = 0;
+
+	virtual void getGlobal(const std::string & name, int & value) = 0;
+	virtual void getGlobal(const std::string & name, std::string & value) = 0;
+	virtual void getGlobal(const std::string & name, double & value) = 0;
+	virtual void getGlobal(const std::string & name, JsonNode & value) = 0;
+
+	virtual JsonNode saveState() = 0;
 };
 
 class DLL_LINKAGE Script
@@ -73,8 +84,9 @@ class DLL_LINKAGE Pool
 public:
 	virtual ~Pool() = default;
 
-	virtual std::shared_ptr<Context> getContext(const Script * script) = 0;
+	virtual void serializeState(const bool saving, JsonNode & data) = 0;
 
+	virtual std::shared_ptr<Context> getContext(const Script * script) = 0;
 };
 
 }
