@@ -20,7 +20,6 @@
 #include "../../lib/spells/CSpellHandler.h"
 #include "../../lib/spells/ISpellMechanics.h"
 #include "../../lib/CStack.h"//todo: remove
-#include "../../lib/ScriptHandler.h"
 
 #define LOGL(text) print(text)
 #define LOGFL(text, formattingEl) print(boost::str(boost::format(text) % formattingEl))
@@ -124,9 +123,6 @@ BattleAction CBattleAI::activeStack( const CStack * stack )
 		//best action is from effective owner point if view, we are effective owner as we received "activeStack"
 
 		HypotheticBattle hb(getCbc());
-
-		scripting::PoolImpl pool(nullptr, &hb);
-        hb.pool = &pool;
 
 		PotentialTargets targets(stack, &hb);
 		if(targets.possibleAttacks.size())
@@ -404,9 +400,6 @@ void CBattleAI::attemptCastingSpell()
 
 		HypotheticBattle state(cb);
 
-		scripting::PoolImpl pool(nullptr, &state);
-		state.pool = &pool;
-
 		evaluateQueue(valueOfStack, turnOrder, &state, 0, &enemyHadTurn);
 
 		if(!enemyHadTurn)
@@ -424,9 +417,6 @@ void CBattleAI::attemptCastingSpell()
 	auto evaluateSpellcast = [&] (PossibleSpellcast * ps, std::shared_ptr<void>)
 	{
 		HypotheticBattle state(cb);
-
-		scripting::PoolImpl pool(nullptr, &state);
-		state.pool = &pool;
 
 		spells::BattleCast cast(&state, hero, spells::Mode::HERO, ps->spell);
 		cast.cast(&state, rngStub, ps->dest);

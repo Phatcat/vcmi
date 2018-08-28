@@ -69,13 +69,14 @@ private:
 class DLL_LINKAGE PoolImpl : public Pool, public Environment
 {
 public:
-	PoolImpl(const GameCb * gameCb_, const BattleCb * battleCb_);
+	PoolImpl(const GameCb * gameCb_, const BattleCb * battleCb_, events::EventBus * eventBus_);
 	std::shared_ptr<Context> getContext(const Script * script) override;
 
 	const Services * services() const override;
 	const BattleCb * battle() const override;
 	const GameCb * game() const override;
 	::vstd::CLoggerBase * logger() const override;
+	::events::EventBus * eventBus() const override;
 
 	void serializeState(const bool saving, JsonNode & data) override;
 private:
@@ -85,6 +86,7 @@ private:
 
 	const GameCb * gameCb;
 	const BattleCb * battleCb;
+	mutable events::EventBus * _eventBus;
 };
 
 class DLL_LINKAGE ScriptHandler : public ::IHandlerBase, public Service

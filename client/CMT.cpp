@@ -96,7 +96,7 @@ SDL_Surface *screen = nullptr, //main screen surface
 	*screen2 = nullptr, //and hlp surface (used to store not-active interfaces layer)
 	*screenBuf = screen; //points to screen (if only advmapint is present) or screen2 (else) - should be used when updating controls which are not regularly redrawed
 
-std::queue<SDL_Event> events;
+std::queue<SDL_Event> SDLEventsQueue;
 boost::mutex eventsM;
 
 static po::variables_map vm;
@@ -1321,7 +1321,7 @@ static void handleEvent(SDL_Event & ev)
 
 	{
 		boost::unique_lock<boost::mutex> lock(eventsM);
-		events.push(ev);
+		SDLEventsQueue.push(ev);
 	}
 
 }

@@ -10,31 +10,21 @@
 
 #pragma once
 
+#include <vcmi/Environment.h>
+
 class Services;
 class JsonNode;
-class IGameInfoCallback;
 class IGameEventRealizer;
 class IBattleEventRealizer;
-class IBattleInfoCallback;
 
 namespace scripting
 {
 
-using BattleCb = ::IBattleInfoCallback;
-using GameCb = ::IGameInfoCallback;
+using BattleCb = ::Environment::BattleCb;
+using GameCb = ::Environment::GameCb;
+
 using ServerCb = ::IGameEventRealizer;
 using ServerBattleCb = ::IBattleEventRealizer;
-
-class DLL_LINKAGE Environment
-{
-public:
-	virtual ~Environment() = default;
-
-	virtual const Services * services() const = 0;
-	virtual const BattleCb * battle() const = 0;
-	virtual const GameCb * game() const = 0;
-	virtual ::vstd::CLoggerBase * logger() const = 0;
-};
 
 class DLL_LINKAGE Context
 {

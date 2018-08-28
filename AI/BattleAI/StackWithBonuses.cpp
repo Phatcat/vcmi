@@ -11,6 +11,8 @@
 #include "StackWithBonuses.h"
 #include "../../lib/NetPacksBase.h"
 #include "../../lib/CStack.h"
+#include "../../lib/ScriptHandler.h"
+#include "../../lib/events/EventBus.h"
 
 using scripting::Pool;
 
@@ -39,6 +41,8 @@ StackWithBonuses::StackWithBonuses(const HypotheticBattle * Owner, const CStack 
 	localInit(Owner);
 
 	battle::CUnitState::operator=(*Stack);
+
+
 }
 
 StackWithBonuses::StackWithBonuses(const HypotheticBattle * Owner, const battle::UnitInfo & info)
@@ -201,6 +205,9 @@ HypotheticBattle::HypotheticBattle(Subject realBattle)
 	activeUnitId = activeUnit ? activeUnit->unitId() : -1;
 
 	nextId = 0xF0000000;
+
+	eventBus.reset(new events::EventBus());
+	pool.reset(new scripting::PoolImpl(nullptr, this, eventBus.get()));
 }
 
 bool HypotheticBattle::unitHasAmmoCart(const battle::Unit * unit) const
@@ -395,6 +402,6 @@ int64_t HypotheticBattle::getTreeVersion() const
 
 Pool * HypotheticBattle::getContextPool() const
 {
-	return pool;
+	return pool.get();
 }
 

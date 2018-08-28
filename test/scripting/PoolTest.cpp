@@ -38,7 +38,7 @@ public:
 protected:
 	void SetUp() override
 	{
-		subject = std::make_shared<PoolImpl>(nullptr, nullptr);//???
+		subject = std::make_shared<PoolImpl>(nullptr, nullptr, nullptr);//???
 	}
 };
 

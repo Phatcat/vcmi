@@ -131,7 +131,11 @@
 		<Unit filename="../include/vcmi/ArtifactService.h" />
 		<Unit filename="../include/vcmi/Creature.h" />
 		<Unit filename="../include/vcmi/CreatureService.h" />
+		<Unit filename="../include/vcmi/Environment.h" />
 		<Unit filename="../include/vcmi/Services.h" />
+		<Unit filename="../include/vcmi/events/ApplyDamage.h" />
+		<Unit filename="../include/vcmi/events/Event.h" />
+		<Unit filename="../include/vcmi/events/SubscriptionRegistry.h" />
 		<Unit filename="../include/vcmi/scripting/Service.h" />
 		<Unit filename="../include/vcmi/spells/Magic.h" />
 		<Unit filename="../include/vcmi/spells/Service.h" />
@@ -231,6 +235,7 @@
 		<Unit filename="VCMIDirs.h" />
 		<Unit filename="VCMI_Lib.cpp" />
 		<Unit filename="VCMI_Lib.h" />
+		<Unit filename="abilities/Ability.h" />
 		<Unit filename="battle/AccessibilityInfo.cpp" />
 		<Unit filename="battle/AccessibilityInfo.h" />
 		<Unit filename="battle/BattleAction.cpp" />
@@ -270,6 +275,8 @@
 		<Unit filename="battle/SiegeInfo.h" />
 		<Unit filename="battle/Unit.cpp" />
 		<Unit filename="battle/Unit.h" />
+		<Unit filename="events/ApplyDamage.cpp" />
+		<Unit filename="events/EventBus.h" />
 		<Unit filename="filesystem/AdapterLoaders.cpp" />
 		<Unit filename="filesystem/AdapterLoaders.h" />
 		<Unit filename="filesystem/CArchiveLoader.cpp" />

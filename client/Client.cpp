@@ -49,6 +49,7 @@
 #include "CMT.h"
 #include "CServerHandler.h"
 #include "../lib/ScriptHandler.h"
+#include "../lib/events/EventBus.h"
 
 #ifdef VCMI_ANDROID
 #include "lib/CAndroidVMHelper.h"
@@ -128,7 +129,8 @@ void CClient::newGame()
 	initMapHandler();
 
 	scriptsBattleCallback.reset(new CBattleCallback(boost::none, this));
-	clientScripts.reset(new scripting::PoolImpl(this, scriptsBattleCallback.get()));
+	clientEventBus = make_unique<events::EventBus>();
+	clientScripts.reset(new scripting::PoolImpl(this, scriptsBattleCallback.get(), clientEventBus.get()));
 
 	initPlayerInterfaces();
 }
@@ -176,7 +178,8 @@ void CClient::loadGame()
 	initMapHandler();
 
 	scriptsBattleCallback.reset(new CBattleCallback(boost::none, this));
-	clientScripts.reset(new scripting::PoolImpl(this, scriptsBattleCallback.get()));
+	clientEventBus = make_unique<events::EventBus>();
+	clientScripts.reset(new scripting::PoolImpl(this, scriptsBattleCallback.get(), clientEventBus.get()));
 
 	serialize(loader->serializer, loader->serializer.fileVersion);
 

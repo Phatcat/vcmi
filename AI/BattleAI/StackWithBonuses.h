@@ -15,6 +15,11 @@
 class HypotheticBattle;
 class CStack;
 
+namespace events
+{
+	class EventBus;
+}
+
 class StackWithBonuses : public battle::CUnitState, public virtual IBonusBearer
 {
 public:
@@ -72,8 +77,6 @@ class HypotheticBattle : public BattleProxy, public battle::IUnitEnvironment
 public:
 	std::map<uint32_t, std::shared_ptr<StackWithBonuses>> stackStates;
 
-	mutable scripting::Pool * pool;
-
 	HypotheticBattle(Subject realBattle);
 
 	bool unitHasAmmoCart(const battle::Unit * unit) const override;
@@ -114,4 +117,6 @@ private:
 	int32_t activeUnitId;
 	mutable uint32_t nextId;
 
+	mutable std::shared_ptr<scripting::Pool> pool;
+	mutable std::shared_ptr<events::EventBus> eventBus;
 };

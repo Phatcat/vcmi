@@ -23,7 +23,7 @@
 #include "../mock/mock_IGameInfoCallback.h"
 #include "../mock/mock_battle_IBattleState.h"
 #include "../mock/mock_scripting_Pool.h"
-#include "../mock/mock_scripting_Environment.h"
+#include "../mock/mock_Environment.h"
 #include "../mock/mock_vstd_CLoggerBase.h"
 #include "../mock/BattleFake.h"
 

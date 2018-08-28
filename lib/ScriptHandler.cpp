@@ -123,9 +123,10 @@ void ScriptImpl::resolveHost()
 		throw std::runtime_error("Unknown script language in:"+sourcePath);
 }
 
-PoolImpl::PoolImpl(const GameCb * gameCb_, const BattleCb * battleCb_)
+PoolImpl::PoolImpl(const GameCb * gameCb_, const BattleCb * battleCb_, events::EventBus * eventBus_)
 	: gameCb(gameCb_),
-	battleCb(battleCb_)
+	battleCb(battleCb_),
+	_eventBus(eventBus_)
 {
 
 }
@@ -170,6 +171,11 @@ const BattleCb * PoolImpl::battle() const
 ::vstd::CLoggerBase * PoolImpl::logger() const
 {
 	return logMod;
+}
+
+::events::EventBus * PoolImpl::eventBus() const
+{
+    return _eventBus;
 }
 
 void PoolImpl::serializeState(const bool saving, JsonNode & data)

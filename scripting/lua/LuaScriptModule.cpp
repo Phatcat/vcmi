@@ -42,7 +42,7 @@ std::string LuaScriptModule::compile(const std::string & name, const std::string
 	return source;
 }
 
-std::shared_ptr<ContextBase> LuaScriptModule::createContextFor(const Script * source, const scripting::Environment * env) const
+std::shared_ptr<ContextBase> LuaScriptModule::createContextFor(const Script * source, const Environment * env) const
 {
 	auto ret = std::make_shared<LuaContext>(env->logger(), source);
 	ret->init(env->game(), env->battle());

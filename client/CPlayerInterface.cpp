@@ -82,7 +82,7 @@ using namespace CSDL_Ext;
 
 void processCommand(const std::string &message, CClient *&client);
 
-extern std::queue<SDL_Event> events;
+extern std::queue<SDL_Event> SDLEventsQueue;
 extern boost::mutex eventsM;
 boost::recursive_mutex * CPlayerInterface::pim = new boost::recursive_mutex;
 
@@ -377,10 +377,10 @@ void CPlayerInterface::heroMoved(const TryMoveHero & details)
 	//check if user cancelled movement
 	{
 		boost::unique_lock<boost::mutex> un(eventsM);
-		while(!events.empty())
+		while(!SDLEventsQueue.empty())
 		{
-			SDL_Event ev = events.front();
-			events.pop();
+			SDL_Event ev = SDLEventsQueue.front();
+			SDLEventsQueue.pop();
 			switch(ev.type)
 			{
 			case SDL_MOUSEBUTTONDOWN:
@@ -2619,9 +2619,9 @@ bool CPlayerInterface::capturedAllEvents()
 	if (ignoreEvents)
 	{
 		boost::unique_lock<boost::mutex> un(eventsM);
-		while(!events.empty())
+		while(!SDLEventsQueue.empty())
 		{
-			events.pop();
+			SDLEventsQueue.pop();
 		}
 		return true;
 	}

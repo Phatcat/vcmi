@@ -43,7 +43,7 @@ std::string ERMScriptModule::compile(const std::string & name, const std::string
 	return interp->convert();
 }
 
-std::shared_ptr<scripting::ContextBase> ERMScriptModule::createContextFor(const scripting::Script * source, const scripting::Environment * env) const
+std::shared_ptr<scripting::ContextBase> ERMScriptModule::createContextFor(const scripting::Script * source, const Environment * env) const
 {
 	throw std::runtime_error("ERM context creation is not possible");
 }

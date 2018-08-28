@@ -41,6 +41,10 @@ namespace scripting
 	class PoolImpl;
 }
 
+namespace events
+{
+	class EventBus;
+}
 
 template<typename T>
 class ThreadSafeVector
@@ -220,4 +224,6 @@ private:
 
 	std::shared_ptr<CBattleCallback> scriptsBattleCallback;
 	std::shared_ptr<scripting::PoolImpl> clientScripts;
+
+	std::unique_ptr<events::EventBus> clientEventBus;
 };

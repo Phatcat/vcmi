@@ -324,7 +324,11 @@ public:
 	scripting::Pool * getGlobalContextPool() const override;
 	scripting::Pool * getContextPool() const override;
 private:
+	std::unique_ptr<events::EventBus> serverEventBus;
 	std::shared_ptr<scripting::PoolImpl> serverScripts;
+
+	void reinitScripting();
+
 	std::list<PlayerColor> generatePlayerTurnOrder() const;
 	void makeStackDoNothing(const CStack * next);
 	void getVictoryLossMessage(PlayerColor player, const EVictoryLossCheckResult & victoryLossCheckResult, InfoWindow & out) const;
