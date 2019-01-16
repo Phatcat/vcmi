@@ -1312,7 +1312,7 @@ void CGArtifact::initObj(CRandomGenerator & rand)
 
 std::string CGArtifact::getObjectName() const
 {
-	return VLC->arth->artifacts[subID]->Name();
+	return VLC->arth->artifacts[subID]->getName();
 }
 
 void CGArtifact::onHeroVisit(const CGHeroInstance * h) const
@@ -1330,7 +1330,7 @@ void CGArtifact::onHeroVisit(const CGHeroInstance * h) const
 					iw.text << message;
 				else
 				{
-					if(VLC->arth->artifacts[subID]->EventText().size())
+					if(VLC->arth->artifacts[subID]->getEventText().size())
 						iw.text << std::pair<ui8, ui32>(MetaString::ART_EVNTS, subID);
 					else //fix for mod artifacts with no event text
 					{

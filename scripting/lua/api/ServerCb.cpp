@@ -18,6 +18,8 @@ namespace scripting
 namespace api
 {
 
+VCMI_REGISTER_CORE_SCRIPT_API(ServerCbProxy);
+
 const std::vector<ServerCbProxy::RegType> ServerCbProxy::REGISTER =
 {
 	{

@@ -1438,8 +1438,8 @@ void CPlayerInterface::showGarrisonDialog( const CArmedInstance *up, const CGHer
  */
 void CPlayerInterface::showArtifactAssemblyDialog (ui32 artifactID, ui32 assembleTo, bool assemble, CFunctionList<bool()> onYes, CFunctionList<bool()> onNo)
 {
-	const CArtifact &artifact = *CGI->arth->artifacts[artifactID];
-	std::string text = artifact.Description();
+	const CArtifact & artifact = *CGI->arth->artifacts[artifactID];
+	std::string text = artifact.getDescription();
 	text += "\n\n";
 	std::vector<std::shared_ptr<CComponent>> scs;
 
@@ -1448,12 +1448,10 @@ void CPlayerInterface::showArtifactAssemblyDialog (ui32 artifactID, ui32 assembl
 		const CArtifact &assembledArtifact = *CGI->arth->artifacts[assembleTo];
 
 		// You possess all of the components to...
-		text += boost::str(boost::format(CGI->generaltexth->allTexts[732]) % assembledArtifact.Name());
+		text += boost::str(boost::format(CGI->generaltexth->allTexts[732]) % assembledArtifact.getName());
 
 		// Picture of assembled artifact at bottom.
-		auto sc = std::make_shared<CComponent>(CComponent::artifact, assembledArtifact.id, 0);
-		//sc->description = assembledArtifact.Description();
-		//sc->subtitle = assembledArtifact.Name();
+		auto sc = std::make_shared<CComponent>(CComponent::artifact, assembledArtifact.getIndex(), 0);
 		scs.push_back(sc);
 	}
 	else

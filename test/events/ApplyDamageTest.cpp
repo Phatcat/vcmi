@@ -9,26 +9,54 @@
  */
 #include "StdInc.h"
 
+#include <vcmi/events/EventBus.h>
 #include <vcmi/events/ApplyDamage.h>
 
-#include "../../lib/events/EventBus.h"
 #include "../../lib/NetPacks.h"
+
+#include "../mock/mock_Environment.h"
+#include "../mock/mock_battle_Unit.h"
 
 namespace test
 {
 using namespace ::testing;
 using namespace ::events;
 
+class ListenerMock
+{
+public:
+	MOCK_METHOD1(beforeEvent, void(ApplyDamage &));
+	MOCK_METHOD1(afterEvent, void(const ApplyDamage &));
+};
+
 class ApplyDamageTest : public Test
 {
 public:
+	EventBus eventBus;
+	ListenerMock listener;
+	StrictMock<EnvironmentMock> environmentMock;
 
-
+	std::shared_ptr<StrictMock<UnitMock>> targetMock;
+protected:
+	void SetUp() override
+	{
+		targetMock = std::make_shared<StrictMock<UnitMock>>();
+	}
 };
 
-TEST_F(ApplyDamageTest, First)
+TEST_F(ApplyDamageTest, Subscription)
 {
+	auto subscription1 = eventBus.subscribeBefore<ApplyDamage>(std::bind(&ListenerMock::beforeEvent, &listener, _1));
+	auto subscription2 = eventBus.subscribeAfter<ApplyDamage>(std::bind(&ListenerMock::afterEvent, &listener, _1));
 
+	EXPECT_CALL(listener, beforeEvent(_)).Times(1);
+	EXPECT_CALL(listener, afterEvent(_)).Times(1);
+
+	BattleStackAttacked pack;
+
+	ApplyDamage event(&environmentMock, &pack, targetMock);
+
+	eventBus.executeEvent(event);
 }
 
 }

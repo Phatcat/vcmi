@@ -49,7 +49,7 @@
 #include "CMT.h"
 #include "CServerHandler.h"
 #include "../lib/ScriptHandler.h"
-#include "../lib/events/EventBus.h"
+#include <vcmi/events/EventBus.h>
 
 #ifdef VCMI_ANDROID
 #include "lib/CAndroidVMHelper.h"

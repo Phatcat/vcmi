@@ -48,18 +48,38 @@
 	ART_POS(SHOULDERS)  \
 	ART_POS(HEAD)
 
-const std::string & CArtifact::Name() const
+int32_t CArtifact::getIndex() const
+{
+	return id.toEnum();
+}
+
+const std::string & CArtifact::getName() const
 {
 	return name;
 }
 
-const std::string & CArtifact::Description() const
+const std::string & CArtifact::getJsonKey() const
+{
+	return identifier;
+}
+
+ArtifactID CArtifact::getId() const
+{
+	return id;
+}
+
+const std::string & CArtifact::getDescription() const
 {
 	return description;
 }
-const std::string & CArtifact::EventText() const
+const std::string & CArtifact::getEventText() const
 {
 	return eventText;
+}
+
+CreatureID CArtifact::getWarMachine() const
+{
+	return warMachine;
 }
 
 bool CArtifact::isBig() const
@@ -117,7 +137,7 @@ int CArtifact::getArtClassSerial() const
 
 std::string CArtifact::nodeName() const
 {
-	return "Artifact: " + Name();
+	return "Artifact: " + getName();
 }
 
 void CArtifact::addNewBonus(const std::shared_ptr<Bonus>& b)
@@ -586,9 +606,9 @@ void CArtHandler::giveArtBonus(ArtifactID aid, std::shared_ptr<Bonus> bonus)
 {
 	bonus->sid = aid;
 	if(bonus->subtype == Bonus::MORALE || bonus->type == Bonus::LUCK)
-		bonus->description = artifacts[aid]->Name()  + (bonus->val > 0 ? " +" : " ") + boost::lexical_cast<std::string>(bonus->val);
+		bonus->description = artifacts[aid]->getName()  + (bonus->val > 0 ? " +" : " ") + boost::lexical_cast<std::string>(bonus->val);
 	else
-		bonus->description = artifacts[aid]->Name();
+		bonus->description = artifacts[aid]->getName();
 
 	artifacts[aid]->addNewBonus(bonus);
 }
@@ -684,11 +704,11 @@ void CArtHandler::erasePickedArt(ArtifactID id)
 			artifactList->erase(itr);
 		}
 		else
-			logMod->warn("Problem: cannot erase artifact %s from list, it was not present", art->Name());
+			logMod->warn("Problem: cannot erase artifact %s from list, it was not present", art->getName());
 
 	}
 	else
-		logMod->warn("Problem: cannot find list for artifact %s, strange class. (special?)", art->Name());
+		logMod->warn("Problem: cannot find list for artifact %s, strange class. (special?)", art->getName());
 }
 
 boost::optional<std::vector<CArtifact*>&> CArtHandler::listFromClass( CArtifact::EartClass artifactClass )
@@ -752,7 +772,7 @@ void CArtifactInstance::setType( CArtifact *Art )
 
 std::string CArtifactInstance::nodeName() const
 {
-	return "Artifact instance of " + (artType ? artType->Name() : std::string("uninitialized")) + " type";
+	return "Artifact instance of " + (artType ? artType->getName() : std::string("uninitialized")) + " type";
 }
 
 CArtifactInstance *CArtifactInstance::createScroll(SpellID sid)
@@ -773,9 +793,9 @@ void CArtifactInstance::init()
 std::string CArtifactInstance::getEffectiveDescription(
 	const CGHeroInstance *hero) const
 {
-	std::string text = artType->Description();
+	std::string text = artType->getDescription();
 	if (!vstd::contains(text, '{'))
-		text = '{' + artType->Name() + "}\n\n" + text; //workaround for new artifacts with single name, turns it to H3-style
+		text = '{' + artType->getName() + "}\n\n" + text; //workaround for new artifacts with single name, turns it to H3-style
 
 	if(artType->id == ArtifactID::SPELL_SCROLL)
 	{
@@ -796,11 +816,11 @@ std::string CArtifactInstance::getEffectiveDescription(
 		std::string artList;
 		auto combinedArt = artType->constituentOf[0];
 		text += "\n\n";
-		text += "{" + combinedArt->Name() + "}";
+		text += "{" + combinedArt->getName() + "}";
 		int wornArtifacts = 0;
 		for (auto a : *combinedArt->constituents) //TODO: can the artifact be a part of more than one set?
 		{
-			artList += "\n" + a->Name();
+			artList += "\n" + a->getName();
 			if (hero->hasArt(a->id, true))
 				wornArtifacts++;
 		}
@@ -855,7 +875,7 @@ bool CArtifactInstance::canBePutAt(const CArtifactSet *artSet, ArtifactPosition 
  	auto possibleSlots = artType->possibleSlots.find(artSet->bearerType());
  	if(possibleSlots == artType->possibleSlots.end())
  	{
-		logMod->warn("Warning: artifact %s doesn't have defined allowed slots for bearer of type %s", artType->Name(), artSet->bearerType());
+		logMod->warn("Warning: artifact %s doesn't have defined allowed slots for bearer of type %s", artType->getName(), artSet->bearerType());
 		return false;
 	}
 

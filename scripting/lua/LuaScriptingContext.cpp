@@ -17,12 +17,6 @@
 
 #include "api/Registry.h"
 
-#include "api/GameCb.h"
-#include "api/BattleCb.h"
-
-#include "api/ServerCb.h"
-#include "api/BattleServerCb.h"
-
 #include "../../lib/JsonNode.h"
 #include "../../lib/NetPacks.h"
 #include "../../lib/filesystem/Filesystem.h"
@@ -32,9 +26,10 @@ namespace scripting
 
 const std::string LuaContext::STATE_FIELD = "DATA";
 
-LuaContext::LuaContext(vstd::CLoggerBase * logger_, const Script * source)
-	: ContextBase(logger_),
-	script(source)
+LuaContext::LuaContext(const Script * source, const Environment * env_)
+	: ContextBase(env_->logger()),
+	script(source),
+	env(env_)
 {
 	L = luaL_newstate();
 
@@ -60,10 +55,30 @@ LuaContext::LuaContext(vstd::CLoggerBase * logger_, const Script * source)
 	int top = lua_gettop(L);
 	if(top != 0)
 		logger->error("Lua stack at %s unbalanced: %d", BOOST_CURRENT_FUNCTION, top);
+
+	popAll();
+
+	LuaStack S(L);
+
+	S.push(env->game());
+	lua_setglobal(L, "GAME");
+
+	S.push(env->battle());
+	lua_setglobal(L, "BATTLE");
+
+	S.push(env->eventBus());
+	lua_setglobal(L, "EVENT_BUS");
+	popAll();
+
+	lua_newtable(L);
+	modules = std::make_shared<LuaReference>(L);
+	popAll();
 }
 
 LuaContext::~LuaContext()
 {
+	modules.reset();
+	scriptClosure.reset();
 	lua_close(L);
 }
 
@@ -95,20 +110,6 @@ void LuaContext::cleanupGlobals()
 	//math.randomseed
 }
 
-void LuaContext::init(const GameCb * cb, const BattleCb * battleCb)
-{
-	icb = cb;
-	bicb = battleCb;
-
-	LuaStack S(L);
-
-	S.push(icb);
-	lua_setglobal(L, "GAME");
-
-	S.push(bicb);
-	lua_setglobal(L, "BATTLE");
-}
-
 void LuaContext::run(const JsonNode & initialState)
 {
 	setGlobal(STATE_FIELD, initialState);
@@ -121,6 +122,10 @@ void LuaContext::run(const JsonNode & initialState)
 		popAll();
 		return;
 	}
+
+	scriptClosure = std::make_shared<LuaReference>(L);
+	popAll();
+	scriptClosure->push();
 
 	ret = lua_pcall(L, 0, 0, 0);
 
@@ -165,7 +170,7 @@ JsonNode LuaContext::callGlobal(const std::string & name, const JsonNode & param
 	{
 		std::string error = lua_tostring(L, -1);
 
-		boost::format fmt("LUA function %s failed with message: %s");
+		boost::format fmt("Lua function %s failed with message: %s");
 		fmt % name % error;
 
 		logger->error(fmt.str());
@@ -439,17 +444,11 @@ void LuaContext::registerCore()
 	push(&LuaContext::require, this);
 	lua_setglobal(L, "require");
 
-	api::ServerCbProxy::registrator(L, api::TypeRegistry::get());
-	lua_settop(L, 0);
-
-	api::BattleServerCbProxy::registrator(L, api::TypeRegistry::get());
-	lua_settop(L, 0);
-
-	api::GameCbProxy::registrator(L, api::TypeRegistry::get());
-	lua_settop(L, 0);
-
-	api::BattleCbProxy::registrator(L, api::TypeRegistry::get());
-	lua_settop(L, 0);
+	for(auto & registar : api::Registry::get()->getCoreData())
+	{
+		registar->perform(L, api::TypeRegistry::get());
+		popAll();
+	}
 }
 
 int LuaContext::require(lua_State * L)
@@ -473,14 +472,28 @@ int LuaContext::loadModule()
 	if(argc < 1)
 		return errorRetVoid("Module name required");
 
+	//if module is loaded already, assume that module name is valid
+	modules->push();
+	lua_pushvalue(L, -2);
+	lua_rawget(L, -2);
+
+	if(lua_istable(L, -1))
+	{
+		lua_replace(L, 1);
+		lua_settop(L, 1);
+		return 1;
+	}
+
+	//continue with more checks
 	if(!lua_isstring(L, 1))
 		return errorRetVoid("Module name must be string");
 
 	std::string resourceName = toStringRaw(1);
-	popAll();
 
 	if(resourceName.empty())
 		return errorRetVoid("Module name is empty");
+
+	popAll();
 
 	auto temp = vstd::split(resourceName, ":");
 
@@ -522,7 +535,7 @@ int LuaContext::loadModule()
 		ResourceID id(modulePath, EResType::LUA);
 
 		if(!loader->existsResource(id))
-			return errorRetVoid("Module not found "+modulePath);
+			return errorRetVoid("Module not found: "+modulePath);
 
 		auto rawData = loader->load(id)->readAll();
 
@@ -533,12 +546,13 @@ int LuaContext::loadModule()
 		if(ret)
 			return errorRetVoid(toStringRaw(-1));
 
-		ret = lua_pcall(L, 0, LUA_MULTRET, 0);
+		ret = lua_pcall(L, 0, 1, 0);
 
 		if(ret)
 		{
 			logger->error("Module '%s' failed to run, error: %s", modulePath, toStringRaw(-1));
 			popAll();
+			return 0;
 		}
 	}
 	else
@@ -547,8 +561,12 @@ int LuaContext::loadModule()
 		return errorRetVoid("No access to scope "+scope);
 	}
 
+	modules->push();
+	lua_pushvalue(L, -2);
+	lua_rawset(L, -2);
 
-	return lua_gettop(L);
+	lua_settop(L, 1);
+	return 1;
 }
 
 int LuaContext::print(lua_State * L)

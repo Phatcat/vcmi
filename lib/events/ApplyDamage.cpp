@@ -10,28 +10,36 @@
 #include "StdInc.h"
 
 #include <vcmi/events/ApplyDamage.h>
+#include <vcmi/Environment.h>
 
 #include "../../lib/NetPacks.h"
 
 namespace events
 {
 
-ApplyDamage::ApplyDamage(BattleStackAttacked * pack_, std::shared_ptr<battle::Unit> target_)
-	: pack(pack_),
+ApplyDamage::ApplyDamage(const Environment * env_, BattleStackAttacked * pack_, std::shared_ptr<battle::Unit> target_)
+	: env(env_),
+	pack(pack_),
 	target(target_)
-{
 
+{
+	initalDamage = pack->damageAmount;
 }
 
-void ApplyDamage::execute(const EventBus * bus)
+void ApplyDamage::execute()
 {
-
+	//TODO: move CStack::prepareAttacked code here, except REBIRTH
 }
 
 SubscriptionRegistry<ApplyDamage> * ApplyDamage::getRegistry()
 {
 	static std::unique_ptr<SubscriptionRegistry<ApplyDamage>> Instance = make_unique<SubscriptionRegistry<ApplyDamage>>();
 	return Instance.get();
+}
+
+int64_t ApplyDamage::getInitalDamage()
+{
+	return initalDamage;
 }
 
 int64_t ApplyDamage::getDamage()

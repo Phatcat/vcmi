@@ -25,8 +25,12 @@ set(test_SRCS
 		battle/battle_UnitTest.cpp
 
 		erm/ERM_BU.cpp
-		erm/ExamplesTest.cpp
+		erm/ERM_MF.cpp
 		erm/ERMPersistenceTest.cpp
+		erm/ExamplesTest.cpp
+
+		events/ApplyDamageTest.cpp
+		events/EventBusTest.cpp
 
 		game/CGameStateTest.cpp
 

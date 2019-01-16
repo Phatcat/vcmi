@@ -9,7 +9,7 @@
  */
 #include "StdInc.h"
 
-#include "api/BattleCb.h"
+#include "BattleCb.h"
 
 #include "../LuaStack.h"
 #include "../LuaCallWrapper.h"
@@ -21,6 +21,8 @@ namespace scripting
 namespace api
 {
 
+VCMI_REGISTER_CORE_SCRIPT_API(BattleCbProxy);
+
 const std::vector<BattleCbProxy::RegType> BattleCbProxy::REGISTER =
 {
 	{
@@ -29,11 +31,11 @@ const std::vector<BattleCbProxy::RegType> BattleCbProxy::REGISTER =
 	},
 	{
 		"getNextUnitId",
-		&BattleCbProxy::getNextUnitId
+		LuaCallWrapper<const BattleCb>::createFunctor(&BattleCb::battleNextUnitId)
 	},
 	{
 		"getTacticDistance",
-		&BattleCbProxy::getTacticDistance
+		LuaCallWrapper<const BattleCb>::createFunctor(&BattleCb::battleTacticDist)
 	},
 	{
 		"getTerrainType",
@@ -45,7 +47,7 @@ const std::vector<BattleCbProxy::RegType> BattleCbProxy::REGISTER =
 	},
 	{
 		"isFinished",
-		&BattleCbProxy::isFinished
+		LuaCallWrapper<const BattleCb>::createFunctor(&BattleCb::battleIsFinished)
 	}
 };
 
@@ -55,16 +57,6 @@ int BattleCbProxy::getBattlefieldType(lua_State * L, const BattleCb * object)
 	auto ret = object->battleGetBattlefieldType();
 	S.push(static_cast<si32>(ret.num));
 	return 1;
-}
-
-int BattleCbProxy::getNextUnitId(lua_State * L, const BattleCb * object)
-{
-	return LuaCallWrapper<const BattleCb>::wrap(L, object, &BattleCb::battleNextUnitId);
-}
-
-int BattleCbProxy::getTacticDistance(lua_State * L, const BattleCb * object)
-{
-	return LuaCallWrapper<const BattleCb>::wrap(L, object, &BattleCb::battleTacticDist);
 }
 
 int BattleCbProxy::getTerrainType(lua_State * L, const BattleCb * object)
@@ -91,11 +83,6 @@ int BattleCbProxy::getUnitByPos(lua_State * L, const BattleCb * object)
 
 	S.push(object->battleGetUnitByPos(hex, onlyAlive));
 	return 1;
-}
-
-int BattleCbProxy::isFinished(lua_State * L, const BattleCb * object)
-{
-	return LuaCallWrapper<const BattleCb>::wrap(L, object, &BattleCb::battleIsFinished);
 }
 
 }

@@ -12,7 +12,7 @@
 #include "../../lib/NetPacksBase.h"
 #include "../../lib/CStack.h"
 #include "../../lib/ScriptHandler.h"
-#include "../../lib/events/EventBus.h"
+#include <vcmi/events/EventBus.h>
 
 using scripting::Pool;
 

@@ -39,9 +39,8 @@ local BU_D = function(x, hex, p1)
 			return nil, unit:unitId()
 		end
 	else
-        return nil, -1
+		return nil, -1
 	end
-
 end
 
 BU.D = function(self, x, ...)

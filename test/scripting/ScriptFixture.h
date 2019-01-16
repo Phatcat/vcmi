@@ -11,6 +11,9 @@
 #pragma once
 
 #include <vstd/RNG.h>
+
+#include <vcmi/events/EventBus.h>
+
 #include "../../lib/JsonNode.h"
 #include "../../lib/HeroBonus.h"
 #include "../../lib/ScriptHandler.h"
@@ -34,10 +37,13 @@ namespace test
 
 using namespace ::testing;
 using namespace ::scripting;
+using ::events::EventBus;
 
 class ScriptFixture
 {
 public:
+	EventBus eventBus;
+
 	std::shared_ptr<PoolMock> pool;
 
 	std::shared_ptr<ScriptImpl> subject;
@@ -45,7 +51,7 @@ public:
 
 	battle::UnitsFake unitsFake;
 
-	EnvironmentMock environmentMock;
+	StrictMock<EnvironmentMock> environmentMock;
 
 	StrictMock<IBattleInfoCallbackMock> binfoMock;
 	StrictMock<IGameInfoCallbackMock> infoMock;

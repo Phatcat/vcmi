@@ -10,12 +10,20 @@
 
 #pragma once
 
-#include <lua.hpp>
+#include <typeinfo>
+#include <typeindex>
 
 #define VCMI_REGISTER_SCRIPT_API(Type, Name) \
 namespace\
 {\
 RegisterAPI<Type> _register(Name);\
+}\
+\
+
+#define VCMI_REGISTER_CORE_SCRIPT_API(Type) \
+namespace\
+{\
+RegisterCoreAPI<Type> _register;\
 }\
 \
 
@@ -40,8 +48,15 @@ public:
 
 	const Registar * find(const std::string & name) const;
 	void add(const std::string & name, std::shared_ptr<Registar> item);
+	void addCore(std::shared_ptr<Registar> item);
+
+	const std::vector<std::shared_ptr<Registar>> & getCoreData() const
+	{
+		return coreData;
+	}
 private:
 	std::map<std::string, std::shared_ptr<Registar>> data;
+	std::vector<std::shared_ptr<Registar>> coreData;
 
 	Registry();
 };
@@ -64,6 +79,16 @@ public:
 	{
 		auto r = std::make_shared<RegistarT<T>>();
 		Registry::get()->add(name, r);
+	}
+};
+
+template<typename T>
+class RegisterCoreAPI
+{
+public:
+	RegisterCoreAPI()
+	{
+		Registry::get()->addCore(std::make_shared<RegistarT<T>>());
 	}
 };
 

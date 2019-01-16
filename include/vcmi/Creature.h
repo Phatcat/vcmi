@@ -10,11 +10,12 @@
 
 #pragma once
 
-class DLL_LINKAGE Creature
+#include "Entity.h"
+
+class CreatureID;
+
+class DLL_LINKAGE Creature : public EntityT<CreatureID>
 {
 public:
-	virtual ~Creature() = default;
-
-	virtual int32_t getIndex() const = 0;
 	virtual uint32_t getMaxHealth() const = 0;
 };

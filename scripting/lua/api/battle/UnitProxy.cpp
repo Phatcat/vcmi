@@ -29,23 +29,13 @@ const std::vector<UnitProxy::RegType> UnitProxy::REGISTER =
 {
 	{
 		"isAlive",
-		&UnitProxy::isAlive
+		LuaCallWrapper<const Unit>::createFunctor(&Unit::alive)
 	},
 	{
 		"unitId",
-		&UnitProxy::unitId
+		LuaCallWrapper<const IUnitInfo>::createFunctor(&IUnitInfo::unitId)
 	}
 };
-
-int UnitProxy::isAlive(lua_State * L, const Unit * object)
-{
-	return LuaCallWrapper<const Unit>::wrap(L, object, &Unit::alive);
-}
-
-int UnitProxy::unitId(lua_State * L, const Unit * object)
-{
-	return LuaCallWrapper<const IUnitInfo>::wrap(L, object, &IUnitInfo::unitId);
-}
 
 
 }

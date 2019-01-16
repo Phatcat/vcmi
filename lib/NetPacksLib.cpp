@@ -995,7 +995,7 @@ DLL_LINKAGE void EraseArtifact::applyGs(CGameState *gs)
 	auto slot = al.getSlot();
 	if(slot->locked)
 	{
-		logGlobal->debug("Erasing locked artifact: %s", slot->artifact->artType->Name());
+		logGlobal->debug("Erasing locked artifact: %s", slot->artifact->artType->getName());
 		DisassembledArtifact dis;
 		dis.al.artHolder = al.artHolder;
 		auto aset = al.getHolderArtSet();
@@ -1015,12 +1015,12 @@ DLL_LINKAGE void EraseArtifact::applyGs(CGameState *gs)
 			}
 		}
 		assert(found && "Failed to determine the assembly this locked artifact belongs to");
-		logGlobal->debug("Found the corresponding assembly: %s", dis.al.getSlot()->artifact->artType->Name());
+		logGlobal->debug("Found the corresponding assembly: %s", dis.al.getSlot()->artifact->artType->getName());
 		dis.applyGs(gs);
 	}
 	else
 	{
-		logGlobal->debug("Erasing artifact %s", slot->artifact->artType->Name());
+		logGlobal->debug("Erasing artifact %s", slot->artifact->artType->getName());
 	}
 	al.removeArtifact();
 }

@@ -44,9 +44,7 @@ std::string LuaScriptModule::compile(const std::string & name, const std::string
 
 std::shared_ptr<ContextBase> LuaScriptModule::createContextFor(const Script * source, const Environment * env) const
 {
-	auto ret = std::make_shared<LuaContext>(env->logger(), source);
-	ret->init(env->game(), env->battle());
-	return ret;
+	return std::make_shared<LuaContext>(source, env);
 }
 
 void LuaScriptModule::registerSpellEffect(spells::effects::Registry * registry, const Script * source) const

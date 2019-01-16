@@ -64,6 +64,9 @@
 		</Linker>
 		<Unit filename="CMakeLists.txt" />
 		<Unit filename="LuaCallWrapper.h" />
+		<Unit filename="LuaFunctor.h" />
+		<Unit filename="LuaReference.cpp" />
+		<Unit filename="LuaReference.h" />
 		<Unit filename="LuaScriptModule.cpp" />
 		<Unit filename="LuaScriptModule.h" />
 		<Unit filename="LuaScriptingContext.cpp" />
@@ -89,6 +92,12 @@
 		<Unit filename="api/ServerCb.h" />
 		<Unit filename="api/battle/UnitProxy.cpp" />
 		<Unit filename="api/battle/UnitProxy.h" />
+		<Unit filename="api/events/BattleEvents.cpp" />
+		<Unit filename="api/events/BattleEvents.h" />
+		<Unit filename="api/events/EventBusProxy.cpp" />
+		<Unit filename="api/events/EventBusProxy.h" />
+		<Unit filename="api/events/SubscriptionRegistryProxy.cpp" />
+		<Unit filename="api/events/SubscriptionRegistryProxy.h" />
 		<Unit filename="api/netpacks/BattleLogMessage.cpp" />
 		<Unit filename="api/netpacks/BattleLogMessage.h" />
 		<Unit filename="api/netpacks/BattleStackMoved.cpp" />

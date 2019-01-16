@@ -189,6 +189,21 @@ void CSpell::forEachSchool(const std::function<void(const spells::SchoolInfo &, 
 	}
 }
 
+SpellID CSpell::getId() const
+{
+	return id;
+}
+
+const std::string & CSpell::getName() const
+{
+	return name;
+}
+
+const std::string & CSpell::getJsonKey() const
+{
+	return identifier;
+}
+
 int32_t CSpell::getIndex() const
 {
 	return id.toEnum();

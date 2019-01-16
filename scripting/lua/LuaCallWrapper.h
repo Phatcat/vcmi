@@ -11,11 +11,12 @@
 #pragma once
 
 #include "LuaStack.h"
+#include "LuaFunctor.h"
 
 namespace scripting
 {
 
-//TODO:
+//TODO: all of these should be variadic, once design settle down
 
 template <typename T>
 class LuaCallWrapper
@@ -23,23 +24,140 @@ class LuaCallWrapper
 public:
 	using Wrapped = typename std::remove_const<T>::type;
 
-	template <typename R, typename U>
-	static int wrap(lua_State * L, U * object, R (Wrapped::* method)() const)
+	static std::function<int(lua_State *, T *)> createFunctor(void (Wrapped::* method)())
 	{
-		LuaStack S(L);
 		auto functor = std::mem_fn(method);
-		S.push(functor(object));
-		return 1;
+		auto ret = [=](lua_State * L, T * object)->int
+		{
+			LuaStack S(L);
+			functor(object);
+			return S.retVoid();
+		};
+
+		return ret;
 	}
 
-	template <typename R, typename U>
-	static int wrap(lua_State * L, U * object, R (Wrapped::* method)())
+	static std::function<int(lua_State *, T *)> createFunctor(void (Wrapped::* method)() const)
 	{
-		LuaStack S(L);
 		auto functor = std::mem_fn(method);
-		S.push(functor(object));
-		return 1;
+		auto ret = [=](lua_State * L, T * object)->int
+		{
+			LuaStack S(L);
+			functor(object);
+			return S.retVoid();
+		};
+
+		return ret;
 	}
+
+	template <typename R>
+	static std::function<int(lua_State *, T *)> createFunctor(R (Wrapped::* method)())
+	{
+		auto functor = std::mem_fn(method);
+		auto ret = [=](lua_State * L, T * object)->int
+		{
+			LuaStack S(L);
+			S.push(functor(object));
+			return 1;
+		};
+
+		return ret;
+	}
+
+	template <typename R>
+	static std::function<int(lua_State *, T *)> createFunctor(R (Wrapped::* method)() const)
+	{
+		auto functor = std::mem_fn(method);
+		auto ret = [=](lua_State * L, T * object)->int
+		{
+			LuaStack S(L);
+			S.push(functor(object));
+			return 1;
+		};
+
+		return ret;
+	}
+
+	template <typename P1>
+	static std::function<int(lua_State *, T *)> createFunctor(void (Wrapped::* method)(P1))
+	{
+		auto functor = std::mem_fn(method);
+		auto ret = [=](lua_State * L, T * object)->int
+		{
+			LuaStack S(L);
+			P1 p1;
+			if(S.tryGet(1, p1))
+			{
+				functor(object, p1);
+			}
+
+			return S.retVoid();
+		};
+
+		return ret;
+	}
+
+	template <typename P1>
+	static std::function<int(lua_State *, T *)> createFunctor(void (Wrapped::* method)(P1) const)
+	{
+		auto functor = std::mem_fn(method);
+		auto ret = [=](lua_State * L, T * object)->int
+		{
+			LuaStack S(L);
+			P1 p1;
+			if(S.tryGet(1, p1))
+			{
+				functor(object, p1);
+			}
+
+			return S.retVoid();
+		};
+
+		return ret;
+	}
+
+	template <typename R, typename P1>
+	static std::function<int(lua_State *, T *)> createFunctor(R (Wrapped::* method)(P1))
+	{
+		auto functor = std::mem_fn(method);
+		auto ret = [=](lua_State * L, T * object)->int
+		{
+			LuaStack S(L);
+			P1 p1;
+			if(S.tryGet(1, p1))
+			{
+				S.push(functor(object, p1));
+				return 1;
+			}
+
+			return S.retVoid();
+		};
+
+		return ret;
+	}
+
+	template <typename R, typename P1>
+	static std::function<int(lua_State *, T *)> createFunctor(R (Wrapped::* method)(P1) const)
+	{
+		auto functor = std::mem_fn(method);
+		auto ret = [=](lua_State * L, T * object)->int
+		{
+			LuaStack S(L);
+			P1 p1;
+			if(S.tryGet(1, p1))
+			{
+				S.push(functor(object, p1));
+				return 1;
+			}
+
+			return S.retVoid();
+		};
+
+		return ret;
+	}
+
 };
+
+
 
 }

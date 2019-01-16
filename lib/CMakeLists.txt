@@ -21,6 +21,8 @@ set(lib_SRCS
 		battle/SiegeInfo.cpp
 		battle/Unit.cpp
 
+		events/ApplyDamage.cpp
+
 		filesystem/AdapterLoaders.cpp
 		filesystem/CArchiveLoader.cpp
 		filesystem/CBinaryReader.cpp
@@ -168,14 +170,20 @@ set_source_files_properties(${CMAKE_BINARY_DIR}/Version.cpp
 
 set(lib_HEADERS
 		../include/vstd/CLoggerBase.h
+		../Global.h
+		StdInc.h
+
 		../include/vstd/ContainerUtils.h
 		../include/vstd/RNG.h
 		../include/vstd/StringUtils.h
 
-		StdInc.h
-		../Global.h
+		../include/vcmi/events/ApplyDamage.h
+		../include/vcmi/events/Event.h
+		../include/vcmi/events/EventBus.h
+		../include/vcmi/events/SubscriptionRegistry.h
 
 		../include/vcmi/scripting/Service.h
+
 		../include/vcmi/spells/Magic.h
 		../include/vcmi/spells/Service.h
 		../include/vcmi/spells/Spell.h
@@ -184,7 +192,11 @@ set(lib_HEADERS
 		../include/vcmi/ArtifactService.h
 		../include/vcmi/Creature.h
 		../include/vcmi/CreatureService.h
+		../include/vcmi/Entity.h
+		../include/vcmi/Environment.h
 		../include/vcmi/Services.h
+
+		abilities/Ability.h
 
 		battle/AccessibilityInfo.h
 		battle/BattleAction.h
@@ -310,6 +322,7 @@ set(lib_HEADERS
 		spells/effects/Timed.h
 		spells/effects/RemoveObstacle.h
 		spells/effects/Sacrifice.h
+
 		AI_Base.h
 		CAndroidVMHelper.h
 		CArtHandler.h

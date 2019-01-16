@@ -10,12 +10,14 @@
 
 #pragma once
 
-#include <vcmi/events/SubscriptionRegistry.h>
+#include "SubscriptionRegistry.h"
+
+class Environment;
 
 namespace events
 {
 
-class DLL_LINKAGE EventBus
+class DLL_LINKAGE EventBus : public boost::noncopyable
 {
 public:
 	template <typename E>

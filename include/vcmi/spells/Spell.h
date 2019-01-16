@@ -10,16 +10,17 @@
 
 #pragma once
 
+#include "../Entity.h"
+
+class SpellID;
+
 namespace spells
 {
 struct SchoolInfo;
 
-class DLL_LINKAGE Spell
+class DLL_LINKAGE Spell: public EntityT<SpellID>
 {
 public:
-	virtual ~Spell() = default;
-
-	virtual int32_t getIndex() const = 0;
 	virtual int32_t getLevel() const = 0;
 	virtual boost::logic::tribool getPositiveness() const = 0;
 	virtual bool isAdventureSpell() const = 0;

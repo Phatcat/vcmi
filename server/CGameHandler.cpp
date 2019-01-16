@@ -48,7 +48,7 @@
 #include "../lib/serializer/Connection.h"
 #include "../lib/serializer/Cast.h"
 #include "../lib/ScriptHandler.h"
-#include "../lib/events/EventBus.h"
+#include <vcmi/events/EventBus.h>
 
 
 #ifndef _MSC_VER

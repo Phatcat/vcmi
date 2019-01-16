@@ -1246,10 +1246,10 @@ std::string Bonus::Description() const
 			switch(source)
 			{
 			case ARTIFACT:
-				str << VLC->arth->artifacts[sid]->Name();
+				str << ArtifactID(sid).toArtifact(VLC->artifactService())->getName();
 				break;
 			case SPELL_EFFECT:
-				str << SpellID(sid).toSpell()->name;
+				str << SpellID(sid).toSpell(VLC->spellService())->getName();
 				break;
 			case CREATURE_ABILITY:
 				str << VLC->creh->creatures[sid]->namePl;

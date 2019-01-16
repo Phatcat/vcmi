@@ -10,8 +10,15 @@
 
 #pragma once
 
-class DLL_LINKAGE Artifact
+#include "Entity.h"
+
+class ArtifactID;
+class CreatureID;
+
+class DLL_LINKAGE Artifact : public EntityT<ArtifactID>
 {
 public:
-	virtual ~Artifact() = default;
+	virtual bool isBig() const = 0;
+	virtual bool isTradable() const = 0;
+	virtual CreatureID getWarMachine() const = 0;
 };

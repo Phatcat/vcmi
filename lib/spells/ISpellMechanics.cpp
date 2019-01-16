@@ -625,17 +625,17 @@ int32_t BaseMechanics::getSpellIndex() const
 
 SpellID BaseMechanics::getSpellId() const
 {
-	return owner->id;
+	return owner->getId();
 }
 
 std::string BaseMechanics::getSpellName() const
 {
-	return owner->name;
+	return owner->getName();
 }
 
 int32_t BaseMechanics::getSpellLevel() const
 {
-	return owner->level;
+	return owner->getLevel();
 }
 
 bool BaseMechanics::isSmart() const
@@ -690,7 +690,7 @@ int64_t BaseMechanics::adjustEffectValue(const battle::Unit * target) const
 	return owner->adjustRawDamage(caster, target, getEffectValue());
 }
 
-int64_t BaseMechanics::applySpellBonus(int64_t value, const battle::Unit* target) const
+int64_t BaseMechanics::applySpellBonus(int64_t value, const battle::Unit * target) const
 {
 	return caster->getSpellBonus(owner, value, target);
 }

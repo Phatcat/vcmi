@@ -26,24 +26,27 @@ namespace events
 class DLL_LINKAGE ApplyDamage : public Event
 {
 public:
-	BattleStackAttacked * pack;
-
-	std::shared_ptr<battle::Unit> target;
-
 	using PreHandler = SubscriptionRegistry<ApplyDamage>::PreHandler;
 	using PostHandler = SubscriptionRegistry<ApplyDamage>::PostHandler;
 	using BusTag = SubscriptionRegistry<ApplyDamage>::BusTag;
 
-	ApplyDamage(BattleStackAttacked * pack_, std::shared_ptr<battle::Unit> target_);
+	ApplyDamage(const Environment * env_, BattleStackAttacked * pack_, std::shared_ptr<battle::Unit> target_);
 
-	void execute(const EventBus * bus) override;
+	void execute() override;
 
 	static SubscriptionRegistry<ApplyDamage> * getRegistry();
 
+	int64_t getInitalDamage();
 	int64_t getDamage();
 	void setDamage(int64_t value);
 
 	friend class SubscriptionRegistry<ApplyDamage>;
+private:
+	int64_t initalDamage;
+
+	const Environment * env;
+	BattleStackAttacked * pack;
+	std::shared_ptr<battle::Unit> target;
 };
 
 }

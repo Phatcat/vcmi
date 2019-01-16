@@ -25,6 +25,21 @@ int32_t CCreature::getIndex() const
 	return idNumber.toEnum();
 }
 
+const std::string & CCreature::getName() const
+{
+	return nameSing;//???
+}
+
+const std::string & CCreature::getJsonKey() const
+{
+	return identifier;
+}
+
+CreatureID CCreature::getId() const
+{
+	return idNumber;
+}
+
 uint32_t CCreature::getMaxHealth() const
 {
 	return CBonusSystemNode::MaxHealth();

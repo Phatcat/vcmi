@@ -117,8 +117,11 @@ public:
 
 	ArtifactID warMachine;
 
-	virtual int32_t getIndex() const override;
-	virtual uint32_t getMaxHealth() const override;
+	int32_t getIndex() const override;
+	const std::string & getName() const override;
+	const std::string & getJsonKey() const override;
+	CreatureID getId() const override;
+	uint32_t getMaxHealth() const override;
 
 	bool isItNativeTerrain(int terrain) const;
 	bool isDoubleWide() const; //returns true if unit is double wide on battlefield

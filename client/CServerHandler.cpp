@@ -45,7 +45,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include "../lib/serializer/Cast.h"
 
-#include "../lib/events/EventBus.h"
+#include <vcmi/events/EventBus.h>
 
 template<typename T> class CApplyOnLobby;
 

@@ -30,9 +30,6 @@ public:
 	using Wrapper = OpaqueWrapper<const Unit, UnitProxy>;
 
 	static const std::vector<typename Wrapper::RegType> REGISTER;
-
-	static int isAlive(lua_State * L, const Unit * object);
-	static int unitId(lua_State * L, const Unit * object);
 };
 
 }

@@ -231,9 +231,6 @@ public:
 
 	spells::AimType getTargetType() const;
 
-	bool isCombatSpell() const;
-	bool isCreatureAbility() const;
-
 	bool isPositive() const;
 	bool isNegative() const;
 	bool isNeutral() const;
@@ -265,21 +262,27 @@ public:
 	 *
 	 * Set stop to true to abort looping
 	 */
-	void forEachSchool(const std::function<void (const spells::SchoolInfo &, bool &)> & cb) const override;
+	void forEachSchool(const std::function<void(const spells::SchoolInfo &, bool &)> & cb) const override;
 
 	int32_t getIndex() const override;
+	const std::string & getName() const override;
+	const std::string & getJsonKey() const override;
+	SpellID getId() const override;
+
 	int32_t getLevel() const override;
 
 	boost::logic::tribool getPositiveness() const override;
 
 	bool isAdventureSpell() const override;
+	bool isCombatSpell() const;
+	bool isCreatureAbility() const;
 
 	/**
 	 * Returns resource name of icon for SPELL_IMMUNITY bonus
 	 */
-	const std::string& getIconImmune() const;
+	const std::string & getIconImmune() const;
 
-	const std::string& getCastSound() const;
+	const std::string & getCastSound() const;
 
 	template <typename Handler> void serialize(Handler & h, const int version)
 	{

@@ -70,7 +70,7 @@ void MetaString::getLocalString(const std::pair<ui8,ui32> &txt, std::string &dst
 
 	if(type == ART_NAMES)
 	{
-		dst = VLC->arth->artifacts[ser]->Name();
+		dst = VLC->arth->artifacts[ser]->getName();
 	}
 	else if(type == CRE_PL_NAMES)
 	{
@@ -94,11 +94,11 @@ void MetaString::getLocalString(const std::pair<ui8,ui32> &txt, std::string &dst
 	}
 	else if(type == ART_DESCR)
 	{
-		dst = VLC->arth->artifacts[ser]->Description();
+		dst = VLC->arth->artifacts[ser]->getDescription();
 	}
 	else if (type == ART_EVNTS)
 	{
-		dst = VLC->arth->artifacts[ser]->EventText();
+		dst = VLC->arth->artifacts[ser]->getEventText();
 	}
 	else if (type == OBJ_NAMES)
 	{

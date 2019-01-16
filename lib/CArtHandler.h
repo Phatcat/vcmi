@@ -62,12 +62,17 @@ public:
 	ArtifactID id;
 	CreatureID warMachine;
 
-	const std::string &Name() const; //getter
-	const std::string &Description() const; //getter
-	const std::string &EventText() const;
+	int32_t getIndex() const override;
+	const std::string & getName() const override;
+	const std::string & getJsonKey() const override;
+	ArtifactID getId() const override;
 
-	bool isBig () const;
-	bool isTradable () const;
+	const std::string & getDescription() const;
+	const std::string & getEventText() const;
+
+	CreatureID getWarMachine() const override;
+	bool isBig() const override;
+	bool isTradable() const override;
 
 	int getArtClassSerial() const; //0 - treasure, 1 - minor, 2 - major, 3 - relic, 4 - spell scroll, 5 - other
 	std::string nodeName() const override;

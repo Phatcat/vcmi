@@ -23,6 +23,8 @@ namespace scripting
 namespace api
 {
 
+VCMI_REGISTER_CORE_SCRIPT_API(BattleServerCbProxy);
+
 const std::vector<BattleServerCbProxy::RegType> BattleServerCbProxy::REGISTER =
 {
 	{
