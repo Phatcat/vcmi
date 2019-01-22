@@ -282,6 +282,7 @@
 		<Unit filename="battle/Unit.cpp" />
 		<Unit filename="battle/Unit.h" />
 		<Unit filename="events/ApplyDamage.cpp" />
+		<Unit filename="events/ApplyDamage.h" />
 		<Unit filename="filesystem/AdapterLoaders.cpp" />
 		<Unit filename="filesystem/AdapterLoaders.h" />
 		<Unit filename="filesystem/CArchiveLoader.cpp" />

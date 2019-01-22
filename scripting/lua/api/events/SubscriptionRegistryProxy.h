@@ -68,10 +68,8 @@ public:
 			if(lua_pcall(L, 1, 0, 0) != 0)
 			{
 				std::string msg;
-				S.tryGet(1, msg);\
-				logGlobal->error("Script callback error: %s", msg);
-
-				throw std::runtime_error(msg);
+				S.tryGet(1, msg);
+				logMod->error("Script callback error: %s", msg);
 			}
 
 			S.clear();

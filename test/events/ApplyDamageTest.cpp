@@ -10,8 +10,8 @@
 #include "StdInc.h"
 
 #include <vcmi/events/EventBus.h>
-#include <vcmi/events/ApplyDamage.h>
 
+#include "../../lib/events/ApplyDamage.h"
 #include "../../lib/NetPacks.h"
 
 #include "../mock/mock_Environment.h"
@@ -54,7 +54,7 @@ TEST_F(ApplyDamageTest, Subscription)
 
 	BattleStackAttacked pack;
 
-	ApplyDamage event(&environmentMock, &pack, targetMock);
+	CApplyDamage event(&environmentMock, &pack, targetMock);
 
 	eventBus.executeEvent(event);
 }

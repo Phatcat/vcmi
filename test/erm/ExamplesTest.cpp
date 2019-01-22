@@ -16,7 +16,7 @@
 #include "../JsonComparer.h"
 
 
-///All unsorted ERM acceptance tests goes here
+///All unsorted ERM tests goes here
 
 namespace test
 {

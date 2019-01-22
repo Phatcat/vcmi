@@ -1,36 +1,29 @@
+require("battle.Unit")
 local MF = {}
 
-local MF_D = function(x)
-	return MF.ERM.activeEvent:getInitalDamage()
-end
-
 MF.D = function(self, x, ...)
-	local argc = select('#', ...)
-
-	if argc == 1 then
-		return MF_D(x, ...)
-	else
-		error("MF:D requires one argument")
-	end
+	return self.ERM.activeEvent:getInitalDamage()
 end
 
-local MF_F = function(x, p1)
+MF.E = function(self, x, ...)
+	error("MF.E is not implemented")
+end
+
+MF.F = function(self, x, p1, ...)
 	if p1 then
-		MF.ERM.activeEvent:setDamage(p1)
+		self.ERM.activeEvent:setDamage(p1)
 		return nil
 	else
-		return MF.ERM.activeEvent:getDamage()
+		return self.ERM.activeEvent:getDamage()
 	end
 end
 
-MF.F = function(self, x, ...)
-	local argc = select('#', ...)
+MF.N = function(self, x, ...)
+	return self.ERM.activeEvent:getTarget():unitId()
+end
 
-	if argc == 1 then
-		return MF_F(x, ...)
-	else
-		error("MF:F requires one argument")
-	end
+MF.W = function(self, x, ...)
+	error("MF.W is not implemented")
 end
 
 return MF

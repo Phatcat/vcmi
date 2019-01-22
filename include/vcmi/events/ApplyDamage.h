@@ -30,23 +30,15 @@ public:
 	using PostHandler = SubscriptionRegistry<ApplyDamage>::PostHandler;
 	using BusTag = SubscriptionRegistry<ApplyDamage>::BusTag;
 
-	ApplyDamage(const Environment * env_, BattleStackAttacked * pack_, std::shared_ptr<battle::Unit> target_);
-
-	void execute() override;
-
 	static SubscriptionRegistry<ApplyDamage> * getRegistry();
 
-	int64_t getInitalDamage();
-	int64_t getDamage();
-	void setDamage(int64_t value);
+	virtual int64_t getInitalDamage() const = 0;
+	virtual int64_t getDamage() const = 0;
+	virtual void setDamage(int64_t value) = 0;
+	virtual const battle::Unit * getTarget() const = 0;
 
 	friend class SubscriptionRegistry<ApplyDamage>;
-private:
-	int64_t initalDamage;
 
-	const Environment * env;
-	BattleStackAttacked * pack;
-	std::shared_ptr<battle::Unit> target;
 };
 
 }

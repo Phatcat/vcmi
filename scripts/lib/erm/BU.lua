@@ -7,8 +7,8 @@ local battle = BATTLE
 
 local BU = {}
 
-local BU_C = function(x, p1)
-	assert(type(p1) == "nil", "BU:C can only check value")
+BU.C = function(self, x, p1, ...)
+	assert(type(p1) == "nil", "!!BU:C can only check value")
 
 	local ret = battle:isFinished()
 
@@ -19,16 +19,8 @@ local BU_C = function(x, p1)
 	end
 end
 
-BU.C = function(self, x, ...)
-	local argc = select('#', ...)
-
-	if argc == 1 then
-		return BU_C(x, ...)
-	end
-end
-
-local BU_D = function(x, hex, p1)
-	assert(type(p1) == "nil", "BU:D can only check value")
+BU.D = function(self, x, hex, p1, ...)
+	assert(type(p1) == "nil", "!!BU:D can only check value")
 
 	local unit = battle:getUnitByPos(hex, false)
 
@@ -43,16 +35,8 @@ local BU_D = function(x, hex, p1)
 	end
 end
 
-BU.D = function(self, x, ...)
-	local argc = select('#', ...)
-
-	if argc == 2 then
-		return BU_D(x, ...)
-	end
-end
-
-local BU_E = function(x, hex, p1)
-	assert(type(p1) == "nil", "BU:E can only check value")
+BU.E = function(self, x, hex, p1, ...)
+	assert(type(p1) == "nil", "!!BU:E can only check value")
 
 	local unit = battle:getUnitByPos(hex, false)
 
@@ -60,14 +44,6 @@ local BU_E = function(x, hex, p1)
 		return nil, unit:unitId()
 	else
 		return nil, -1
-	end
-end
-
-BU.E = function(self, x, ...)
-	local argc = select('#', ...)
-
-	if argc == 2 then
-		return BU_E(x, ...)
 	end
 end
 
@@ -85,8 +61,8 @@ SPECIAL_FIELDS[15] = 8
 SPECIAL_FIELDS[16] = 9
 
 
-local BU_G = function(x, p1)
-	assert(type(p1) == "nil", "BU:G? is not implemented")
+BU.G = function(self, x, p1, ...)
+	assert(type(p1) == "nil", "!!BU:G? is not implemented")
 
 	local bfield = SPECIAL_FIELDS[battle:getBattlefieldType()]
 
@@ -97,29 +73,21 @@ local BU_G = function(x, p1)
 	end
 end
 
-BU.G = function(self, x, ...)
-	local argc = select('#', ...)
-
-	if argc == 1 then
-		return BU_G(x, ...)
-	end
-end
-
-local BU_M = function(x, message)
+BU.M = function(self, x, message, ...)
 	local pack = BattleLogMessage.new()
 	pack:addText(message)
 	BATTLESERVER:addToBattleLog(pack)
 end
 
-BU.M = function(self, x, ...)
-	local argc = select('#', ...)
-
-	if argc == 1 then
-		return BU_M(x, ...)
-	end
+BU.O = function(self, x, ...)
+	error("!!BU:O is not implemented")
 end
 
-local BU_S = function(x, typ, count, hex, side, slot)
+BU.R = function(self, x, ...)
+	error("!!BU:R is not implemented")
+end
+
+BU.S = function(self, x, typ, count, hex, side, slot, ...)
 	local pack = BattleUnitsChanged.new()
 
 	local id = battle:getNextUnitId()
@@ -139,15 +107,7 @@ local BU_S = function(x, typ, count, hex, side, slot)
 	BATTLESERVER:changeUnits(pack)
 end
 
-BU.S = function(self, x, ...)
-	local argc = select('#', ...)
-
-	if argc >= 5 then
-		return BU_S(x, ...)
-	end
-end
-
-local BU_T = function(x)
+BU.T = function(self, x, ...)
 	local tacticDistance = battle:getTacticDistance()
 
 	if tacticDistance == 0 then
@@ -157,12 +117,8 @@ local BU_T = function(x)
 	end
 end
 
-BU.T = function(self, x, ...)
-	local argc = select('#', ...)
-
-	if argc == 1 then
-		return BU_T(x, ...)
-	end
+BU.V = function(self, x, ...)
+	error("!!BU:V is not implemented")
 end
 
 return BU

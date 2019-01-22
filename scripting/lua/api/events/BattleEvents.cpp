@@ -39,6 +39,10 @@ const std::vector<ApplyDamageProxy::RegType> ApplyDamageProxy::REGISTER =
 	{
 		"setDamage",
 		LuaCallWrapper<ApplyDamage>::createFunctor(&ApplyDamage::setDamage)
+	},
+	{
+		"getTarget",
+		LuaCallWrapper<ApplyDamage>::createFunctor(&ApplyDamage::getTarget)
 	}
 };
 

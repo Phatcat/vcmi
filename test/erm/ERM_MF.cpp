@@ -13,10 +13,7 @@
 #include "../scripting/ScriptFixture.h"
 #include "../JsonComparer.h"
 
-#include <vcmi/events/ApplyDamage.h>
-
-#include "../../lib/NetPacks.h"
-
+#include  "../mock/mock_events_ApplyDamage.h"
 
 namespace test
 {
@@ -24,24 +21,29 @@ namespace scripting
 {
 using namespace ::testing;
 using ::events::ApplyDamage;
+using ::events::ApplyDamageMock;
 
 class ERM_MF : public Test, public ScriptFixture
 {
 public:
-	std::shared_ptr<StrictMock<UnitMock>> targetMock;
+	StrictMock<UnitMock> targetMock;
+	ApplyDamageMock event;
 
+	void setDefaultExpectations()
+	{
+		EXPECT_CALL(event, execute());
+	}
 
 protected:
 	void SetUp() override
 	{
 		ScriptFixture::setUp();
-
-		targetMock = std::make_shared<StrictMock<UnitMock>>();
 	}
 };
 
 TEST_F(ERM_MF, ChangesDamage)
 {
+	setDefaultExpectations();
 	std::stringstream source;
 	source << "VERM" << std::endl;
 	source << "!?MF1;" << std::endl;
@@ -53,15 +55,37 @@ TEST_F(ERM_MF, ChangesDamage)
 	SCOPED_TRACE("\n" + subject->code);
 	run();
 
-	BattleStackAttacked pack;
-	pack.damageAmount = 23450;
+	EXPECT_CALL(event, getInitalDamage()).WillOnce(Return(23450));
+	EXPECT_CALL(event, setDamage(Eq(23460))).Times(1);
 
-	ApplyDamage event(&environmentMock, &pack, targetMock);
+	eventBus.executeEvent(event);
+}
+
+TEST_F(ERM_MF, GetsUnitId)
+{
+	setDefaultExpectations();
+
+	std::stringstream source;
+	source << "VERM" << std::endl;
+	source << "!?MF1;" << std::endl;
+	source << "!!MF:N?v1;" << std::endl;
+
+	loadScript(VLC->scriptHandler->erm, source.str());
+	SCOPED_TRACE("\n" + subject->code);
+	run();
+
+	EXPECT_CALL(event, getTarget()).WillRepeatedly(Return(&targetMock));
+	EXPECT_CALL(targetMock, unitId()).WillRepeatedly(Return(42));
 
 	eventBus.executeEvent(event);
 
-	EXPECT_EQ(pack.damageAmount, 23460);
+	JsonNode actualState = context->saveState();
+
+	EXPECT_EQ(actualState["ERM"]["v"]["1"].Float(), 42);
 }
+
+//TODO:MF:E
+//TODO:MF:W
 
 }
 }
