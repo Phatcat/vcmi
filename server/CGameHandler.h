@@ -182,6 +182,9 @@ public:
 	void changeFogOfWar(std::unordered_set<int3, ShashInt3> &tiles, PlayerColor player, bool hide) override;
 
 	bool isVisitCoveredByAnotherQuery(const CGObjectInstance *obj, const CGHeroInstance *hero) override;
+	void setObjProperty(ObjectInstanceID objid, int prop, si64 val) override;
+	void showInfoDialog(InfoWindow * iw) override;
+	void showInfoDialog(const std::string & msg, PlayerColor player) override;
 
 	//////////////////////////////////////////////////////////////////////////
 	void useScholarSkill(ObjectInstanceID hero1, ObjectInstanceID hero2);
@@ -196,8 +199,6 @@ public:
 
 	void expGiven(const CGHeroInstance *hero); //triggers needed level-ups, handles also commander of this hero
 	//////////////////////////////////////////////////////////////////////////
-
-	void commitPackage(CPackForClient *pack) override;
 
 	void init(StartInfo *si);
 	void handleClientDisconnection(std::shared_ptr<CConnection> c);
@@ -247,6 +248,8 @@ public:
 	void engageIntoBattle( PlayerColor player );
 	bool dig(const CGHeroInstance *h);
 	void moveArmy(const CArmedInstance *src, const CArmedInstance *dst, bool allowMerging);
+	const ObjectInstanceID putNewObject(Obj ID, int subID, int3 pos);
+
 
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{

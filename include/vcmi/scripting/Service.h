@@ -14,8 +14,14 @@
 
 class Services;
 class JsonNode;
-class IGameEventRealizer;
 class IBattleEventRealizer;
+struct CPackForClient;
+
+class DLL_LINKAGE IGameEventRealizer
+{
+public:
+	virtual void commitPackage(CPackForClient * pack) = 0;
+};
 
 namespace scripting
 {

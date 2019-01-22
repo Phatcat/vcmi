@@ -49,7 +49,7 @@ public:
 	void loadCommonState(Loader &in); //loads GS and VLC
 };
 
-class DLL_LINKAGE IGameEventCallback : public IGameEventRealizer
+class DLL_LINKAGE IGameEventCallback
 {
 public:
 	virtual void setObjProperty(ObjectInstanceID objid, int prop, si64 val) = 0;
@@ -128,14 +128,6 @@ class DLL_LINKAGE IGameCallback : public CPrivilegedInfoCallback, public IGameEv
 {
 public:
 	virtual ~IGameCallback(){};
-
-	void showInfoDialog(InfoWindow * iw) override;
-	void showInfoDialog(const std::string & msg, PlayerColor player) override;
-
-	//do sth
-	const CGObjectInstance *putNewObject(Obj ID, int subID, int3 pos);
-	const CGCreature *putNewMonster(CreatureID creID, int count, int3 pos);
-	void setObjProperty(ObjectInstanceID objid, int prop, si64 val);
 
 	virtual scripting::Pool * getGlobalContextPool() const = 0;
 

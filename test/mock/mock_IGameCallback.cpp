@@ -27,11 +27,6 @@ void GameCallbackMock::setGameState(CGameState * gameState)
 	gs = gameState;
 }
 
-void GameCallbackMock::commitPackage(CPackForClient * pack)
-{
-	sendAndApply(pack);
-}
-
 void GameCallbackMock::sendAndApply(CPackForClient * pack)
 {
 	upperCallback->sendAndApply(pack);

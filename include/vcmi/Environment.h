@@ -15,6 +15,11 @@ class Services;
 class IGameInfoCallback;
 class IBattleInfoCallback;
 
+namespace vstd
+{
+	class RNG;
+}
+
 namespace events
 {
 	class EventBus;
@@ -31,6 +36,6 @@ public:
 	virtual const Services * services() const = 0;
 	virtual const BattleCb * battle() const = 0;
 	virtual const GameCb * game() const = 0;
-	virtual ::vstd::CLoggerBase * logger() const = 0;
-	virtual ::events::EventBus * eventBus() const = 0;
+	virtual vstd::CLoggerBase * logger() const = 0;
+	virtual events::EventBus * eventBus() const = 0;
 };

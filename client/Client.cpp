@@ -469,14 +469,6 @@ void CClient::handlePack(CPack * pack)
 	delete pack;
 }
 
-void CClient::commitPackage(CPackForClient * pack)
-{
-	CommitPackage cp;
-	cp.freePack = false;
-	cp.packToCommit = pack;
-	sendRequest(&cp, PlayerColor::NEUTRAL);
-}
-
 int CClient::sendRequest(const CPackForServer * request, PlayerColor player)
 {
 	static ui32 requestCounter = 0;

@@ -1861,30 +1861,6 @@ struct ShowWorldViewEx : public CPackForClient
 
 /***********************************************************************************************************/
 
-struct CommitPackage : public CPackForServer
-{
-	bool freePack; //for local usage, DO NOT serialize
-	bool applyGh(CGameHandler *gh);
-	CPackForClient *packToCommit;
-
-	CommitPackage()
-	{
-		freePack = true;
-		packToCommit = nullptr;
-	}
-	~CommitPackage()
-	{
-		if(freePack)
-			delete packToCommit;
-	}
-
-	template <typename Handler> void serialize(Handler &h, const int version)
-	{
-		h & static_cast<CPackForServer &>(*this);
-		h & packToCommit;
-	}
-};
-
 struct EndTurn : public CPackForServer
 {
 	bool applyGh(CGameHandler *gh);

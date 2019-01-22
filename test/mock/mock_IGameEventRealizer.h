@@ -11,7 +11,7 @@
 #pragma once
 
 
-#include "../../lib/CGameInfoCallback.h"
+#include <vcmi/scripting/Service.h>
 
 class IGameEventRealizerMock : public IGameEventRealizer
 {

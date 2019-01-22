@@ -33,12 +33,6 @@ struct ShashInt3;
 class CGameState;
 class PathfinderConfig;
 
-class DLL_LINKAGE IGameEventRealizer
-{
-public:
-	virtual void commitPackage(CPackForClient * pack) = 0;
-};
-
 class DLL_LINKAGE IGameInfoCallback
 {
 public:

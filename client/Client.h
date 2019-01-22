@@ -148,7 +148,6 @@ public:
 	static ThreadSafeVector<int> waitingRequest; //FIXME: make this normal field (need to join all threads before client destruction)
 
 	void handlePack(CPack * pack); //applies the given pack and deletes it
-	void commitPackage(CPackForClient * pack) override;
 	int sendRequest(const CPackForServer * request, PlayerColor player); //returns ID given to that request
 
 	void battleStarted(const BattleInfo * info);
@@ -217,6 +216,11 @@ public:
 
 	void changeFogOfWar(int3 center, ui32 radius, PlayerColor player, bool hide) override {}
 	void changeFogOfWar(std::unordered_set<int3, ShashInt3> & tiles, PlayerColor player, bool hide) override {}
+
+	void setObjProperty(ObjectInstanceID objid, int prop, si64 val) override {}
+
+	void showInfoDialog(InfoWindow * iw) override {};
+	void showInfoDialog(const std::string & msg, PlayerColor player) override {};
 
 	scripting::Pool * getGlobalContextPool() const override;
 private:

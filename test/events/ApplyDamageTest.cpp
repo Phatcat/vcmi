@@ -44,6 +44,7 @@ protected:
 	}
 };
 
+//this should be the only subscription test for events, just in case cross-binary subscription breaks
 TEST_F(ApplyDamageTest, Subscription)
 {
 	auto subscription1 = eventBus.subscribeBefore<ApplyDamage>(std::bind(&ListenerMock::beforeEvent, &listener, _1));

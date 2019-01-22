@@ -241,50 +241,9 @@ CArmedInstance * CNonConstInfoCallback::getArmyInstance(ObjectInstanceID oid)
 	return dynamic_cast<CArmedInstance *>(getObjInstance(oid));
 }
 
-void IGameCallback::showInfoDialog(InfoWindow * iw)
-{
-	commitPackage(iw);
-}
-
-void IGameCallback::showInfoDialog(const std::string &msg, PlayerColor player)
-{
-	InfoWindow iw;
-	iw.player = player;
-	iw.text << msg;
-	showInfoDialog(&iw);
-}
-
-const CGObjectInstance * IGameCallback::putNewObject(Obj ID, int subID, int3 pos)
-{
-	NewObject no;
-	no.ID = ID; //creature
-	no.subID= subID;
-	no.pos = pos;
-	commitPackage(&no);
-	return getObj(no.id); //id field will be filled during applying on gs
-}
-
-const CGCreature * IGameCallback::putNewMonster(CreatureID creID, int count, int3 pos)
-{
-	const CGObjectInstance *m = putNewObject(Obj::MONSTER, creID, pos);
-	setObjProperty(m->id, ObjProperty::MONSTER_COUNT, count);
-	setObjProperty(m->id, ObjProperty::MONSTER_POWER, (si64)1000*count);
-	return dynamic_cast<const CGCreature*>(m);
-}
-
-void IGameCallback::setObjProperty(ObjectInstanceID objid, int prop, si64 val)
-{
-	SetObjectProperty sob;
-	sob.id = objid;
-	sob.what = prop;
-	sob.val = static_cast<ui32>(val);
-	commitPackage(&sob);
-}
-
-
 bool IGameCallback::isVisitCoveredByAnotherQuery(const CGObjectInstance *obj, const CGHeroInstance *hero)
 {
 	//only server knows
-	assert(0);
+	logGlobal->error("isVisitCoveredByAnotherQuery call on client side");
 	return false;
 }

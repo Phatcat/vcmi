@@ -342,8 +342,6 @@ void registerTypesServerPacks(Serializer &s)
 	s.template registerType<CPackForServer, DigWithHero>();
 	s.template registerType<CPackForServer, CastAdvSpell>();
 	s.template registerType<CPackForServer, CastleTeleportHero>();
-	s.template registerType<CPackForServer, CommitPackage>();
-
 	s.template registerType<CPackForServer, SaveGame>();
 	s.template registerType<CPackForServer, PlayerMessage>();
 }

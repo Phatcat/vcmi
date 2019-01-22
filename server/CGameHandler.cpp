@@ -6327,11 +6327,6 @@ void CGameHandler::setBattleResult(BattleResult::EResult resultType, int victori
 	battleResult.data = br;
 }
 
-void CGameHandler::commitPackage(CPackForClient *pack)
-{
-	sendAndApply(pack);
-}
-
 void CGameHandler::spawnWanderingMonsters(CreatureID creatureID)
 {
 	std::vector<int3>::iterator tile;
@@ -6346,7 +6341,13 @@ void CGameHandler::spawnWanderingMonsters(CreatureID creatureID)
 	{
 		tile = tiles.begin();
 		logGlobal->trace("\tSpawning monster at %s", tile->toString());
-		putNewMonster(creatureID, cre->getRandomAmount(std::rand), *tile);
+		{
+			auto count = cre->getRandomAmount(std::rand);
+
+			auto monsterId  = putNewObject(Obj::MONSTER, creatureID, *tile);
+			setObjProperty(monsterId, ObjProperty::MONSTER_COUNT, count);
+			setObjProperty(monsterId, ObjProperty::MONSTER_POWER, (si64)1000*count);
+		}
 		tiles.erase(tile); //not use it again
 	}
 }
@@ -6590,6 +6591,28 @@ bool CGameHandler::isVisitCoveredByAnotherQuery(const CGObjectInstance *obj, con
 	return true;
 }
 
+void CGameHandler::setObjProperty(ObjectInstanceID objid, int prop, si64 val)
+{
+	SetObjectProperty sob;
+	sob.id = objid;
+	sob.what = prop;
+	sob.val = static_cast<ui32>(val);
+	sendAndApply(&sob);
+}
+
+void CGameHandler::showInfoDialog(InfoWindow * iw)
+{
+	sendAndApply(iw);
+}
+
+void CGameHandler::showInfoDialog(const std::string & msg, PlayerColor player)
+{
+	InfoWindow iw;
+	iw.player = player;
+	iw.text << msg;
+	showInfoDialog(&iw);
+}
+
 CasualtiesAfterBattle::CasualtiesAfterBattle(const CArmedInstance * _army, BattleInfo *bat):
 	army(_army)
 {
@@ -6764,6 +6787,16 @@ scripting::Pool * CGameHandler::getGlobalContextPool() const
 scripting::Pool *  CGameHandler::getContextPool() const
 {
 	return serverScripts.get();
+}
+
+const ObjectInstanceID CGameHandler::putNewObject(Obj ID, int subID, int3 pos)
+{
+	NewObject no;
+	no.ID = ID; //creature
+	no.subID= subID;
+	no.pos = pos;
+	sendAndApply(&no);
+	return no.id; //id field will be filled during applying on gs
 }
 
 ///ServerSpellCastEnvironment

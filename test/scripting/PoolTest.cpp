@@ -90,8 +90,6 @@ TEST_F(PoolTest, SavesScriptState)
 
 	JsonComparer c(false);
 	c.compare("state", actualState, expectedState);
-
-//	EXPECT_EQ(actualState, expectedState);
 }
 
 TEST_F(PoolTest, LoadsScriptState)

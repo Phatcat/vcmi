@@ -36,6 +36,10 @@ public:
 
 	//TODO: fail all stub calls
 
+	void setObjProperty(ObjectInstanceID objid, int prop, si64 val) override {};
+	void showInfoDialog(InfoWindow * iw) override {};
+	void showInfoDialog(const std::string & msg, PlayerColor player) override {};
+
 	void changeSpells(const CGHeroInstance * hero, bool give, const std::set<SpellID> &spells) override {};
 	bool removeObject(const CGObjectInstance * obj) override {return false;};
 	void setBlockVis(ObjectInstanceID objid, bool bv) override {};
@@ -87,7 +91,6 @@ public:
 	void changeFogOfWar(std::unordered_set<int3, ShashInt3> &tiles, PlayerColor player, bool hide) override {};
 
 	///useful callback methods
-	void commitPackage(CPackForClient * pack) override;
 	void sendAndApply(CPackForClient * pack) override;
 
 	MOCK_CONST_METHOD0(getGlobalContextPool, scripting::Pool *());
