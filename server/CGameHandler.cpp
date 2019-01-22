@@ -2110,12 +2110,6 @@ void CGameHandler::giveSpells(const CGTownInstance *t, const CGHeroInstance *h)
 		sendAndApply(&cs);
 }
 
-void CGameHandler::setBlockVis(ObjectInstanceID objid, bool bv)
-{
-	SetObjectProperty sop(objid, ObjProperty::BLOCKVIS, bv);
-	sendAndApply(&sop);
-}
-
 bool CGameHandler::removeObject(const CGObjectInstance * obj)
 {
 	if (!obj || !getObj(obj->id))
@@ -2130,12 +2124,6 @@ bool CGameHandler::removeObject(const CGObjectInstance * obj)
 
 	checkVictoryLossConditionsForAll(); //eg if monster escaped (removing objs after battle is done dircetly by endBattle, not this function)
 	return true;
-}
-
-void CGameHandler::setAmount(ObjectInstanceID objid, ui32 val)
-{
-	SetObjectProperty sop(objid, ObjProperty::PRIMARY_STACK_COUNT, val);
-	sendAndApply(&sop);
 }
 
 bool CGameHandler::moveHero(ObjectInstanceID hid, int3 dst, ui8 teleporting, bool transit, PlayerColor asker)

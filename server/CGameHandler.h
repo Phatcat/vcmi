@@ -130,7 +130,6 @@ public:
 	//do sth
 	void changeSpells(const CGHeroInstance * hero, bool give, const std::set<SpellID> &spells) override;
 	bool removeObject(const CGObjectInstance * obj) override;
-	void setBlockVis(ObjectInstanceID objid, bool bv) override;
 	void setOwner(const CGObjectInstance * obj, PlayerColor owner) override;
 	void changePrimSkill(const CGHeroInstance * hero, PrimarySkill::PrimarySkill which, si64 val, bool abs=false) override;
 	void changeSecSkill(const CGHeroInstance * hero, SecondarySkill which, int val, bool abs=false) override;
@@ -161,7 +160,7 @@ public:
 	void putArtifact(const ArtifactLocation &al, const CArtifactInstance *a) override;
 	void removeArtifact(const ArtifactLocation &al) override;
 	bool moveArtifact(const ArtifactLocation &al1, const ArtifactLocation &al2) override;
-	void synchronizeArtifactHandlerLists() override;
+	void synchronizeArtifactHandlerLists();
 
 	void showCompInfo(ShowInInfobox * comp) override;
 	void heroVisitCastle(const CGTownInstance * obj, const CGHeroInstance * hero) override;
@@ -169,7 +168,6 @@ public:
 	void startBattlePrimary(const CArmedInstance *army1, const CArmedInstance *army2, int3 tile, const CGHeroInstance *hero1, const CGHeroInstance *hero2, bool creatureBank = false, const CGTownInstance *town = nullptr) override; //use hero=nullptr for no hero
 	void startBattleI(const CArmedInstance *army1, const CArmedInstance *army2, int3 tile, bool creatureBank = false) override; //if any of armies is hero, hero will be used
 	void startBattleI(const CArmedInstance *army1, const CArmedInstance *army2, bool creatureBank = false) override; //if any of armies is hero, hero will be used, visitable tile of second obj is place of battle
-	void setAmount(ObjectInstanceID objid, ui32 val) override;
 	bool moveHero(ObjectInstanceID hid, int3 dst, ui8 teleporting, bool transit = false, PlayerColor asker = PlayerColor::NEUTRAL) override;
 	void giveHeroBonus(GiveBonus * bonus) override;
 	void setMovePoints(SetMovePoints * smp) override;
