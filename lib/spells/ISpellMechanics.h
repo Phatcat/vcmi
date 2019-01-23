@@ -11,11 +11,12 @@
 #pragma once
 
 #include <vcmi/spells/Magic.h>
+#include <vcmi/ServerCallback.h>
+
 #include "../battle/Destination.h"
 #include "../int3.h"
 #include "../GameConstants.h"
 #include "../HeroBonus.h"
-#include "../battle/IBattleEventRealizer.h"
 
 struct Query;
 class IBattleState;
@@ -41,58 +42,21 @@ namespace scripting
 
 
 ///callback to be provided by server
-class DLL_LINKAGE SpellCastEnvironment : public spells::PacketSender
+class DLL_LINKAGE SpellCastEnvironment : public ServerCallback
 {
 public:
 	virtual ~SpellCastEnvironment(){};
 
-	virtual CRandomGenerator & getRandomGenerator() const = 0;
-
 	virtual const CMap * getMap() const = 0;
 	virtual const CGameInfoCallback * getCb() const = 0;
 
-	virtual bool moveHero(ObjectInstanceID hid, int3 dst, bool teleporting) const = 0;	//TODO: remove
+	virtual bool moveHero(ObjectInstanceID hid, int3 dst, bool teleporting) = 0;	//TODO: remove
 
-	virtual void genericQuery(Query * request, PlayerColor color, std::function<void(const JsonNode &)> callback) const = 0;//TODO: type safety on query, use generic query packet when implemented
+	virtual void genericQuery(Query * request, PlayerColor color, std::function<void(const JsonNode &)> callback) = 0;//TODO: type safety on query, use generic query packet when implemented
 };
 
 namespace spells
 {
-
-using ServerBattleCb = ::IBattleEventRealizer;
-
-class DLL_LINKAGE BattleStateProxy : public ServerBattleCb
-{
-public:
-	BattleStateProxy(const PacketSender * server_);
-	BattleStateProxy(IBattleState * battleState_);
-
-	template<typename P>
-	void applyAny(P * pack)
-	{
-		if(server)
-			server->sendAndApply(pack);
-		else
-			pack->applyBattle(battleState);
-	}
-
-	bool describeChanges() const override;
-
-	void complain(const std::string & problem) const override;
-
-	void apply(BattleLogMessage * pack)	override;
-	void apply(BattleStackMoved * pack) override;
-	void apply(BattleUnitsChanged * pack) override;
-	void apply(SetStackEffect * pack) override;
-	void apply(StacksInjured * pack) override;
-	void apply(BattleObstaclesChanged * pack) override;
-	void apply(CatapultAttack * pack) override;
-
-private:
-	const bool describe;
-	const PacketSender * server;
-	IBattleState * battleState;
-};
 
 class DLL_LINKAGE IBattleCast
 {
@@ -160,16 +124,16 @@ public:
 	void setEffectValue(Value64 value);
 
 	///only apply effects to specified targets
-	void applyEffects(const SpellCastEnvironment * env, Target target, bool indirect = false, bool ignoreImmunity = false) const;
+	void applyEffects(ServerCallback * server, Target target, bool indirect = false, bool ignoreImmunity = false) const;
 
 	///normal cast
-	void cast(const SpellCastEnvironment * env, Target target);
+	void cast(ServerCallback * server, Target target);
 
 	///cast evaluation
-	void cast(IBattleState * battleState, vstd::RNG & rng, Target target);
+	void castEval(ServerCallback * server, Target target);
 
 	///cast with silent check for permitted cast
-	bool castIfPossible(const SpellCastEnvironment * env, Target target);
+	bool castIfPossible(ServerCallback * server, Target target);
 
 	std::vector<Target> findPotentialTargets() const;
 
@@ -222,11 +186,11 @@ public:
 	virtual bool canBeCast(Problem & problem) const = 0;
 	virtual bool canBeCastAt(Problem & problem, const Target & target) const = 0;
 
-	virtual void applyEffects(ServerBattleCb * battleState, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const = 0;
+	virtual void applyEffects(ServerCallback * server, const Target & targets, bool indirect, bool ignoreImmunity) const = 0;
 
-	virtual void cast(const PacketSender * server, vstd::RNG & rng, const Target & target) = 0;
+	virtual void cast(ServerCallback * server, const Target & target) = 0;
 
-	virtual void cast(IBattleState * battleState, vstd::RNG & rng, const Target & target) = 0;
+	virtual void castEval(ServerCallback * server, const Target & target) = 0;
 
 	virtual bool isReceptive(const battle::Unit * target) const = 0;
 
@@ -381,7 +345,7 @@ public:
 	IAdventureSpellMechanics(const CSpell * s);
 	virtual ~IAdventureSpellMechanics() = default;
 
-	virtual bool adventureCast(const SpellCastEnvironment * env, const AdventureSpellCastParameters & parameters) const = 0;
+	virtual bool adventureCast(SpellCastEnvironment * env, const AdventureSpellCastParameters & parameters) const = 0;
 
 	static std::unique_ptr<IAdventureSpellMechanics> createMechanics(const CSpell * s);
 protected:

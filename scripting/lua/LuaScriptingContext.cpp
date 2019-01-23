@@ -187,7 +187,7 @@ JsonNode LuaContext::callGlobal(const std::string & name, const JsonNode & param
 	return ret;
 }
 
-JsonNode LuaContext::callGlobal(ServerCb * cb, const std::string & name, const JsonNode & parameters)
+JsonNode LuaContext::callGlobal(ServerCallback * cb, const std::string & name, const JsonNode & parameters)
 {
 	LuaStack S(L);
 	S.push(cb);
@@ -197,20 +197,6 @@ JsonNode LuaContext::callGlobal(ServerCb * cb, const std::string & name, const J
 
 	S.pushNil();
 	lua_setglobal(L, "SERVER");
-
-	return ret;
-}
-
-JsonNode LuaContext::callGlobal(ServerBattleCb * cb, const std::string & name, const JsonNode & parameters)
-{
-	LuaStack S(L);
-	S.push(cb);
-	lua_setglobal(L, "BATTLESERVER");
-
-	auto ret = callGlobal(name, parameters);
-
-	S.pushNil();
-	lua_setglobal(L, "BATTLESERVER");
 
 	return ret;
 }

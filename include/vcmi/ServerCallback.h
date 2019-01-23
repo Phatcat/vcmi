@@ -1,5 +1,5 @@
 /*
- * IBattleEventRealizer.h, part of VCMI engine
+ * ServerCallback.h, part of VCMI engine
  *
  * Authors: listed in file AUTHORS in main folder
  *
@@ -10,8 +10,12 @@
 
 #pragma once
 
-#include "BattleHex.h"
+namespace vstd
+{
+	class RNG;
+}
 
+struct CPackForClient;
 struct BattleLogMessage;
 struct BattleStackMoved;
 struct BattleUnitsChanged;
@@ -20,11 +24,15 @@ struct StacksInjured;
 struct BattleObstaclesChanged;
 struct CatapultAttack;
 
-class DLL_LINKAGE IBattleEventRealizer
+class DLL_LINKAGE ServerCallback
 {
 public:
-	virtual void complain(const std::string & problem) const = 0;
+	virtual void complain(const std::string & problem) = 0;
 	virtual bool describeChanges() const = 0;
+
+	virtual vstd::RNG * getRNG() = 0;
+
+	virtual void apply(CPackForClient * pack) = 0;
 
 	virtual void apply(BattleLogMessage * pack) = 0;
 	virtual void apply(BattleStackMoved * pack) = 0;

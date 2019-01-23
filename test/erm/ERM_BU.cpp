@@ -199,9 +199,9 @@ TEST_F(ERM_BU_M, Simple)
 			EXPECT_EQ(pack->lines[0].toString(), "Test 1");
 	};
 
-	EXPECT_CALL(battleApplierMock, apply(Matcher<BattleLogMessage *>(_))).WillOnce(Invoke(checkApply));
+	EXPECT_CALL(serverMock, apply(Matcher<BattleLogMessage *>(_))).WillOnce(Invoke(checkApply));
 
-	context->callGlobal(&battleApplierMock, "FU1", JsonNode());
+	context->callGlobal(&serverMock, "FU1", JsonNode());
 }
 
 class ERM_BU_O : public ERM_BU
@@ -256,9 +256,9 @@ TEST_F(ERM_BU_S, Summon)
 	};
 
 	EXPECT_CALL(binfoMock, battleNextUnitId()).WillOnce(Return(UNIT_ID));
-	EXPECT_CALL(battleApplierMock, apply(Matcher<BattleUnitsChanged *>(_))).WillOnce(Invoke(checkApply));
+	EXPECT_CALL(serverMock, apply(Matcher<BattleUnitsChanged *>(_))).WillOnce(Invoke(checkApply));
 
-	context->callGlobal(&battleApplierMock, "FU1", JsonNode());
+	context->callGlobal(&serverMock, "FU1", JsonNode());
 }
 
 class ERM_BU_T : public ERM_BU

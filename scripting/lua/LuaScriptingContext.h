@@ -33,8 +33,7 @@ public:
 	int errorRetVoid(const std::string & message);
 
 	JsonNode callGlobal(const std::string & name, const JsonNode & parameters) override;
-	JsonNode callGlobal(ServerCb * cb, const std::string & name, const JsonNode & parameters) override;
-	JsonNode callGlobal(ServerBattleCb * cb, const std::string & name, const JsonNode & parameters) override;
+	JsonNode callGlobal(ServerCallback * cb, const std::string & name, const JsonNode & parameters) override;
 
 	void getGlobal(const std::string & name, int & value) override;
 	void getGlobal(const std::string & name, std::string & value) override;

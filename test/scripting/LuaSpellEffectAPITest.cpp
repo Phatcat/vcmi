@@ -13,7 +13,7 @@
 
 #include "../../lib/NetPacks.h"
 
-#include "../mock/mock_IBattleEventRealizer.h"
+#include "../mock/mock_ServerCallback.h"
 
 namespace test
 {
@@ -24,8 +24,7 @@ using namespace ::scripting;
 class LuaSpellEffectAPITest : public Test, public ScriptFixture
 {
 public:
-
-	StrictMock<IBattleEventRealizerMock> battleServer;
+	StrictMock<ServerCallbackMock> battleServer;
 
 protected:
 	void SetUp() override

@@ -134,7 +134,7 @@ BattleSpellMechanics::BattleSpellMechanics(const IBattleCast * event, std::share
 
 BattleSpellMechanics::~BattleSpellMechanics() = default;
 
-void BattleSpellMechanics::applyEffects(ServerBattleCb * battleState, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const
+void BattleSpellMechanics::applyEffects(ServerCallback * server, const Target & targets, bool indirect, bool ignoreImmunity) const
 {
 	auto callback = [&](const effects::Effect * effect, bool & stop)
 	{
@@ -142,12 +142,12 @@ void BattleSpellMechanics::applyEffects(ServerBattleCb * battleState, vstd::RNG 
 		{
 			if(ignoreImmunity)
 			{
-				effect->apply(battleState, rng, this, targets);
+				effect->apply(server, this, targets);
 			}
 			else
 			{
 				EffectTarget filtered = effect->filterTarget(this, targets);
-				effect->apply(battleState, rng, this, filtered);
+				effect->apply(server, this, filtered);
 			}
 		}
 	};
@@ -241,7 +241,7 @@ std::vector<const CStack *> BattleSpellMechanics::getAffectedStacks(const Target
 	return res;
 }
 
-void BattleSpellMechanics::cast(const PacketSender * server, vstd::RNG & rng, const Target & target)
+void BattleSpellMechanics::cast(ServerCallback * server, const Target & target)
 {
 	BattleSpellCast sc;
 
@@ -293,7 +293,7 @@ void BattleSpellMechanics::cast(const PacketSender * server, vstd::RNG & rng, co
 		sc.activeCast = true;
 	}
 
-	beforeCast(sc, rng, target);
+	beforeCast(sc, *server->getRNG(), target);
 
 	BattleLogMessage castDescription;
 
@@ -321,15 +321,12 @@ void BattleSpellMechanics::cast(const PacketSender * server, vstd::RNG & rng, co
 		sc.affectedCres.insert(unit->unitId());
 
 	if(!castDescription.lines.empty())
-		server->sendAndApply(&castDescription);
+		server->apply(&castDescription);
 
-	server->sendAndApply(&sc);
+	server->apply(&sc);
 
-	{
-		BattleStateProxy proxy(server);
-		for(auto & p : effectsToApply)
-			p.first->apply(&proxy, rng, this, p.second);
-	}
+	for(auto & p : effectsToApply)
+		p.first->apply(server, this, p.second);
 
 //	afterCast();
 
@@ -407,8 +404,9 @@ void BattleSpellMechanics::beforeCast(BattleSpellCast & sc, vstd::RNG & rng, con
 		addCustomEffect(sc, unit, 78);
 }
 
-void BattleSpellMechanics::cast(IBattleState * battleState, vstd::RNG & rng, const Target & target)
+void BattleSpellMechanics::castEval(ServerCallback * server, const Target & target)
 {
+	affectedUnits.clear();
 	//TODO: evaluate caster updates (mana usage etc.)
 	//TODO: evaluate random values
 
@@ -416,27 +414,15 @@ void BattleSpellMechanics::cast(IBattleState * battleState, vstd::RNG & rng, con
 
 	effectsToApply = effects->prepare(this, target, spellTarget);
 
-	std::set<const battle::Unit *> stacks = collectTargets();
+	std::set<const battle::Unit *> unitTargets = collectTargets();
 
-	for(const battle::Unit * one : stacks)
-	{
-		auto selector = std::bind(&BattleSpellMechanics::counteringSelector, this, _1);
+	auto selector = std::bind(&BattleSpellMechanics::counteringSelector, this, _1);
 
-		std::vector<Bonus> buffer;
-		auto bl = one->getBonuses(selector);
+	std::copy(std::begin(unitTargets), std::end(unitTargets), std::back_inserter(affectedUnits));
+	doRemoveEffects(server, affectedUnits, selector);
 
-		for(auto item : *bl)
-			buffer.emplace_back(*item);
-
-		if(!buffer.empty())
-			battleState->removeUnitBonus(one->unitId(), buffer);
-	}
-
-	{
-		BattleStateProxy proxy(battleState);
-		for(auto & p : effectsToApply)
-			p.first->apply(&proxy, rng, this, p.second);
-	}
+	for(auto & p : effectsToApply)
+		p.first->apply(server, this, p.second);
 }
 
 void BattleSpellMechanics::addCustomEffect(BattleSpellCast & sc, const battle::Unit * target, ui32 effect)
@@ -466,7 +452,7 @@ std::set<const battle::Unit *> BattleSpellMechanics::collectTargets() const
 	return result;
 }
 
-void BattleSpellMechanics::doRemoveEffects(const PacketSender * server, const std::vector<const battle::Unit *> & targets, const CSelector & selector)
+void BattleSpellMechanics::doRemoveEffects(ServerCallback * server, const std::vector<const battle::Unit *> & targets, const CSelector & selector)
 {
 	SetStackEffect sse;
 
@@ -483,7 +469,7 @@ void BattleSpellMechanics::doRemoveEffects(const PacketSender * server, const st
 	}
 
 	if(!sse.toRemove.empty())
-		server->sendAndApply(&sse);
+		server->apply(&sse);
 }
 
 bool BattleSpellMechanics::counteringSelector(const Bonus * bonus) const

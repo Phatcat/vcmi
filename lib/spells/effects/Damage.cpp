@@ -39,12 +39,12 @@ Damage::Damage()
 
 Damage::~Damage() = default;
 
-void Damage::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
+void Damage::apply(ServerCallback * server, const Mechanics * m, const EffectTarget & target) const
 {
 	StacksInjured stacksInjured;
-	prepareEffects(stacksInjured, rng, m, target, battleState->describeChanges());
+	prepareEffects(stacksInjured, *server->getRNG(), m, target, server->describeChanges());
 	if(!stacksInjured.stacks.empty())
-		battleState->apply(&stacksInjured);
+		server->apply(&stacksInjured);
 }
 
 bool Damage::isReceptive(const Mechanics * m, const battle::Unit * unit) const

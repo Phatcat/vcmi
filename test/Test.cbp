@@ -13,7 +13,6 @@
 				<Option object_output="obj/Debug/x86/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=" --gtest_filter=*ERM*" />
 				<Compiler>
 					<Add option="-Og" />
 					<Add option="-Wextra" />
@@ -116,15 +115,14 @@
 		<Unit filename="mock/mock_Creature.h" />
 		<Unit filename="mock/mock_CreatureService.h" />
 		<Unit filename="mock/mock_Environment.h" />
-		<Unit filename="mock/mock_IBattleEventRealizer.h" />
 		<Unit filename="mock/mock_IBattleInfoCallback.h" />
 		<Unit filename="mock/mock_IGameCallback.cpp" />
 		<Unit filename="mock/mock_IGameCallback.h" />
 		<Unit filename="mock/mock_IGameEventCallback.h" />
-		<Unit filename="mock/mock_IGameEventRealizer.h" />
 		<Unit filename="mock/mock_IGameInfoCallback.h" />
 		<Unit filename="mock/mock_MapService.cpp" />
 		<Unit filename="mock/mock_MapService.h" />
+		<Unit filename="mock/mock_ServerCallback.h" />
 		<Unit filename="mock/mock_UnitEnvironment.h" />
 		<Unit filename="mock/mock_UnitInfo.h" />
 		<Unit filename="mock/mock_battle_IBattleState.h" />

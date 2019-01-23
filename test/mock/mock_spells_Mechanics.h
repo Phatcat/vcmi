@@ -27,10 +27,10 @@ public:
 	MOCK_CONST_METHOD1(canBeCast, bool(Problem &));
 	MOCK_CONST_METHOD2(canBeCastAt, bool(Problem &, const Target &));
 
-	MOCK_CONST_METHOD5(applyEffects, void(ServerBattleCb *, vstd::RNG &, const Target &, bool, bool));
+	MOCK_CONST_METHOD4(applyEffects, void(ServerCallback *, const Target &, bool, bool));
 
-	MOCK_METHOD3(cast, void(const PacketSender * , vstd::RNG &, const Target &));
-	MOCK_METHOD3(cast, void(IBattleState *, vstd::RNG &, const Target &));
+	MOCK_METHOD2(cast, void(ServerCallback *, const Target &));
+	MOCK_METHOD2(castEval, void(ServerCallback *, const Target &));
 
 	MOCK_CONST_METHOD1(isReceptive, bool(const battle::Unit * ));
 	MOCK_CONST_METHOD0(getTargetTypes, std::vector<AimType>());

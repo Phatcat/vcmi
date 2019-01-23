@@ -79,7 +79,7 @@ void ProxyCaster::getCastDescription(const Spell * spell, const std::vector<cons
 	actualCaster->getCastDescription(spell, attacked, text);
 }
 
-void ProxyCaster::spendMana(const PacketSender * server, const int spellCost) const
+void ProxyCaster::spendMana(ServerCallback * server, const int spellCost) const
 {
 	actualCaster->spendMana(server, spellCost);
 }

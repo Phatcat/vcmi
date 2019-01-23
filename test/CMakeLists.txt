@@ -113,7 +113,6 @@ set(mock_HEADERS
 		mock/mock_Creature.h
 		mock/mock_CreatureService.h
 		mock/mock_IBattleInfoCallback.h
-		mock/mock_IBattleEventRealizer.h
 		mock/mock_scripting_Context.h
 		mock/mock_scripting_Script.h
 		mock/mock_scripting_Service.h

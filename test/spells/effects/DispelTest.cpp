@@ -209,14 +209,18 @@ TEST_F(DispelApplyTest, RemovesEffects)
 
 	EXPECT_CALL(mechanicsMock, getSpellIndex()).Times(AtLeast(1)).WillRepeatedly(Return(neutralID.toEnum()));
 
+	EXPECT_CALL(serverMock, apply(Matcher<SetStackEffect *>(_))).Times(1);
+	EXPECT_CALL(serverMock, describeChanges()).WillRepeatedly(Return(false));
+
 	setDefaultExpectaions();
 	unitsFake.setDefaultBonusExpectations();
+	setupDefaultRNG();
 
 	EffectTarget target;
 	target.emplace_back(&unit0, BattleHex());
 	target.emplace_back(&unit1, BattleHex());
 
-	subject->apply(battleProxy.get(), rngMock, &mechanicsMock, target);
+	subject->apply(&serverMock, &mechanicsMock, target);
 
 	EXPECT_THAT(actualBonus[0], UnorderedElementsAreArray(expectedBonus[0]));
 	EXPECT_THAT(actualBonus[1], UnorderedElementsAreArray(expectedBonus[1]));

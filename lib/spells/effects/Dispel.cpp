@@ -35,13 +35,13 @@ Dispel::Dispel()
 
 Dispel::~Dispel() = default;
 
-void Dispel::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
+void Dispel::apply(ServerCallback * server, const Mechanics * m, const EffectTarget & target) const
 {
 	SetStackEffect sse;
-	prepareEffects(sse, rng, m, target, battleState->describeChanges());
+	prepareEffects(sse, *server->getRNG(), m, target, server->describeChanges());
 
 	if(!sse.toRemove.empty())
-		battleState->apply(&sse);
+		server->apply(&sse);
 }
 
 bool Dispel::isValidTarget(const Mechanics * m, const battle::Unit * unit) const

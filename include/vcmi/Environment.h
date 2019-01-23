@@ -15,11 +15,6 @@ class Services;
 class IGameInfoCallback;
 class IBattleInfoCallback;
 
-namespace vstd
-{
-	class RNG;
-}
-
 namespace events
 {
 	class EventBus;

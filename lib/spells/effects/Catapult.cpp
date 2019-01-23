@@ -66,7 +66,7 @@ bool Catapult::applicable(Problem & problem, const Mechanics * m) const
 	return true;
 }
 
-void Catapult::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & /* eTarget */) const
+void Catapult::apply(ServerCallback * server, const Mechanics * m, const EffectTarget & /* eTarget */) const
 {
 	//start with all destructible parts
 	static const std::set<EWallPart::EWallPart> possibleTargets =
@@ -91,7 +91,7 @@ void Catapult::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * 
 	for(int i = 0; i < targetsToAttack; i++)
 	{
 		//Any destructible part can be hit regardless of its HP. Multiple hit on same target is allowed.
-		EWallPart::EWallPart target = *RandomGeneratorUtil::nextItem(possibleTargets, rng);
+		EWallPart::EWallPart target = *RandomGeneratorUtil::nextItem(possibleTargets, *server->getRNG());
 
 		auto state = m->battle()->battleGetWallState(target);
 
@@ -140,10 +140,10 @@ void Catapult::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * 
 		}
 	}
 
-	battleState->apply(&ca);
+	server->apply(&ca);
 
 	if(!removeUnits.changedStacks.empty())
-		battleState->apply(&removeUnits);
+		server->apply(&removeUnits);
 }
 
 void Catapult::serializeJsonEffect(JsonSerializeFormat & handler)

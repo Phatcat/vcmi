@@ -36,13 +36,13 @@ Timed::Timed()
 
 Timed::~Timed() = default;
 
-void Timed::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
+void Timed::apply(ServerCallback * server, const Mechanics * m, const EffectTarget & target) const
 {
 	SetStackEffect sse;
-	prepareEffects(sse, m, target, battleState->describeChanges());
+	prepareEffects(sse, m, target, server->describeChanges());
 
 	if(!(sse.toAdd.empty() && sse.toUpdate.empty()))
-		battleState->apply(&sse);
+		server->apply(&sse);
 }
 
 void Timed::convertBonus(const Mechanics * m, int32_t & duration, std::vector<Bonus> & converted) const

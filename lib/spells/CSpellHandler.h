@@ -357,7 +357,7 @@ public:
 	///Server logic. Has write access to GameState via packets.
 	///May be executed on client side by (future) non-cheat-proof scripts.
 
-	bool adventureCast(const SpellCastEnvironment * env, const AdventureSpellCastParameters & parameters) const;
+	bool adventureCast(SpellCastEnvironment * env, const AdventureSpellCastParameters & parameters) const;
 
 public://internal, for use only by Mechanics classes
 	///applies caster`s secondary skills and affectedCreature`s to raw damage

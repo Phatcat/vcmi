@@ -26,10 +26,10 @@ public:
 	Heal();
 	virtual ~Heal();
 
-	void apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+	void apply(ServerCallback * server, const Mechanics * m, const EffectTarget & target) const override;
 
 protected:
-	void apply(int64_t value, ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const;
+	void apply(int64_t value, ServerCallback * server, const Mechanics * m, const EffectTarget & target) const;
 
 	bool isValidTarget(const Mechanics * m, const battle::Unit * unit) const override;
 	void serializeJsonUnitEffect(JsonSerializeFormat & handler) override final;

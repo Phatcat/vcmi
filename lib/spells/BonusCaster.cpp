@@ -48,7 +48,7 @@ void BonusCaster::getCastDescription(const Spell * spell, const std::vector<cons
 		attacked.at(0)->addNameReplacement(text, true);
 }
 
-void BonusCaster::spendMana(const PacketSender * server, const int spellCost) const
+void BonusCaster::spendMana(ServerCallback * server, const int spellCost) const
 {
 	logGlobal->error("Unexpected call to BonusCaster::spendMana");
 }

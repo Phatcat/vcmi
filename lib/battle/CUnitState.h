@@ -326,7 +326,7 @@ public:
 
 	int32_t unitBaseAmount() const override;
 
-	void spendMana(const spells::PacketSender * server, const int spellCost) const override;
+	void spendMana(ServerCallback * server, const int spellCost) const override;
 
 private:
 	const IUnitInfo * unit;

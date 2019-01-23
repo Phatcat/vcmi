@@ -1,5 +1,5 @@
 /*
- * mock_IBattleEventRealizer.h, part of VCMI engine
+ * mock_ServerCallback.h, part of VCMI engine
  *
  * Authors: listed in file AUTHORS in main folder
  *
@@ -10,13 +10,17 @@
 
 #pragma once
 
-#include "../../lib/battle/IBattleEventRealizer.h"
+#include <vcmi/ServerCallback.h>
 
-class IBattleEventRealizerMock : public IBattleEventRealizer
+class ServerCallbackMock : public ServerCallback
 {
 public:
-	MOCK_CONST_METHOD1(complain, void(const std::string & ));
 	MOCK_CONST_METHOD0(describeChanges, bool());
+
+	MOCK_METHOD1(complain, void(const std::string &));
+	MOCK_METHOD0(getRNG, vstd::RNG *());
+
+	MOCK_METHOD1(apply, void(CPackForClient *));
 
 	MOCK_METHOD1(apply, void(BattleLogMessage *));
 	MOCK_METHOD1(apply, void(BattleStackMoved *));

@@ -18,5 +18,5 @@ apply = function(targets)
 	pack:setTeleporting(true)
 	pack:addTileToMove(dest)
 
-	BATTLESERVER:moveUnit(pack)
+	SERVER:moveUnit(pack)
 end

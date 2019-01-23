@@ -28,6 +28,7 @@
 #include "../../mock/mock_vstd_RNG.h"
 #include "../../mock/mock_scripting_Pool.h"
 #include "../../mock/BattleFake.h"
+#include "../../mock/mock_ServerCallback.h"
 
 
 #include "../../../lib/JsonNode.h"
@@ -67,7 +68,7 @@ public:
 	std::shared_ptr<PoolMock> pool;
 	std::shared_ptr<battle::BattleFake> battleFake;
 
-	std::shared_ptr<BattleStateProxy> battleProxy;
+	StrictMock<ServerCallbackMock> serverMock;
 
 	std::string effectName;
 

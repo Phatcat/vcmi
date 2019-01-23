@@ -37,7 +37,7 @@ public:
 	void setDefaultExpectaions()
 	{
 		EXPECT_CALL(infoMock, getLocalPlayer()).WillRepeatedly(Return(PlayerColor(3)));
-		EXPECT_CALL(applierMock, commitPackage(_)).Times(AtLeast(1)).WillRepeatedly(Invoke(this, &ExamplesTest::onCommit));
+		EXPECT_CALL(serverMock, apply(Matcher<CPackForClient *>(_))).Times(AtLeast(1)).WillRepeatedly(Invoke(this, &ExamplesTest::onCommit));
 	}
 
 	void onCommit(CPackForClient * pack)
@@ -70,7 +70,7 @@ TEST_F(ExamplesTest, TESTY_ERM)
 
 	run();
 
-	JsonNode ret = context->callGlobal(&applierMock, "FU42", JsonNode());
+	JsonNode ret = context->callGlobal(&serverMock, "FU42", JsonNode());
 
 	JsonNode expected;
 
@@ -105,7 +105,7 @@ TEST_F(ExamplesTest, STD_VERM)
 
 	run();
 
-	JsonNode ret = context->callGlobal(&applierMock, "FU42", JsonNode());
+	JsonNode ret = context->callGlobal(&serverMock, "FU42", JsonNode());
 
 	JsonNode expected;
 

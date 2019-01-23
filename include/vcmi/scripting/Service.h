@@ -14,23 +14,13 @@
 
 class Services;
 class JsonNode;
-class IBattleEventRealizer;
-struct CPackForClient;
-
-class DLL_LINKAGE IGameEventRealizer
-{
-public:
-	virtual void commitPackage(CPackForClient * pack) = 0;
-};
+class ServerCallback;
 
 namespace scripting
 {
 
 using BattleCb = ::Environment::BattleCb;
 using GameCb = ::Environment::GameCb;
-
-using ServerCb = ::IGameEventRealizer;
-using ServerBattleCb = ::IBattleEventRealizer;
 
 class DLL_LINKAGE Context
 {
@@ -40,8 +30,7 @@ public:
 	virtual void run(const JsonNode & initialState) = 0;
 
 	virtual JsonNode callGlobal(const std::string & name, const JsonNode & parameters) = 0;
-	virtual JsonNode callGlobal(ServerCb * cb, const std::string & name, const JsonNode & parameters) = 0;
-	virtual JsonNode callGlobal(ServerBattleCb * cb, const std::string & name, const JsonNode & parameters) = 0;
+	virtual JsonNode callGlobal(ServerCallback * server, const std::string & name, const JsonNode & parameters) = 0;
 
 	virtual void setGlobal(const std::string & name, int value) = 0;
 	virtual void setGlobal(const std::string & name, const std::string & value) = 0;

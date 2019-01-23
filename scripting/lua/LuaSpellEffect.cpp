@@ -119,7 +119,7 @@ bool LuaSpellEffect::applicable(Problem & problem, const Mechanics * m, const Ef
 	return response.Bool();
 }
 
-void LuaSpellEffect::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
+void LuaSpellEffect::apply(ServerCallback * server, const Mechanics * m, const EffectTarget & target) const
 {
 	if(target.empty())
 		return;
@@ -127,7 +127,7 @@ void LuaSpellEffect::apply(ServerBattleCb * battleState, RNG & rng, const Mechan
 	std::shared_ptr<scripting::Context> context = resolveScript(m);
 	if(!context)
 	{
-		battleState->complain("Unable to create scripting context");
+		server->complain("Unable to create scripting context");
 		return;
 	}
 
@@ -151,7 +151,7 @@ void LuaSpellEffect::apply(ServerBattleCb * battleState, RNG & rng, const Mechan
 	JsonNode request;
 	request.Vector().push_back(requestP);
 
-	context->callGlobal(battleState, APPLY, request);
+	context->callGlobal(server, APPLY, request);
 }
 
 EffectTarget LuaSpellEffect::filterTarget(const Mechanics * m, const EffectTarget & target) const

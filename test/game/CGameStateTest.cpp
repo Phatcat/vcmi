@@ -45,19 +45,59 @@ public:
 		IObjectInterface::cb = nullptr;
 	}
 
-	void sendAndApply(CPackForClient * pack) const override
+	bool describeChanges() const override
+	{
+		return true;
+	}
+
+	void apply(CPackForClient * pack) override
 	{
 		gameState->apply(pack);
 	}
 
-	void complain(const std::string & problem) const
+	void apply(BattleLogMessage * pack) override
+	{
+		gameState->apply(pack);
+	}
+
+	void apply(BattleStackMoved * pack) override
+	{
+		gameState->apply(pack);
+	}
+
+	void apply(BattleUnitsChanged * pack) override
+	{
+		gameState->apply(pack);
+	}
+
+	void apply(SetStackEffect * pack) override
+	{
+		gameState->apply(pack);
+	}
+
+	void apply(StacksInjured * pack) override
+	{
+		gameState->apply(pack);
+	}
+
+	void apply(BattleObstaclesChanged * pack) override
+	{
+		gameState->apply(pack);
+	}
+
+	void apply(CatapultAttack * pack) override
+	{
+		gameState->apply(pack);
+	}
+
+	void complain(const std::string & problem) override
 	{
 		FAIL() << "Server-side assertion:" << problem;
 	};
 
-	CRandomGenerator & getRandomGenerator() const override
+	vstd::RNG * getRNG() override
 	{
-		return gameState->getRandomGenerator();//todo: mock this
+		return &gameState->getRandomGenerator();//todo: mock this
 	}
 
 	const CMap * getMap() const override
@@ -69,12 +109,12 @@ public:
 		return gameState.get();
 	}
 
-	bool moveHero(ObjectInstanceID hid, int3 dst, bool teleporting) const override
+	bool moveHero(ObjectInstanceID hid, int3 dst, bool teleporting) override
 	{
 		return false;
 	}
 
-	void genericQuery(Query * request, PlayerColor color, std::function<void(const JsonNode &)> callback) const
+	void genericQuery(Query * request, PlayerColor color, std::function<void(const JsonNode &)> callback) override
 	{
 		//todo:
 	}

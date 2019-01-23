@@ -11,6 +11,8 @@
 #include "StdInc.h"
 #include "CGHeroInstance.h"
 
+#include <vcmi/ServerCallback.h>
+
 #include "../NetPacks.h"
 #include "../CGeneralTextHandler.h"
 #include "../CHeroHandler.h"
@@ -709,7 +711,7 @@ void CGHeroInstance::getCastDescription(const spells::Spell * spell, const std::
 		attacked.at(0)->addNameReplacement(text, true);
 }
 
-void CGHeroInstance::spendMana(const spells::PacketSender * server, const int spellCost) const
+void CGHeroInstance::spendMana(ServerCallback * server, const int spellCost) const
 {
 	if(spellCost != 0)
 	{
@@ -718,7 +720,7 @@ void CGHeroInstance::spendMana(const spells::PacketSender * server, const int sp
 		sm.hid = id;
 		sm.val = -spellCost;
 
-		server->sendAndApply(&sm);
+		server->apply(&sm);
 	}
 }
 

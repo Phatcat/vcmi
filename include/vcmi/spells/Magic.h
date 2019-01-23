@@ -21,7 +21,7 @@
 class CSpell;
 class PlayerColor;
 struct MetaString;
-struct CPackForClient;
+class ServerCallback;
 
 namespace battle
 {
@@ -55,14 +55,6 @@ enum class AimType
 	CREATURE,
 	OBSTACLE,
 	LOCATION
-};
-
-class DLL_LINKAGE PacketSender
-{
-public:
-	virtual ~PacketSender(){};
-	virtual void sendAndApply(CPackForClient * pack) const = 0;
-	virtual void complain(const std::string & problem) const = 0;
 };
 
 class DLL_LINKAGE Problem
@@ -122,7 +114,7 @@ public:
 	///full default text
 	virtual void getCastDescription(const Spell * spell, const std::vector<const battle::Unit *> & attacked, MetaString & text) const = 0;
 
-	virtual void spendMana(const PacketSender * server, const int spellCost) const = 0;
+	virtual void spendMana(ServerCallback * server, const int spellCost) const = 0;
 };
 
 }

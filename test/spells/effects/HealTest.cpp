@@ -292,12 +292,14 @@ TEST_P(HealApplyTest, Heals)
 
 	EXPECT_CALL(*battleFake, setUnitState(Eq(unitId), _, Gt(0))).Times(1);
 
+	EXPECT_CALL(serverMock, apply(Matcher<BattleUnitsChanged *>(_))).Times(1);
+
 	setupDefaultRNG();
 
 	EffectTarget target;
 	target.emplace_back(&targetUnit, BattleHex());
 
-	subject->apply(battleProxy.get(), rngMock, &mechanicsMock, target);
+	subject->apply(&serverMock, &mechanicsMock, target);
 
 	switch(healLevel)
 	{

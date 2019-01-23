@@ -133,68 +133,6 @@ public:
 	}
 };
 
-BattleStateProxy::BattleStateProxy(const PacketSender * server_)
-	: server(server_),
-	battleState(nullptr),
-	describe(true)
-{
-}
-
-BattleStateProxy::BattleStateProxy(IBattleState * battleState_)
-	: server(nullptr),
-	battleState(battleState_),
-	describe(false)
-{
-}
-
-bool BattleStateProxy::describeChanges() const
-{
-	return describe;
-}
-
-void BattleStateProxy::complain(const std::string & problem) const
-{
-	if(server)
-		server->complain(problem);
-	else
-		logGlobal->error(problem);
-}
-
-void BattleStateProxy::apply(BattleLogMessage * pack)
-{
-	applyAny(pack);
-}
-
-void BattleStateProxy::apply(BattleStackMoved * pack)
-{
-	applyAny(pack);
-}
-
-void BattleStateProxy::apply(BattleUnitsChanged * pack)
-{
-	applyAny(pack);
-}
-
-void BattleStateProxy::apply(SetStackEffect * pack)
-{
-	applyAny(pack);
-}
-
-void BattleStateProxy::apply(StacksInjured * pack)
-{
-	applyAny(pack);
-}
-
-void BattleStateProxy::apply(BattleObstaclesChanged * pack)
-{
-	applyAny(pack);
-}
-
-void BattleStateProxy::apply(CatapultAttack * pack)
-{
-	applyAny(pack);
-}
-
 
 BattleCast::BattleCast(const CBattleInfoCallback * cb_, const Caster * caster_, const Mode mode_, const CSpell * spell_)
 	: spell(spell_),
@@ -208,7 +146,7 @@ BattleCast::BattleCast(const CBattleInfoCallback * cb_, const Caster * caster_, 
 	smart(boost::logic::indeterminate),
 	massive(boost::logic::indeterminate)
 {
-	gameCb = IObjectInterface::cb; //FIXME: pass player callback (problem is that BattleAI do have one)
+	gameCb = IObjectInterface::cb; //FIXME: pass player callback (problem is that BattleAI do not have one)
 }
 
 BattleCast::BattleCast(const BattleCast & orig, const Caster * caster_)
@@ -303,16 +241,14 @@ void BattleCast::setEffectValue(BattleCast::Value64 value)
 	effectValue = boost::make_optional(value);
 }
 
-void BattleCast::applyEffects(const SpellCastEnvironment * env, Target target,  bool indirect, bool ignoreImmunity) const
+void BattleCast::applyEffects(ServerCallback * server, Target target,  bool indirect, bool ignoreImmunity) const
 {
 	auto m = spell->battleMechanics(this);
 
-	BattleStateProxy proxy(env);
-
-	m->applyEffects(&proxy, env->getRandomGenerator(), target, indirect, ignoreImmunity);
+	m->applyEffects(server, target, indirect, ignoreImmunity);
 }
 
-void BattleCast::cast(const SpellCastEnvironment * env, Target target)
+void BattleCast::cast(ServerCallback * server, Target target)
 {
 	if(target.empty())
 		target.emplace_back();
@@ -333,7 +269,7 @@ void BattleCast::cast(const SpellCastEnvironment * env, Target target)
 	bool tryMagicMirror = (mainTarget != nullptr) && (mode == Mode::HERO || mode == Mode::CREATURE_ACTIVE);//TODO: recheck
 	tryMagicMirror = tryMagicMirror && (mainTarget->unitOwner() != caster->getOwner()) && !spell->isPositive();//TODO: recheck
 
-	m->cast(env, env->getRandomGenerator(), target);
+	m->cast(server, target);
 
 	//Magic Mirror effect
 	if(tryMagicMirror)
@@ -341,7 +277,7 @@ void BattleCast::cast(const SpellCastEnvironment * env, Target target)
 		const std::string magicMirrorCacheStr = "type_MAGIC_MIRROR";
 		static const auto magicMirrorSelector = Selector::type(Bonus::MAGIC_MIRROR);
 
-		auto rangeGen = env->getRandomGenerator().getInt64Range(0, 99);
+		auto rangeGen = server->getRNG()->getInt64Range(0, 99);
 
 		const int mirrorChance = mainTarget->valOfBonuses(magicMirrorSelector, magicMirrorCacheStr);
 
@@ -356,19 +292,19 @@ void BattleCast::cast(const SpellCastEnvironment * env, Target target)
 
 			if(!mirrorTargets.empty())
 			{
-				auto mirrorDesination = (*RandomGeneratorUtil::nextItem(mirrorTargets, env->getRandomGenerator()));
+				auto mirrorDesination = (*RandomGeneratorUtil::nextItem(mirrorTargets, *server->getRNG()));
 
 				Target mirrorTarget;
 				mirrorTarget.emplace_back(mirrorDesination);
 
 				BattleCast mirror(*this, mainTarget);
-				mirror.cast(env, mirrorTarget);
+				mirror.cast(server, mirrorTarget);
 			}
 		}
 	}
 }
 
-void BattleCast::cast(IBattleState * battleState, vstd::RNG & rng, Target target)
+void BattleCast::castEval(ServerCallback * server, Target target)
 {
 	//TODO: make equivalent to normal cast
 	if(target.empty())
@@ -378,14 +314,14 @@ void BattleCast::cast(IBattleState * battleState, vstd::RNG & rng, Target target
 	//TODO: reflection
 	//TODO: random effects evaluation
 
-	m->cast(battleState, rng, target);
+	m->castEval(server, target);
 }
 
-bool BattleCast::castIfPossible(const SpellCastEnvironment * env, Target target)
+bool BattleCast::castIfPossible(ServerCallback * server, Target target)
 {
 	if(spell->canBeCast(cb, mode, caster))
 	{
-		cast(env, target);
+		cast(server, target);
 		return true;
 	}
 	return false;

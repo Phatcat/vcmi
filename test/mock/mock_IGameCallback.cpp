@@ -11,7 +11,7 @@
 
 #include "mock_IGameCallback.h"
 
-GameCallbackMock::GameCallbackMock(const UpperCallback * upperCallback_)
+GameCallbackMock::GameCallbackMock(UpperCallback * upperCallback_)
 	: upperCallback(upperCallback_)
 {
 
@@ -29,5 +29,5 @@ void GameCallbackMock::setGameState(CGameState * gameState)
 
 void GameCallbackMock::sendAndApply(CPackForClient * pack)
 {
-	upperCallback->sendAndApply(pack);
+	upperCallback->apply(pack);
 }

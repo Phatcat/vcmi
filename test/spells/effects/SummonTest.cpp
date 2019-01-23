@@ -224,11 +224,12 @@ TEST_P(SummonApplyTest, SpawnsNewUnit)
 
 	EXPECT_CALL(*battleFake, nextUnitId()).WillOnce(Return(unitId));
 	EXPECT_CALL(*battleFake, addUnit(Eq(unitId), _)).WillOnce(Invoke(this, &SummonApplyTest::onUnitAdded));
+	EXPECT_CALL(serverMock, apply(Matcher<BattleUnitsChanged *>(_))).Times(1);
 
 	EffectTarget target;
 	target.emplace_back(unitPosition);
 
-	subject->apply(battleProxy.get(), rngMock, &mechanicsMock, target);
+	subject->apply(&serverMock, &mechanicsMock, target);
 
 	EXPECT_EQ(unitAddInfo->count, unitAmount);
 	EXPECT_EQ(unitAddInfo->id, unitId);
@@ -259,12 +260,14 @@ TEST_P(SummonApplyTest, UpdatesOldUnit)
 
 	EXPECT_CALL(unit, unitId()).WillOnce(Return(unitId));
 
+	EXPECT_CALL(serverMock, apply(Matcher<BattleUnitsChanged *>(_))).Times(1);
+
 	unitsFake.setDefaultBonusExpectations();
 
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	subject->apply(battleProxy.get(), rngMock, &mechanicsMock, target);
+	subject->apply(&serverMock, &mechanicsMock, target);
 }
 
 INSTANTIATE_TEST_CASE_P

@@ -119,7 +119,7 @@ CSpell::~CSpell()
 
 }
 
-bool CSpell::adventureCast(const SpellCastEnvironment * env, const AdventureSpellCastParameters & parameters) const
+bool CSpell::adventureCast(SpellCastEnvironment * env, const AdventureSpellCastParameters & parameters) const
 {
 	assert(env);
 

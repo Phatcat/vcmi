@@ -211,7 +211,6 @@ set(lib_HEADERS
 		battle/CPlayerBattleCallback.h
 		battle/CUnitState.h
 		battle/Destination.h
-		battle/IBattleEventRealizer.h
 		battle/IBattleInfoCallback.h
 		battle/IBattleState.h
 		battle/IUnitInfo.h

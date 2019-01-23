@@ -13,6 +13,8 @@
 
 #include <vstd/RNG.h>
 
+#include "../../../lib/NetPacks.h"
+
 #include "../../../lib/serializer/JsonDeserializer.h"
 
 bool battle::operator==(const Destination& left, const Destination& right)
@@ -78,14 +80,22 @@ void EffectFixture::setUp()
 	EXPECT_CALL(mechanicsMock, game()).WillRepeatedly(Return(&gameMock));
 	EXPECT_CALL(mechanicsMock, battle()).WillRepeatedly(Return(battleFake.get()));
 
-	battleProxy = std::make_shared<BattleStateProxy>(battleFake.get());
-
 	ON_CALL(*battleFake, getUnitsIf(_)).WillByDefault(Invoke(&unitsFake, &battle::UnitsFake::getUnitsIf));
 	ON_CALL(mechanicsMock, spellService()).WillByDefault(Return(&spellServiceMock));
 	ON_CALL(spellServiceMock, getSpell(_)).WillByDefault(Return(&spellStub));
 
 	ON_CALL(mechanicsMock, creatureService()).WillByDefault(Return(&creatureServiceMock));
 	ON_CALL(creatureServiceMock, getCreature(_)).WillByDefault(Return(&creatureStub));
+
+	ON_CALL(serverMock, getRNG()).WillByDefault(Return(&rngMock));
+
+	ON_CALL(serverMock, apply(Matcher<BattleLogMessage *>(_))).WillByDefault(Invoke(battleFake.get(),  &battle::BattleFake::accept<BattleLogMessage>));
+	ON_CALL(serverMock, apply(Matcher<BattleStackMoved *>(_))).WillByDefault(Invoke(battleFake.get(),  &battle::BattleFake::accept<BattleStackMoved>));
+	ON_CALL(serverMock, apply(Matcher<BattleUnitsChanged *>(_))).WillByDefault(Invoke(battleFake.get(),  &battle::BattleFake::accept<BattleUnitsChanged>));
+	ON_CALL(serverMock, apply(Matcher<SetStackEffect *>(_))).WillByDefault(Invoke(battleFake.get(),  &battle::BattleFake::accept<SetStackEffect>));
+	ON_CALL(serverMock, apply(Matcher<StacksInjured *>(_))).WillByDefault(Invoke(battleFake.get(),  &battle::BattleFake::accept<StacksInjured>));
+	ON_CALL(serverMock, apply(Matcher<BattleObstaclesChanged *>(_))).WillByDefault(Invoke(battleFake.get(),  &battle::BattleFake::accept<BattleObstaclesChanged>));
+	ON_CALL(serverMock, apply(Matcher<CatapultAttack *>(_))).WillByDefault(Invoke(battleFake.get(),  &battle::BattleFake::accept<CatapultAttack>));
 }
 
 static vstd::TRandI64 getInt64RangeDef(int64_t lower, int64_t upper)
@@ -106,6 +116,7 @@ static vstd::TRand getDoubleRangeDef(double lower, double upper)
 
 void EffectFixture::setupDefaultRNG()
 {
+	EXPECT_CALL(serverMock, getRNG()).Times(AtLeast(0));
 	EXPECT_CALL(rngMock, getInt64Range(_,_)).WillRepeatedly(Invoke(&getInt64RangeDef));
 	EXPECT_CALL(rngMock, getDoubleRange(_,_)).WillRepeatedly(Invoke(&getDoubleRangeDef));
 }

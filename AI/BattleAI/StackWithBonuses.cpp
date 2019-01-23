@@ -9,7 +9,7 @@
  */
 #include "StdInc.h"
 #include "StackWithBonuses.h"
-#include "../../lib/NetPacksBase.h"
+#include "../../lib/NetPacks.h"
 #include "../../lib/CStack.h"
 #include "../../lib/ScriptHandler.h"
 #include <vcmi/events/EventBus.h>
@@ -192,7 +192,7 @@ void StackWithBonuses::removeUnitBonus(const CSelector & selector)
 	vstd::erase_if(bonusesToUpdate, [&](const Bonus & b){return selector(&b);});
 }
 
-void StackWithBonuses::spendMana(const spells::PacketSender * server, const int spellCost) const
+void StackWithBonuses::spendMana(ServerCallback * server, const int spellCost) const
 {
 	//TODO: evaluate cast use
 }
@@ -208,6 +208,7 @@ HypotheticBattle::HypotheticBattle(Subject realBattle)
 
 	eventBus.reset(new events::EventBus());
 	pool.reset(new scripting::PoolImpl(nullptr, this, eventBus.get()));
+	serverCallback.reset(new HypotheticServerCallback(this));
 }
 
 bool HypotheticBattle::unitHasAmmoCart(const battle::Unit * unit) const
@@ -403,5 +404,71 @@ int64_t HypotheticBattle::getTreeVersion() const
 Pool * HypotheticBattle::getContextPool() const
 {
 	return pool.get();
+}
+
+ServerCallback * HypotheticBattle::getServerCallback()
+{
+	return serverCallback.get();
+}
+
+HypotheticBattle::HypotheticServerCallback::HypotheticServerCallback(HypotheticBattle * owner_)
+	:owner(owner_)
+{
+
+}
+
+void HypotheticBattle::HypotheticServerCallback::complain(const std::string & problem)
+{
+	logAi->error(problem);
+}
+
+bool HypotheticBattle::HypotheticServerCallback::describeChanges() const
+{
+	return false;
+}
+
+vstd::RNG * HypotheticBattle::HypotheticServerCallback::getRNG()
+{
+	return &rngStub;
+}
+
+void HypotheticBattle::HypotheticServerCallback::apply(CPackForClient * pack)
+{
+	logAi->error("Package of type %s is not allowed in battle evaluation", typeid(pack).name());
+}
+
+void HypotheticBattle::HypotheticServerCallback::apply(BattleLogMessage * pack)
+{
+	pack->applyBattle(owner);
+}
+
+void HypotheticBattle::HypotheticServerCallback::apply(BattleStackMoved * pack)
+{
+	pack->applyBattle(owner);
+}
+
+void HypotheticBattle::HypotheticServerCallback::apply(BattleUnitsChanged * pack)
+{
+	pack->applyBattle(owner);
+}
+
+void HypotheticBattle::HypotheticServerCallback::apply(SetStackEffect * pack)
+{
+	pack->applyBattle(owner);
+}
+
+void HypotheticBattle::HypotheticServerCallback::apply(StacksInjured * pack)
+{
+	pack->applyBattle(owner);
+}
+
+void HypotheticBattle::HypotheticServerCallback::apply(BattleObstaclesChanged * pack)
+{
+	pack->applyBattle(owner);
+}
+
+void HypotheticBattle::HypotheticServerCallback::apply(CatapultAttack * pack)
+{
+	pack->applyBattle(owner);
 }
 

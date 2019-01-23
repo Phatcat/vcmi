@@ -72,6 +72,12 @@ public:
 
 	scripting::Pool * getContextPool() const override;
 
+	template <typename T>
+	void accept(T * pack)
+	{
+		pack->applyBattle(this);
+	}
+
 protected:
 
 private:

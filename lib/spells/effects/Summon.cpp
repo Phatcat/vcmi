@@ -96,7 +96,7 @@ bool Summon::applicable(Problem & problem, const Mechanics * m) const
 	return true;
 }
 
-void Summon::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
+void Summon::apply(ServerCallback * server, const Mechanics * m, const EffectTarget & target) const
 {
 	//new feature - percentage bonus
 	auto valueWithBonus = m->applySpecificSpellBonus(m->calculateRawEffectValue(0, m->getEffectPower()));//TODO: consider use base power too
@@ -131,7 +131,7 @@ void Summon::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m,
 
 			if(amount < 1)
 			{
-				battleState->complain("Summoning didn't summon any!");
+				server->complain("Summoning didn't summon any!");
 				continue;
 			}
 
@@ -149,7 +149,7 @@ void Summon::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m,
 	}
 
 	if(!pack.changedStacks.empty())
-		battleState->apply(&pack);
+		server->apply(&pack);
 }
 
 EffectTarget Summon::filterTarget(const Mechanics * m, const EffectTarget & target) const

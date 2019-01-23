@@ -76,7 +76,7 @@ end
 BU.M = function(self, x, message, ...)
 	local pack = BattleLogMessage.new()
 	pack:addText(message)
-	BATTLESERVER:addToBattleLog(pack)
+	SERVER:addToBattleLog(pack)
 end
 
 BU.O = function(self, x, ...)
@@ -104,7 +104,7 @@ BU.S = function(self, x, typ, count, hex, side, slot, ...)
 		}
 	})
 
-	BATTLESERVER:changeUnits(pack)
+	SERVER:changeUnits(pack)
 end
 
 BU.T = function(self, x, ...)

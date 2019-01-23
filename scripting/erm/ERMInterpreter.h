@@ -17,9 +17,6 @@ class ERMInterpreter;
 namespace VERMInterpreter
 {
 	using namespace ERM;
-	using ::scripting::ContextBase;
-	using ::scripting::ServerCb;
-	using ::scripting::ServerBattleCb;
 
 	//different exceptions that can be thrown during interpreting
 	class EInterpreterProblem : public std::exception

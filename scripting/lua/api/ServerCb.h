@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <vcmi/scripting/Service.h>
+#include <vcmi/ServerCallback.h>
 
 #include "../LuaWrapper.h"
 
@@ -19,14 +19,17 @@ namespace scripting
 namespace api
 {
 
-class ServerCbProxy : public OpaqueWrapper<ServerCb, ServerCbProxy>
+class ServerCbProxy : public OpaqueWrapper<ServerCallback, ServerCbProxy>
 {
 public:
-	using Wrapper = OpaqueWrapper<ServerCb, ServerCbProxy>;
+	using Wrapper = OpaqueWrapper<ServerCallback, ServerCbProxy>;
 
-	static int commitPackage(lua_State * L, ServerCb * object);
+	static int commitPackage(lua_State * L, ServerCallback * object);
 
 	static const std::vector<typename Wrapper::RegType> REGISTER;
+
+	template<typename NetPack>
+	static int apply(lua_State * L, ServerCallback * object);
 };
 
 }

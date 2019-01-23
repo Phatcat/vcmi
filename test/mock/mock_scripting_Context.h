@@ -23,8 +23,7 @@ public:
 	MOCK_METHOD1(run, void(const JsonNode &));
 
 	MOCK_METHOD2(callGlobal, JsonNode(const std::string &, const JsonNode &));
-	MOCK_METHOD3(callGlobal, JsonNode(ServerCb *, const std::string &, const JsonNode &));
-	MOCK_METHOD3(callGlobal, JsonNode(ServerBattleCb *, const std::string &, const JsonNode &));
+	MOCK_METHOD3(callGlobal, JsonNode(ServerCallback *, const std::string &, const JsonNode &));
 
 	MOCK_METHOD2(getGlobal, void(const std::string &, int &));
 	MOCK_METHOD2(getGlobal, void(const std::string &, std::string &));

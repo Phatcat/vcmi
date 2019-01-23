@@ -10,8 +10,6 @@
 #include "StdInc.h"
 #include "BattleAI.h"
 
-#include <vstd/RNG.h>
-
 #include "StackWithBonuses.h"
 #include "EnemyInfo.h"
 #include "PossibleSpellcast.h"
@@ -23,26 +21,6 @@
 
 #define LOGL(text) print(text)
 #define LOGFL(text, formattingEl) print(boost::str(boost::format(text) % formattingEl))
-
-class RNGStub : public vstd::RNG
-{
-public:
-	vstd::TRandI64 getInt64Range(int64_t lower, int64_t upper) override
-	{
-		return [=]()->int64_t
-		{
-			return (lower + upper)/2;
-		};
-	}
-
-	vstd::TRand getDoubleRange(double lower, double upper) override
-	{
-		return [=]()->double
-		{
-			return (lower + upper)/2;
-		};
-	}
-};
 
 enum class SpellTypes
 {
@@ -362,8 +340,6 @@ void CBattleAI::attemptCastingSpell()
 		return ourTurnSpan >= minTurnSpan;
 	};
 
-	RNGStub rngStub;
-
 	ValueMap valueOfStack;
 	ValueMap healthOfStack;
 
@@ -419,7 +395,7 @@ void CBattleAI::attemptCastingSpell()
 		HypotheticBattle state(cb);
 
 		spells::BattleCast cast(&state, hero, spells::Mode::HERO, ps->spell);
-		cast.cast(&state, rngStub, ps->dest);
+		cast.castEval(state.getServerCallback(), ps->dest);
 		ValueMap newHealthOfStack;
 		ValueMap newValueOfStack;
 

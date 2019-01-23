@@ -50,7 +50,7 @@ void AbilityCaster::getCastDescription(const Spell * spell, const std::vector<co
 	//do nothing
 }
 
-void AbilityCaster::spendMana(const PacketSender * server, const int spellCost) const
+void AbilityCaster::spendMana(ServerCallback * server, const int spellCost) const
 {
 	//do nothing
 }

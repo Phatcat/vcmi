@@ -10,11 +10,10 @@
 
 #pragma once
 
-#include <vcmi/spells/Magic.h>
+#include <vcmi/ServerCallback.h>
 
 #include "../../lib/IGameCallback.h"
 
-//TODO: move/rename PacketSender to better place
 #include "../../lib/int3.h"
 
 
@@ -22,9 +21,9 @@
 class GameCallbackMock : public IGameCallback
 {
 public:
-	using UpperCallback = ::spells::PacketSender;
+	using UpperCallback = ::ServerCallback;
 
-	GameCallbackMock(const UpperCallback * upperCallback_);
+	GameCallbackMock(UpperCallback * upperCallback_);
 	virtual ~GameCallbackMock();
 
 	void setGameState(CGameState * gameState);
@@ -92,5 +91,5 @@ public:
 
 	MOCK_CONST_METHOD0(getGlobalContextPool, scripting::Pool *());
 private:
-	const UpperCallback * upperCallback;
+	UpperCallback * upperCallback;
 };

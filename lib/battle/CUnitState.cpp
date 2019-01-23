@@ -1033,7 +1033,7 @@ int32_t CUnitStateDetached::unitBaseAmount() const
 	return unit->unitBaseAmount();
 }
 
-void CUnitStateDetached::spendMana(const spells::PacketSender * server, const int spellCost) const
+void CUnitStateDetached::spendMana(ServerCallback * server, const int spellCost) const
 {
 	if(spellCost != 1)
 		logGlobal->warn("Unexpected spell cost %d for creature", spellCost);

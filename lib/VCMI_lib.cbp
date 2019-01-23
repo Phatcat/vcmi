@@ -133,6 +133,7 @@
 		<Unit filename="../include/vcmi/CreatureService.h" />
 		<Unit filename="../include/vcmi/Entity.h" />
 		<Unit filename="../include/vcmi/Environment.h" />
+		<Unit filename="../include/vcmi/ServerCallback.h" />
 		<Unit filename="../include/vcmi/Services.h" />
 		<Unit filename="../include/vcmi/events/ApplyDamage.h" />
 		<Unit filename="../include/vcmi/events/Event.h" />
@@ -268,7 +269,6 @@
 		<Unit filename="battle/CUnitState.h" />
 		<Unit filename="battle/Destination.cpp" />
 		<Unit filename="battle/Destination.h" />
-		<Unit filename="battle/IBattleEventRealizer.h" />
 		<Unit filename="battle/IBattleInfoCallback.h" />
 		<Unit filename="battle/IBattleState.cpp" />
 		<Unit filename="battle/IBattleState.h" />
@@ -406,6 +406,7 @@
 		<Unit filename="serializer/CSerializer.h" />
 		<Unit filename="serializer/CTypeList.cpp" />
 		<Unit filename="serializer/CTypeList.h" />
+		<Unit filename="serializer/Cast.h" />
 		<Unit filename="serializer/Connection.cpp" />
 		<Unit filename="serializer/Connection.h" />
 		<Unit filename="serializer/JsonDeserializer.cpp" />

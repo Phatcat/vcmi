@@ -49,7 +49,7 @@ bool RemoveObstacle::applicable(Problem & problem, const Mechanics * m, const Ef
 	return !getTargets(m, target, false).empty();
 }
 
-void RemoveObstacle::apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
+void RemoveObstacle::apply(ServerCallback * server, const Mechanics * m, const EffectTarget & target) const
 {
 	BattleObstaclesChanged pack;
 
@@ -57,7 +57,7 @@ void RemoveObstacle::apply(ServerBattleCb * battleState, RNG & rng, const Mechan
 		pack.changes.emplace_back(obstacle->uniqueID, BattleChanges::EOperation::REMOVE);
 
 	if(!pack.changes.empty())
-		battleState->apply(&pack);
+		server->apply(&pack);
 }
 
 void RemoveObstacle::serializeJsonEffect(JsonSerializeFormat & handler)

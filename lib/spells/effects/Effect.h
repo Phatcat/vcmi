@@ -15,7 +15,7 @@
 struct BattleHex;
 class CBattleInfoCallback;
 class JsonSerializeFormat;
-class IBattleEventRealizer;
+class ServerCallback;
 
 namespace vstd
 {
@@ -28,7 +28,6 @@ using EffectTarget = Target;
 
 namespace effects
 {
-using ServerBattleCb = ::IBattleEventRealizer;
 using RNG = ::vstd::RNG;
 class Effects;
 class Effect;
@@ -57,7 +56,7 @@ public:
 	virtual bool applicable(Problem & problem, const Mechanics * m) const;
 	virtual bool applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const;
 
-	virtual void apply(ServerBattleCb * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const = 0;
+	virtual void apply(ServerCallback * server, const Mechanics * m, const EffectTarget & target) const = 0;
 
 	virtual EffectTarget filterTarget(const Mechanics * m, const EffectTarget & target) const = 0;
 

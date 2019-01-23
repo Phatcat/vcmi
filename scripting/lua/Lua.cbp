@@ -82,8 +82,6 @@
 		</Unit>
 		<Unit filename="api/BattleCb.cpp" />
 		<Unit filename="api/BattleCb.h" />
-		<Unit filename="api/BattleServerCb.cpp" />
-		<Unit filename="api/BattleServerCb.h" />
 		<Unit filename="api/GameCb.cpp" />
 		<Unit filename="api/GameCb.h" />
 		<Unit filename="api/Registry.cpp" />
