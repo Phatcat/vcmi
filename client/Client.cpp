@@ -514,7 +514,7 @@ void CClient::installNewBattleInterface(std::shared_ptr<CBattleGameInterface> ba
 		logGlobal->trace("\tInitializing the battle interface for player %s", color.getStr());
 		auto cbc = std::make_shared<CBattleCallback>(color, this);
 		battleCallbacks[color] = cbc;
-		battleInterface->init(cbc);
+		battleInterface->init(playerEnvironments.at(color), cbc);
 	}
 }
 

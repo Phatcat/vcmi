@@ -53,9 +53,10 @@ CBattleAI::~CBattleAI()
 	}
 }
 
-void CBattleAI::init(std::shared_ptr<CBattleCallback> CB)
+void CBattleAI::init(std::shared_ptr<Environment> ENV, std::shared_ptr<CBattleCallback> CB)
 {
 	setCbc(CB);
+	env = ENV;
 	cb = CB;
 	playerID = *CB->getPlayerID(); //TODO should be sth in callback
 	wasWaitingForRealize = cb->waitTillRealize;

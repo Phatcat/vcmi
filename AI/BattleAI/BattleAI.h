@@ -49,6 +49,7 @@ class CBattleAI : public CBattleGameInterface
 {
 	int side;
 	std::shared_ptr<CBattleCallback> cb;
+	std::shared_ptr<Environment> env;
 
 	//Previous setting of cb
 	bool wasWaitingForRealize, wasUnlockingGs;
@@ -57,7 +58,7 @@ public:
 	CBattleAI();
 	~CBattleAI();
 
-	void init(std::shared_ptr<CBattleCallback> CB) override;
+	void init(std::shared_ptr<Environment> ENV, std::shared_ptr<CBattleCallback> CB) override;
 	void attemptCastingSpell();
 
 	BattleAction activeStack(const CStack * stack) override; //called when it's turn of that stack

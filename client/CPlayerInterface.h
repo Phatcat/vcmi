@@ -63,8 +63,8 @@ class CPlayerInterface : public CGameInterface, public IUpdateable
 {
 	const CArmedInstance * currentSelection;
 
-	std::shared_ptr<Environment> env;
 public:
+	std::shared_ptr<Environment> env;
 	ObjectInstanceID destinationTeleport; //contain -1 or object id if teleportation
 	int3 destinationTeleportPos;
 

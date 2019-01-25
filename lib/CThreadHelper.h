@@ -37,7 +37,9 @@ public:
 	ThreadPool(Tasks * tasks_, std::vector<std::shared_ptr<Payload>> context_)
 		: currentTask(0),
 		amount(tasks_->size()),
-		threads(context_.size())
+		threads(context_.size()),
+		tasks(tasks_),
+		context(context_)
 	{}
 
 	void run()

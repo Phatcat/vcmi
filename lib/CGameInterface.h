@@ -69,7 +69,7 @@ public:
 	std::string dllName;
 
 	virtual ~CBattleGameInterface() {};
-	virtual void init(std::shared_ptr<CBattleCallback> CB){};
+	virtual void init(std::shared_ptr<Environment> ENV, std::shared_ptr<CBattleCallback> CB){};
 
 	//battle call-ins
 	virtual BattleAction activeStack(const CStack * stack)=0; //called when it's turn of that stack

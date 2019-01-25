@@ -28,9 +28,10 @@ CStupidAI::~CStupidAI()
 	print("destroyed");
 }
 
-void CStupidAI::init(std::shared_ptr<CBattleCallback> CB)
+void CStupidAI::init(std::shared_ptr<Environment> ENV, std::shared_ptr<CBattleCallback> CB)
 {
 	print("init called, saving ptr to IBattleCallback");
+	env = ENV;
 	cbc = cb = CB;
 }
 
