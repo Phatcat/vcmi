@@ -45,12 +45,6 @@
 
 // TODO: as Tow suggested these template should all be part of CClient
 // This will require rework spectator interface properly though
-template<typename T, typename ... Args, typename ... Args2>
-void callPrivilegedInterfaces(CClient * cl, void (T::*ptr)(Args...), Args2 && ...args)
-{
-	for(auto &ger : cl->privilegedGameEventReceivers)
-		((*ger).*ptr)(std::forward<Args2>(args)...);
-}
 
 template<typename T, typename ... Args, typename ... Args2>
 bool callOnlyThatInterface(CClient * cl, PlayerColor player, void (T::*ptr)(Args...), Args2 && ...args)
@@ -67,7 +61,6 @@ template<typename T, typename ... Args, typename ... Args2>
 bool callInterfaceIfPresent(CClient * cl, PlayerColor player, void (T::*ptr)(Args...), Args2 && ...args)
 {
 	bool called = callOnlyThatInterface(cl, player, ptr, std::forward<Args2>(args)...);
-	callPrivilegedInterfaces(cl, ptr, std::forward<Args2>(args)...);
 	return called;
 }
 
@@ -85,17 +78,9 @@ void callOnlyThatBattleInterface(CClient * cl, PlayerColor player, void (T::*ptr
 }
 
 template<typename T, typename ... Args, typename ... Args2>
-void callPrivilegedBattleInterfaces(CClient * cl, void (T::*ptr)(Args...), Args2 && ...args)
-{
-	for(auto & ber : cl->privilegedBattleEventReceivers)
-		((*ber).*ptr)(std::forward<Args2>(args)...);
-}
-
-template<typename T, typename ... Args, typename ... Args2>
 void callBattleInterfaceIfPresent(CClient * cl, PlayerColor player, void (T::*ptr)(Args...), Args2 && ...args)
 {
 	callOnlyThatInterface(cl, player, ptr, std::forward<Args2>(args)...);
-	callPrivilegedBattleInterfaces(cl, ptr, std::forward<Args2>(args)...);
 }
 
 //calls all normal interfaces and privileged ones, playerints may be updated when iterating over it, so we need a copy
@@ -116,9 +101,7 @@ void callBattleInterfaceIfPresentForBothSides(CClient * cl, void (T::*ptr)(Args.
 	{
 		callOnlyThatBattleInterface(cl, PlayerColor::SPECTATOR, ptr, std::forward<Args2>(args)...);
 	}
-	callPrivilegedBattleInterfaces(cl, ptr, std::forward<Args2>(args)...);
 }
-
 
 void SetResources::applyCl(CClient *cl)
 {
@@ -610,8 +593,6 @@ void BattleStart::applyFirstCl(CClient *cl)
 	callOnlyThatBattleInterface(cl, info->sides[1].color, &IBattleEventsReceiver::battleStartBefore, info->sides[0].armyObject, info->sides[1].armyObject,
 		info->tile, info->sides[0].hero, info->sides[1].hero);
 	callOnlyThatBattleInterface(cl, PlayerColor::SPECTATOR, &IBattleEventsReceiver::battleStartBefore, info->sides[0].armyObject, info->sides[1].armyObject,
-		info->tile, info->sides[0].hero, info->sides[1].hero);
-	callPrivilegedBattleInterfaces(cl, &IBattleEventsReceiver::battleStartBefore, info->sides[0].armyObject, info->sides[1].armyObject,
 		info->tile, info->sides[0].hero, info->sides[1].hero);
 }
 

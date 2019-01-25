@@ -377,6 +377,31 @@ void callWith(std::vector<T> args, std::function<void(T)> fun, ui32 which)
 	fun(args[which]);
 }
 
+const Services * CGameHandler::services() const
+{
+	return VLC;
+}
+
+const CGameHandler::BattleCb * CGameHandler::battle() const
+{
+	return this;
+}
+
+const CGameHandler::GameCb * CGameHandler::game() const
+{
+	return this;
+}
+
+vstd::CLoggerBase * CGameHandler::logger() const
+{
+	return logGlobal;
+}
+
+events::EventBus * CGameHandler::eventBus() const
+{
+	return serverEventBus.get();
+}
+
 void CGameHandler::levelUpHero(const CGHeroInstance * hero, SecondarySkill skill)
 {
 	changeSecSkill(hero, skill, 1, 0);

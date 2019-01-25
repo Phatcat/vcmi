@@ -144,9 +144,10 @@ CPlayerInterface::~CPlayerInterface()
 	if (LOCPLINT == this)
 		LOCPLINT = nullptr;
 }
-void CPlayerInterface::init(std::shared_ptr<CCallback> CB)
+void CPlayerInterface::init(std::shared_ptr<Environment> ENV, std::shared_ptr<CCallback> CB)
 {
 	cb = CB;
+	env = ENV;
 	initializeHeroTownList();
 
 	// always recreate advmap interface to avoid possible memory-corruption bugs

@@ -118,4 +118,6 @@ TEST_F(EventBusTest, BusesAreIndependent)
 	subject1.executeEvent(event1);
 }
 
+//TODO: test sending event to destroyed event bus
+
 }

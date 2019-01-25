@@ -62,6 +62,8 @@ namespace boost
 class CPlayerInterface : public CGameInterface, public IUpdateable
 {
 	const CArmedInstance * currentSelection;
+
+	std::shared_ptr<Environment> env;
 public:
 	ObjectInstanceID destinationTeleport; //contain -1 or object id if teleportation
 	int3 destinationTeleportPos;
@@ -210,7 +212,7 @@ public:
 	void openTownWindow(const CGTownInstance * town); //shows townscreen
 	void openHeroWindow(const CGHeroInstance * hero); //shows hero window with given hero
 	void updateInfo(const CGObjectInstance * specific);
-	void init(std::shared_ptr<CCallback> CB) override;
+	void init(std::shared_ptr<Environment> ENV, std::shared_ptr<CCallback> CB) override;
 	int3 repairScreenPos(int3 pos); //returns position closest to pos we can center screen on
 	void activateForSpectator(); // TODO: spectator probably need own player interface class
 

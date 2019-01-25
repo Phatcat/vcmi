@@ -328,19 +328,9 @@ int CCallback::mergeOrSwapStacks(const CArmedInstance *s1, const CArmedInstance 
 		return swapCreatures(s1, s2, p1, p2);
 }
 
-void CCallback::registerGameInterface(std::shared_ptr<IGameEventsReceiver> gameEvents)
-{
-	cl->additionalPlayerInts[*player].push_back(gameEvents);
-}
-
 void CCallback::registerBattleInterface(std::shared_ptr<IBattleEventsReceiver> battleEvents)
 {
 	cl->additionalBattleInts[*player].push_back(battleEvents);
-}
-
-void CCallback::unregisterGameInterface(std::shared_ptr<IGameEventsReceiver> gameEvents)
-{
-	cl->additionalPlayerInts[*player] -= gameEvents;
 }
 
 void CCallback::unregisterBattleInterface(std::shared_ptr<IBattleEventsReceiver> battleEvents)

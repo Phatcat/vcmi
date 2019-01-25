@@ -18,6 +18,9 @@
 #include "mapObjects/CObjectHandler.h"
 
 using boost::logic::tribool;
+
+class Environment;
+
 class CCallback;
 class CBattleCallback;
 class ICallback;
@@ -71,10 +74,6 @@ public:
 	//battle call-ins
 	virtual BattleAction activeStack(const CStack * stack)=0; //called when it's turn of that stack
 	virtual void yourTacticPhase(int distance){}; //called when interface has opportunity to use Tactics skill -> use cb->battleMakeTacticAction from this function
-
-	virtual void saveGame(BinarySerializer & h, const int version);
-	virtual void loadGame(BinaryDeserializer & h, const int version);
-
 };
 
 /// Central class for managing human player / AI interface logic
@@ -82,7 +81,7 @@ class DLL_LINKAGE CGameInterface : public CBattleGameInterface, public IGameEven
 {
 public:
 	virtual ~CGameInterface() = default;
-	virtual void init(std::shared_ptr<CCallback> CB){};
+	virtual void init(std::shared_ptr<Environment> ENV, std::shared_ptr<CCallback> CB){};
 	virtual void yourTurn(){}; //called AFTER playerStartsTurn(player)
 
 	//pskill is gained primary skill, interface has to choose one of given skills and call callback with selection id
@@ -101,6 +100,9 @@ public:
 	virtual void finish(){}; //if for some reason we want to end
 
 	virtual void showWorldViewEx(const std::vector<ObjectPosInfo> & objectPositions){};
+
+	virtual void saveGame(BinarySerializer & h, const int version) = 0;
+	virtual void loadGame(BinaryDeserializer & h, const int version) = 0;
 };
 
 class DLL_LINKAGE CDynLibHandler
@@ -114,6 +116,7 @@ public:
 class DLL_LINKAGE CGlobalAI : public CGameInterface // AI class (to derivate)
 {
 public:
+	std::shared_ptr<Environment> env;
 	CGlobalAI();
 	virtual BattleAction activeStack(const CStack * stack) override;
 };
@@ -147,6 +150,6 @@ public:
 	virtual void battleEnd(const BattleResult *br) override;
 	virtual void battleUnitsChanged(const std::vector<UnitChanges> & units, const std::vector<CustomEffectInfo> & customEffects, const std::vector<MetaString> & battleLog) override;
 
-	virtual void saveGame(BinarySerializer & h, const int version) override; //saving
-	virtual void loadGame(BinaryDeserializer & h, const int version) override; //loading
+	virtual void saveGame(BinarySerializer & h, const int version) override;
+	virtual void loadGame(BinaryDeserializer & h, const int version) override;
 };

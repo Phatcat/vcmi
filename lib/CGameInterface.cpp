@@ -233,20 +233,17 @@ void CAdventureAI::yourTacticPhase(int distance)
 void CAdventureAI::saveGame(BinarySerializer & h, const int version) /*saving */
 {
 	LOG_TRACE_PARAMS(logAi, "version '%i'", version);
-	CGlobalAI::saveGame(h, version);
 	bool hasBattleAI = static_cast<bool>(battleAI);
 	h & hasBattleAI;
 	if(hasBattleAI)
 	{
-		h & std::string(battleAI->dllName);
-		battleAI->saveGame(h, version);
+		h & battleAI->dllName;
 	}
 }
 
 void CAdventureAI::loadGame(BinaryDeserializer & h, const int version) /*loading */
 {
 	LOG_TRACE_PARAMS(logAi, "version '%i'", version);
-	CGlobalAI::loadGame(h, version);
 	bool hasBattleAI = false;
 	h & hasBattleAI;
 	if(hasBattleAI)
@@ -256,14 +253,5 @@ void CAdventureAI::loadGame(BinaryDeserializer & h, const int version) /*loading
 		battleAI = CDynLibHandler::getNewBattleAI(dllName);
 		assert(cbc); //it should have been set by the one who new'ed us
 		battleAI->init(cbc);
-		//battleAI->loadGame(h, version);
 	}
-}
-
-void CBattleGameInterface::saveGame(BinarySerializer & h, const int version)
-{
-}
-
-void CBattleGameInterface::loadGame(BinaryDeserializer & h, const int version)
-{
 }

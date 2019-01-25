@@ -314,15 +314,3 @@ BattleAction CStupidAI::goTowards(const CStack * stack, BattleHex destination)
 		}
 	}
 }
-
-void CStupidAI::saveGame(BinarySerializer & h, const int version)
-{
-	//TODO to be implemented with saving/loading during the battles
-	assert(0);
-}
-
-void CStupidAI::loadGame(BinaryDeserializer & h, const int version)
-{
-	//TODO to be implemented with saving/loading during the battles
-	assert(0);
-}

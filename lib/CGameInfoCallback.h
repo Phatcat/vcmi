@@ -11,9 +11,8 @@
 
 #include "int3.h"
 #include "ResourceSet.h" // for Res::ERes
-#include "battle/CPlayerBattleCallback.h"
+#include "battle/CCallbackBase.h"
 
-class CGObjectInstance;
 struct InfoWindow;
 struct PlayerSettings;
 struct CPackForClient;
@@ -21,17 +20,25 @@ struct TerrainTile;
 struct PlayerState;
 class CTown;
 struct StartInfo;
+
+struct InfoAboutHero;
 struct InfoAboutTown;
+
 struct UpgradeInfo;
 struct SThievesGuildInfo;
-class CGDwelling;
-class CGTeleport;
 class CMapHeader;
 struct TeamState;
 struct QuestInfo;
 struct ShashInt3;
 class CGameState;
 class PathfinderConfig;
+
+class CArmedInstance;
+class CGObjectInstance;
+class CGHeroInstance;
+class CGDwelling;
+class CGTeleport;
+class CGTownInstance;
 
 class DLL_LINKAGE IGameInfoCallback
 {

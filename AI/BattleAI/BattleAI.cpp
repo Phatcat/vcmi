@@ -87,7 +87,7 @@ BattleAction CBattleAI::activeStack( const CStack * stack )
 
 		attemptCastingSpell();
 
-		if(auto ret = getCbc()->battleIsFinished())
+		if(auto ret = cb->battleIsFinished())
 		{
 			//spellcast may finish battle
 			//send special preudo-action
@@ -100,7 +100,7 @@ BattleAction CBattleAI::activeStack( const CStack * stack )
 			return *action;
 		//best action is from effective owner point if view, we are effective owner as we received "activeStack"
 
-		HypotheticBattle hb(getCbc());
+		HypotheticBattle hb(cb);
 
 		PotentialTargets targets(stack, &hb);
 		if(targets.possibleAttacks.size())
@@ -116,7 +116,7 @@ BattleAction CBattleAI::activeStack( const CStack * stack )
 			if(stack->waited())
 			{
 				//ThreatMap threatsToUs(stack); // These lines may be usefull but they are't used in the code.
-				auto dists = getCbc()->battleGetDistances(stack, stack->getPosition());
+				auto dists = cb->battleGetDistances(stack, stack->getPosition());
 				if(!targets.unreachableEnemies.empty())
 				{
 					const EnemyInfo &ei= *range::min_element(targets.unreachableEnemies, std::bind(isCloser, _1, _2, std::ref(dists)));
@@ -221,9 +221,9 @@ void CBattleAI::attemptCastingSpell()
 	LOGL("Casting spells sounds like fun. Let's see...");
 	//Get all spells we can cast
 	std::vector<const CSpell*> possibleSpells;
-	vstd::copy_if(VLC->spellh->objects, std::back_inserter(possibleSpells), [hero](const CSpell *s) -> bool
+	vstd::copy_if(VLC->spellh->objects, std::back_inserter(possibleSpells), [hero, this](const CSpell *s) -> bool
 	{
-		return s->canBeCast(getCbc().get(), spells::Mode::HERO, hero);
+		return s->canBeCast(cb.get(), spells::Mode::HERO, hero);
 	});
 	LOGFL("I can cast %d spells.", possibleSpells.size());
 
@@ -238,7 +238,7 @@ void CBattleAI::attemptCastingSpell()
 	std::vector<PossibleSpellcast> possibleCasts;
 	for(auto spell : possibleSpells)
 	{
-		spells::BattleCast temp(getCbc().get(), hero, spells::Mode::HERO, spell);
+		spells::BattleCast temp(cb.get(), hero, spells::Mode::HERO, spell);
 
 		for(auto & target : temp.findPotentialTargets())
 		{

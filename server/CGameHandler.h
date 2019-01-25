@@ -9,8 +9,11 @@
  */
 #pragma once
 
+#include <vcmi/Environment.h>
+
 #include "../lib/FunctionList.h"
 #include "../lib/IGameCallback.h"
+#include "../lib/battle/CBattleInfoCallback.h"
 #include "../lib/battle/BattleAction.h"
 #include "../lib/ScriptHandler.h"
 #include "CQuery.h"
@@ -82,7 +85,7 @@ struct CasualtiesAfterBattle
 	void updateArmy(CGameHandler *gh);
 };
 
-class CGameHandler : public IGameCallback, CBattleInfoCallback
+class CGameHandler : public IGameCallback, public CBattleInfoCallback, public Environment
 {
 	CVCMIServer * lobby;
 	std::shared_ptr<CApplier<CBaseForGHApply>> applier;
@@ -102,6 +105,12 @@ public:
 	Queries queries;
 
 	SpellCastEnvironment * spellEnv;
+
+	const Services * services() const override;
+	const BattleCb * battle() const override;
+	const GameCb * game() const override;
+	vstd::CLoggerBase * logger() const override;
+	events::EventBus * eventBus() const override;
 
 	bool isValidObject(const CGObjectInstance *obj) const;
 	bool isBlockedByQueries(const CPack *pack, PlayerColor player);
@@ -262,7 +271,6 @@ public:
 
 		if(version >= 800)
 		{
-			//TODO: serialize scripts state
 			JsonNode scriptsState;
 			if(h.saving)
 				serverScripts->serializeState(h.saving, scriptsState);

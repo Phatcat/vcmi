@@ -41,8 +41,7 @@ public:
 
 	BattleAction goTowards(const CStack * stack, BattleHex hex );
 
-	virtual void saveGame(BinarySerializer & h, const int version) override;
-	virtual void loadGame(BinaryDeserializer & h, const int version) override;
+
 
 };
 
