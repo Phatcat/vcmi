@@ -11,6 +11,7 @@
 
 #include <vstd/RNG.h>
 
+#include <vcmi/Environment.h>
 #include <vcmi/ServerCallback.h>
 
 #include "../../lib/HeroBonus.h"
@@ -20,10 +21,6 @@
 class HypotheticBattle;
 class CStack;
 
-namespace events
-{
-	class EventBus;
-}
 
 class RNGStub : public vstd::RNG
 {
@@ -102,7 +99,9 @@ class HypotheticBattle : public BattleProxy, public battle::IUnitEnvironment
 public:
 	std::map<uint32_t, std::shared_ptr<StackWithBonuses>> stackStates;
 
-	HypotheticBattle(Subject realBattle);
+	const Environment * env;
+
+	HypotheticBattle(const Environment * ENV, Subject realBattle);
 
 	bool unitHasAmmoCart(const battle::Unit * unit) const override;
 	PlayerColor unitEffectiveOwner(const battle::Unit * unit) const override;
@@ -166,11 +165,28 @@ private:
 		RNGStub rngStub;
 	};
 
+	class HypotheticEnvironment : public Environment
+	{
+	public:
+		HypotheticEnvironment(HypotheticBattle * owner_, const Environment * upperEnvironment);
+
+		const Services * services() const override;
+		const BattleCb * battle() const override;
+		const GameCb * game() const override;
+		vstd::CLoggerBase * logger() const override;
+		events::EventBus * eventBus() const override;
+
+	private:
+		HypotheticBattle * owner;
+		const Environment * env;
+	};
+
 	int32_t bonusTreeVersion;
 	int32_t activeUnitId;
 	mutable uint32_t nextId;
 
 	std::unique_ptr<HypotheticServerCallback> serverCallback;
+	std::unique_ptr<HypotheticEnvironment> localEnvironment;
 
 	mutable std::shared_ptr<scripting::Pool> pool;
 	mutable std::shared_ptr<events::EventBus> eventBus;

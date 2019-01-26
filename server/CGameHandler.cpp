@@ -1580,7 +1580,7 @@ CGameHandler::~CGameHandler()
 void CGameHandler::reinitScripting()
 {
 	serverEventBus = make_unique<events::EventBus>();
-	serverScripts.reset(new scripting::PoolImpl(this, this, serverEventBus.get()));
+	serverScripts.reset(new scripting::PoolImpl(this));
 }
 
 void CGameHandler::init(StartInfo *si)

@@ -45,7 +45,7 @@ public:
 	void run()
 	{
 		boost::thread_group grupa;
-		for(int i=0;i<threads;i++)
+		for(size_t i=0; i<threads; i++)
 		{
 			std::shared_ptr<Payload> payload = context.at(i);
 
@@ -66,7 +66,7 @@ private:
 	{
 		while(true)
 		{
-			int pom;
+			size_t pom;
 			{
 				boost::unique_lock<boost::mutex> lock(rtinm);
 				if((pom = currentTask) >= amount)

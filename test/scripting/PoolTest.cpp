@@ -11,6 +11,7 @@
 
 #include "../../lib/ScriptHandler.h"
 
+#include "../mock/mock_Environment.h"
 #include "../mock/mock_scripting_Context.h"
 #include "../mock/mock_scripting_Script.h"
 
@@ -27,6 +28,8 @@ class PoolTest : public Test
 public:
 	const std::string SCRIPT_NAME = "TEST SCRIPT";
 
+	NiceMock<EnvironmentMock> env;
+
 	StrictMock<ScriptMock> script;
 	std::shared_ptr<PoolImpl> subject;
 
@@ -38,7 +41,7 @@ public:
 protected:
 	void SetUp() override
 	{
-		subject = std::make_shared<PoolImpl>(nullptr, nullptr, nullptr);//???
+		subject = std::make_shared<PoolImpl>(&env);
 	}
 };
 
@@ -46,7 +49,7 @@ TEST_F(PoolTest, CreatesContext)
 {
 	setDefaultExpectations();
 	auto context = std::make_shared<NiceMock<ContextMock>>();
-	EXPECT_CALL(script, createContext(_)).WillOnce(Return(context));
+	EXPECT_CALL(script, createContext(Eq(&env))).WillOnce(Return(context));
 
 	EXPECT_EQ(context, subject->getContext(&script));
 }
@@ -55,7 +58,7 @@ TEST_F(PoolTest, ReturnsCachedContext)
 {
 	setDefaultExpectations();
 	auto context = std::make_shared<NiceMock<ContextMock>>();
-	EXPECT_CALL(script, createContext(_)).WillOnce(Return(context));
+	EXPECT_CALL(script, createContext(Eq(&env))).WillOnce(Return(context));
 
 	auto first = subject->getContext(&script);
 	EXPECT_EQ(first, subject->getContext(&script));
@@ -65,7 +68,7 @@ TEST_F(PoolTest, CreatesNewContextWithEmptyState)
 {
 	setDefaultExpectations();
 	auto context = std::make_shared<StrictMock<ContextMock>>();
-	EXPECT_CALL(script, createContext(_)).WillOnce(Return(context));
+	EXPECT_CALL(script, createContext(Eq(&env))).WillOnce(Return(context));
 
 	EXPECT_CALL(*context, run(Eq(JsonNode()))).Times(1);
 	subject->getContext(&script);//return value ignored
@@ -75,7 +78,7 @@ TEST_F(PoolTest, SavesScriptState)
 {
 	setDefaultExpectations();
 	auto context = std::make_shared<StrictMock<ContextMock>>();
-	EXPECT_CALL(script, createContext(_)).WillOnce(Return(context));
+	EXPECT_CALL(script, createContext(Eq(&env))).WillOnce(Return(context));
 
 	EXPECT_CALL(*context, run(Eq(JsonNode()))).Times(1);
 	subject->getContext(&script);
@@ -96,7 +99,7 @@ TEST_F(PoolTest, LoadsScriptState)
 {
 	setDefaultExpectations();
 	auto context = std::make_shared<StrictMock<ContextMock>>();
-	EXPECT_CALL(script, createContext(_)).WillOnce(Return(context));
+	EXPECT_CALL(script, createContext(Eq(&env))).WillOnce(Return(context));
 
 	JsonNode expectedState;
 	expectedState[SCRIPT_NAME]["foo"].String() = "bar";

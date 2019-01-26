@@ -39,7 +39,9 @@ SpellTypes spellType(const CSpell * spell)
 }
 
 CBattleAI::CBattleAI()
-	: side(-1), wasWaitingForRealize(false), wasUnlockingGs(false)
+	: side(-1),
+	wasWaitingForRealize(false),
+	wasUnlockingGs(false)
 {
 }
 
@@ -59,7 +61,7 @@ void CBattleAI::init(std::shared_ptr<Environment> ENV, std::shared_ptr<CBattleCa
 	env = ENV;
 	cb = CB;
 	playerID = *CB->getPlayerID(); //TODO should be sth in callback
-	wasWaitingForRealize = cb->waitTillRealize;
+	wasWaitingForRealize = CB->waitTillRealize;
 	wasUnlockingGs = CB->unlockGsWhenWaiting;
 	CB->waitTillRealize = true;
 	CB->unlockGsWhenWaiting = false;
@@ -101,7 +103,7 @@ BattleAction CBattleAI::activeStack( const CStack * stack )
 			return *action;
 		//best action is from effective owner point if view, we are effective owner as we received "activeStack"
 
-		HypotheticBattle hb(cb);
+		HypotheticBattle hb(env.get(), cb);
 
 		PotentialTargets targets(stack, &hb);
 		if(targets.possibleAttacks.size())
@@ -375,7 +377,7 @@ void CBattleAI::attemptCastingSpell()
 	{
 		bool enemyHadTurn = false;
 
-		HypotheticBattle state(cb);
+		HypotheticBattle state(env.get(), cb);
 
 		evaluateQueue(valueOfStack, turnOrder, &state, 0, &enemyHadTurn);
 
@@ -393,7 +395,7 @@ void CBattleAI::attemptCastingSpell()
 
 	auto evaluateSpellcast = [&] (PossibleSpellcast * ps, std::shared_ptr<void>)
 	{
-		HypotheticBattle state(cb);
+		HypotheticBattle state(env.get(), cb);
 
 		spells::BattleCast cast(&state, hero, spells::Mode::HERO, ps->spell);
 		cast.castEval(state.getServerCallback(), ps->dest);

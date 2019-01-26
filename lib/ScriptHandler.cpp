@@ -123,12 +123,9 @@ void ScriptImpl::resolveHost()
 		throw std::runtime_error("Unknown script language in:"+sourcePath);
 }
 
-PoolImpl::PoolImpl(const GameCb * gameCb_, const BattleCb * battleCb_, events::EventBus * eventBus_)
-	: gameCb(gameCb_),
-	battleCb(battleCb_),
-	_eventBus(eventBus_)
+PoolImpl::PoolImpl(const Environment * ENV)
+	: env(ENV)
 {
-
 }
 
 std::shared_ptr<Context> PoolImpl::getContext(const Script * script)
@@ -137,10 +134,10 @@ std::shared_ptr<Context> PoolImpl::getContext(const Script * script)
 
 	if(iter == cache.end())
 	{
-		auto context = script->createContext(this);
+		auto context = script->createContext(env);
 		cache[script] = context;
 
-		auto key = script->getName();
+		auto & key = script->getName();
 		const JsonNode & scriptState = state[key];
 
 		context->run(scriptState);
@@ -151,31 +148,6 @@ std::shared_ptr<Context> PoolImpl::getContext(const Script * script)
 	{
 		return iter->second;
 	}
-}
-
-const Services * PoolImpl::services() const
-{
-	return VLC;
-}
-
-const GameCb * PoolImpl::game() const
-{
-	return gameCb;
-}
-
-const BattleCb * PoolImpl::battle() const
-{
-	return battleCb;
-}
-
-::vstd::CLoggerBase * PoolImpl::logger() const
-{
-	return logMod;
-}
-
-::events::EventBus * PoolImpl::eventBus() const
-{
-    return _eventBus;
 }
 
 void PoolImpl::serializeState(const bool saving, JsonNode & data)

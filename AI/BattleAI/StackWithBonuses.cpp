@@ -9,10 +9,12 @@
  */
 #include "StdInc.h"
 #include "StackWithBonuses.h"
+
+#include <vcmi/events/EventBus.h>
+
 #include "../../lib/NetPacks.h"
 #include "../../lib/CStack.h"
 #include "../../lib/ScriptHandler.h"
-#include <vcmi/events/EventBus.h>
 
 using scripting::Pool;
 
@@ -197,8 +199,9 @@ void StackWithBonuses::spendMana(ServerCallback * server, const int spellCost) c
 	//TODO: evaluate cast use
 }
 
-HypotheticBattle::HypotheticBattle(Subject realBattle)
+HypotheticBattle::HypotheticBattle(const Environment * ENV, Subject realBattle)
 	: BattleProxy(realBattle),
+	env(ENV),
 	bonusTreeVersion(1)
 {
 	auto activeUnit = realBattle->battleActiveUnit();
@@ -207,7 +210,10 @@ HypotheticBattle::HypotheticBattle(Subject realBattle)
 	nextId = 0xF0000000;
 
 	eventBus.reset(new events::EventBus());
-	pool.reset(new scripting::PoolImpl(nullptr, this, eventBus.get()));
+
+	localEnvironment.reset(new HypotheticEnvironment(this, env));
+
+	pool.reset(new scripting::PoolImpl(localEnvironment.get()));
 	serverCallback.reset(new HypotheticServerCallback(this));
 }
 
@@ -470,5 +476,37 @@ void HypotheticBattle::HypotheticServerCallback::apply(BattleObstaclesChanged * 
 void HypotheticBattle::HypotheticServerCallback::apply(CatapultAttack * pack)
 {
 	pack->applyBattle(owner);
+}
+
+HypotheticBattle::HypotheticEnvironment::HypotheticEnvironment(HypotheticBattle * owner_, const Environment * upperEnvironment)
+	: owner(owner_),
+	env(upperEnvironment)
+{
+
+}
+
+const Services * HypotheticBattle::HypotheticEnvironment::services() const
+{
+	return env->services();
+}
+
+const Environment::BattleCb * HypotheticBattle::HypotheticEnvironment::battle() const
+{
+	return owner;
+}
+
+const Environment::GameCb * HypotheticBattle::HypotheticEnvironment::game() const
+{
+	return env->game();
+}
+
+vstd::CLoggerBase * HypotheticBattle::HypotheticEnvironment::logger() const
+{
+	return env->logger();
+}
+
+events::EventBus * HypotheticBattle::HypotheticEnvironment::eventBus() const
+{
+	return owner->eventBus.get();
 }
 
