@@ -184,6 +184,7 @@ set(lib_HEADERS
 
 		../include/vcmi/scripting/Service.h
 
+		../include/vcmi/spells/Caster.h
 		../include/vcmi/spells/Magic.h
 		../include/vcmi/spells/Service.h
 		../include/vcmi/spells/Spell.h

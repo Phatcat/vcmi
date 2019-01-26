@@ -140,6 +140,7 @@
 		<Unit filename="../include/vcmi/events/EventBus.h" />
 		<Unit filename="../include/vcmi/events/SubscriptionRegistry.h" />
 		<Unit filename="../include/vcmi/scripting/Service.h" />
+		<Unit filename="../include/vcmi/spells/Caster.h" />
 		<Unit filename="../include/vcmi/spells/Magic.h" />
 		<Unit filename="../include/vcmi/spells/Service.h" />
 		<Unit filename="../include/vcmi/spells/Spell.h" />

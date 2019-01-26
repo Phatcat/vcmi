@@ -15,6 +15,8 @@
 #include "CSpellHandler.h"
 #include "Problem.h"
 
+#include <vcmi/spells/Caster.h>
+
 #include "../CGeneralTextHandler.h"
 #include "../filesystem/Filesystem.h"
 
@@ -131,13 +133,12 @@ bool CSpell::adventureCast(SpellCastEnvironment * env, const AdventureSpellCastP
 	return adventureMechanics->adventureCast(env, parameters);
 }
 
-
-const CSpell::LevelInfo & CSpell::getLevelInfo(const int level) const
+const CSpell::LevelInfo & CSpell::getLevelInfo(const int32_t level) const
 {
 	if(level < 0 || level >= GameConstants::SPELL_SCHOOL_LEVELS)
 	{
-		logGlobal->error("CSpell::getLevelInfo invalid school level %d", level);
-		throw std::runtime_error("Invalid school level");
+		logGlobal->error("CSpell::getLevelInfo: invalid school level %d", level);
+		return levels.at(0);
 	}
 
 	return levels.at(level);
@@ -297,12 +298,17 @@ const std::string & CSpell::getCastSound() const
 	return castSound;
 }
 
-si32 CSpell::getCost(const int skillLevel) const
+int32_t CSpell::getCost(const int32_t skillLevel) const
 {
 	return getLevelInfo(skillLevel).cost;
 }
 
-si32 CSpell::getPower(const int skillLevel) const
+int32_t CSpell::getBasePower() const
+{
+	return power;
+}
+
+int32_t CSpell::getLevelPower(const int32_t skillLevel) const
 {
 	return getLevelInfo(skillLevel).power;
 }
@@ -390,7 +396,7 @@ int64_t CSpell::adjustRawDamage(const spells::Caster * caster, const battle::Uni
 
 int64_t CSpell::calculateRawEffectValue(int32_t effectLevel, int32_t basePowerMultiplier, int32_t levelPowerMultiplier) const
 {
-	return basePowerMultiplier * power + levelPowerMultiplier * getPower(effectLevel);
+	return (int64_t)basePowerMultiplier * getBasePower() + levelPowerMultiplier * getLevelPower(effectLevel);
 }
 
 void CSpell::setIsOffensive(const bool val)

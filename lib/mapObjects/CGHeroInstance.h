@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#include <vcmi/spells/Magic.h>
+#include <vcmi/spells/Caster.h>
 
 #include "CObjectHandler.h"
 #include "CArmedInstance.h"
@@ -169,7 +169,7 @@ public:
 	si32 manaRegain() const; //how many points of mana can hero regain "naturally" in one day
 	si32 getManaNewTurn() const; //calculate how much mana this hero is going to have the next day
 	int getCurrentLuck(int stack=-1, bool town=false) const;
-	int getSpellCost(const CSpell *sp) const; //do not use during battles -> bonuses from army would be ignored
+	int32_t getSpellCost(const spells::Spell * sp) const; //do not use during battles -> bonuses from army would be ignored
 
 	bool canLearnSpell(const CSpell * spell) const;
 
@@ -248,16 +248,13 @@ public:
 
 	///spells::Caster
 	int32_t getCasterUnitId() const override;
-	ui8 getSpellSchoolLevel(const spells::Spell * spell, int * outSelectedSchool = nullptr) const override;
+	int32_t getSpellSchoolLevel(const spells::Spell * spell, int32_t * outSelectedSchool = nullptr) const override;
 	int64_t getSpellBonus(const spells::Spell * spell, int64_t base, const battle::Unit * affectedStack) const override;
 	int64_t getSpecificSpellBonus(const spells::Spell * spell, int64_t base) const override;
 
-	int getEffectLevel(const spells::Spell * spell) const override;
-
-	int getEffectPower(const spells::Spell * spell) const override;
-
-	int getEnchantPower(const spells::Spell * spell) const override;
-
+	int32_t getEffectLevel(const spells::Spell * spell) const override;
+	int32_t getEffectPower(const spells::Spell * spell) const override;
+	int32_t getEnchantPower(const spells::Spell * spell) const override;
 	int64_t getEffectValue(const spells::Spell * spell) const override;
 
 	const PlayerColor getOwner() const override;

@@ -207,7 +207,7 @@ HypotheticBattle::HypotheticBattle(const Environment * ENV, Subject realBattle)
 	auto activeUnit = realBattle->battleActiveUnit();
 	activeUnitId = activeUnit ? activeUnit->unitId() : -1;
 
-	nextId = 0xF0000000;
+	nextId = 0x00F00000;
 
 	eventBus.reset(new events::EventBus());
 

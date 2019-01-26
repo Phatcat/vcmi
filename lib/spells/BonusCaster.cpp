@@ -11,6 +11,8 @@
 
 #include "BonusCaster.h"
 
+#include <vcmi/spells/Spell.h>
+
 #include "../NetPacksBase.h"
 #include "../HeroBonus.h"
 #include "../battle/Unit.h"

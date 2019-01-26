@@ -26,6 +26,14 @@ public:
 	virtual bool isAdventureSpell() const = 0;
 
 	virtual void forEachSchool(const std::function<void (const SchoolInfo &, bool &)> & cb) const = 0;
+
+	virtual int32_t getCost(const int32_t skillLevel) const = 0;
+
+	virtual int32_t getBasePower() const = 0;
+	/**
+	 * Returns spell level power, base power ignored
+	 */
+	virtual int32_t getLevelPower(const int32_t skillLevel) const = 0;
 };
 
 }

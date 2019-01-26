@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <vcmi/spells/Magic.h>
+#include <vcmi/spells/Caster.h>
 
 #include "../HeroBonus.h"
 

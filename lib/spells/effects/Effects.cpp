@@ -11,6 +11,8 @@
 
 #include "Effects.h"
 
+#include <vcmi/spells/Caster.h>
+
 #include "../ISpellMechanics.h"
 
 #include "../../serializer/JsonSerializeFormat.h"

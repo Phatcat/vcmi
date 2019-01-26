@@ -2211,8 +2211,8 @@ void CPlayerInterface::advmapSpellCast(const CGHeroInstance * caster, int spellI
 	if(spellID == SpellID::VIEW_EARTH)
 	{
 		//TODO: implement on server side
-		int level = caster->getSpellSchoolLevel(spell);
-		adventureInt->worldViewOptions.showAllTerrain = (level>2);
+		const auto level = caster->getSpellSchoolLevel(spell);
+		adventureInt->worldViewOptions.showAllTerrain = (level > 2);
 	}
 
 	auto castSoundPath = spell->getCastSound();

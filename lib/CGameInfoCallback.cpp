@@ -177,7 +177,7 @@ const StartInfo * CGameInfoCallback::getStartInfo(bool beforeRandomization) cons
 		return gs->scenarioOps;
 }
 
-int CGameInfoCallback::getSpellCost(const CSpell * sp, const CGHeroInstance * caster) const
+int32_t CGameInfoCallback::getSpellCost(const spells::Spell * sp, const CGHeroInstance * caster) const
 {
 	//boost::shared_lock<boost::shared_mutex> lock(*gs->mx);
 	ERROR_RET_VAL_IF(!canGetFullInfo(caster), "Cannot get info about caster!", -1);

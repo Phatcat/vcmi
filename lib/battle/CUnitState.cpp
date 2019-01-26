@@ -11,6 +11,8 @@
 
 #include "CUnitState.h"
 
+#include <vcmi/spells/Spell.h>
+
 #include "../NetPacks.h"
 #include "../CCreatureHandler.h"
 
@@ -559,9 +561,9 @@ int32_t CUnitState::getCasterUnitId() const
 	return static_cast<int32_t>(unitId());
 }
 
-ui8 CUnitState::getSpellSchoolLevel(const spells::Spell * spell, int * outSelectedSchool) const
+int32_t CUnitState::getSpellSchoolLevel(const spells::Spell * spell, int32_t * outSelectedSchool) const
 {
-	int skill = valOfBonuses(Selector::typeSubtype(Bonus::SPELLCASTER, spell->getIndex()));
+	int32_t skill = valOfBonuses(Selector::typeSubtype(Bonus::SPELLCASTER, spell->getIndex()));
 	vstd::abetween(skill, 0, 3);
 	return skill;
 }
@@ -577,19 +579,19 @@ int64_t CUnitState::getSpecificSpellBonus(const spells::Spell * spell, int64_t b
 	return base;
 }
 
-int CUnitState::getEffectLevel(const spells::Spell * spell) const
+int32_t CUnitState::getEffectLevel(const spells::Spell * spell) const
 {
 	return getSpellSchoolLevel(spell);
 }
 
-int CUnitState::getEffectPower(const spells::Spell * spell) const
+int32_t CUnitState::getEffectPower(const spells::Spell * spell) const
 {
 	return valOfBonuses(Bonus::CREATURE_SPELL_POWER) * getCount() / 100;
 }
 
-int CUnitState::getEnchantPower(const spells::Spell * spell) const
+int32_t CUnitState::getEnchantPower(const spells::Spell * spell) const
 {
-	int res = valOfBonuses(Bonus::CREATURE_ENCHANT_POWER);
+	int32_t res = valOfBonuses(Bonus::CREATURE_ENCHANT_POWER);
 	if(res <= 0)
 		res = 3;//default for creatures
 	return res;

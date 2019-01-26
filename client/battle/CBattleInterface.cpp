@@ -1079,8 +1079,6 @@ void CBattleInterface::stacksAreAttacked(std::vector<StackAttackedInfo> attacked
 		killedBySide.at(side) += attackedInfo.amountKilled;
 	}
 
-	int killed = killedBySide[0] + killedBySide[1];
-
 	for(ui8 side = 0; side < 2; side++)
 	{
 		if(killedBySide.at(side) > killedBySide.at(1-side))

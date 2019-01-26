@@ -700,7 +700,7 @@ TDmgRange CBattleInfoCallback::calculateDmgRange(const BattleAttackInfo & info) 
 		}
 
 		if(isAffected)
-			attackDefenceDifference += SpellID(SpellID::SLAYER).toSpell()->getPower(spLevel);
+			attackDefenceDifference += SpellID(SpellID::SLAYER).toSpell()->getLevelPower(spLevel);
 	}
 
 	//bonus from attack/defense skills
@@ -1528,17 +1528,17 @@ std::vector<BattleHex> CBattleInfoCallback::getAttackableBattleHexes() const
 	return attackableBattleHexes;
 }
 
-ui32 CBattleInfoCallback::battleGetSpellCost(const CSpell * sp, const CGHeroInstance * caster) const
+int32_t CBattleInfoCallback::battleGetSpellCost(const spells::Spell * sp, const CGHeroInstance * caster) const
 {
 	RETURN_IF_NOT_BATTLE(-1);
 	//TODO should be replaced using bonus system facilities (propagation onto battle node)
 
-	ui32 ret = caster->getSpellCost(sp);
+	int32_t ret = caster->getSpellCost(sp);
 
 	//checking for friendly stacks reducing cost of the spell and
 	//enemy stacks increasing it
-	si32 manaReduction = 0;
-	si32 manaIncrease = 0;
+	int32_t manaReduction = 0;
+	int32_t manaIncrease = 0;
 
 	for(auto unit : battleAliveUnits())
 	{

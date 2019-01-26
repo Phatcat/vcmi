@@ -43,7 +43,8 @@ bool AdventureSpellMechanics::adventureCast(SpellCastEnvironment * env, const Ad
 		return false;
 	}
 
-	const int cost = caster->getSpellCost(owner);
+	const auto level = caster->getSpellSchoolLevel(owner);
+	const auto cost = owner->getCost(level);
 
 	if(!caster->canCastThisSpell(owner))
 	{
@@ -70,7 +71,7 @@ ESpellCastResult AdventureSpellMechanics::applyAdventureEffects(SpellCastEnviron
 	if(owner->hasEffects())
 	{
 		//todo: cumulative effects support
-		const int schoolLevel = parameters.caster->getSpellSchoolLevel(owner);
+		const auto schoolLevel = parameters.caster->getSpellSchoolLevel(owner);
 
 		std::vector<Bonus> bonuses;
 
@@ -112,7 +113,8 @@ void AdventureSpellMechanics::performCast(SpellCastEnvironment * env, const Adve
 
 void AdventureSpellMechanics::endCast(SpellCastEnvironment * env, const AdventureSpellCastParameters & parameters, const ESpellCastResult result) const
 {
-	const int cost = parameters.caster->getSpellCost(owner);
+	const auto level = parameters.caster->getSpellSchoolLevel(owner);
+	const auto cost = owner->getCost(level);
 
 	switch(result)
 	{
@@ -158,10 +160,10 @@ ESpellCastResult SummonBoatMechanics::applyAdventureEffects(SpellCastEnvironment
 		return ESpellCastResult::CANCEL;
 	}
 
-	const int schoolLevel = parameters.caster->getSpellSchoolLevel(owner);
+	const auto schoolLevel = parameters.caster->getSpellSchoolLevel(owner);
 
 	//check if spell works at all
-	if(env->getRNG()->getInt64Range(0, 99)() >= owner->getPower(schoolLevel)) //power is % chance of success
+	if(env->getRNG()->getInt64Range(0, 99)() >= owner->getLevelPower(schoolLevel)) //power is % chance of success
 	{
 		InfoWindow iw;
 		iw.player = parameters.caster->tempOwner;
@@ -225,9 +227,9 @@ ScuttleBoatMechanics::ScuttleBoatMechanics(const CSpell * s):
 
 ESpellCastResult ScuttleBoatMechanics::applyAdventureEffects(SpellCastEnvironment * env, const AdventureSpellCastParameters & parameters) const
 {
-	const int schoolLevel = parameters.caster->getSpellSchoolLevel(owner);
+	const auto schoolLevel = parameters.caster->getSpellSchoolLevel(owner);
 	//check if spell works at all
-	if(env->getRNG()->getInt64Range(0, 99)() >= owner->getPower(schoolLevel)) //power is % chance of success
+	if(env->getRNG()->getInt64Range(0, 99)() >= owner->getLevelPower(schoolLevel)) //power is % chance of success
 	{
 		InfoWindow iw;
 		iw.player = parameters.caster->tempOwner;
@@ -292,13 +294,13 @@ ESpellCastResult DimensionDoorMechanics::applyAdventureEffects(SpellCastEnvironm
 		return ESpellCastResult::ERROR;
 	}
 
-	const int schoolLevel = parameters.caster->getSpellSchoolLevel(owner);
+	const auto schoolLevel = parameters.caster->getSpellSchoolLevel(owner);
 	const int movementCost = GameConstants::BASE_MOVEMENT_COST * ((schoolLevel >= 3) ? 2 : 3);
 
 	std::stringstream cachingStr;
 	cachingStr << "source_" << Bonus::SPELL_EFFECT << "id_" << owner->id.num;
 
-	if(parameters.caster->getBonuses(Selector::source(Bonus::SPELL_EFFECT, owner->id), Selector::all, cachingStr.str())->size() >= owner->getPower(schoolLevel)) //limit casts per turn
+	if(parameters.caster->getBonuses(Selector::source(Bonus::SPELL_EFFECT, owner->id), Selector::all, cachingStr.str())->size() >= owner->getLevelPower(schoolLevel)) //limit casts per turn
 	{
 		InfoWindow iw;
 		iw.player = parameters.caster->tempOwner;
@@ -344,8 +346,8 @@ ESpellCastResult TownPortalMechanics::applyAdventureEffects(SpellCastEnvironment
 	const CGTownInstance * destination = nullptr;
 	const int moveCost = movementCost(parameters);
 
-    if(parameters.caster->getSpellSchoolLevel(owner) < 2)
-    {
+	if(parameters.caster->getSpellSchoolLevel(owner) < 2)
+	{
 		std::vector <const CGTownInstance*> pool = getPossibleTowns(env, parameters);
 		destination = findNearestTown(env, parameters, pool);
 
@@ -537,7 +539,7 @@ std::vector <const CGTownInstance*> TownPortalMechanics::getPossibleTowns(SpellC
 	return ret;
 }
 
-int TownPortalMechanics::movementCost(const AdventureSpellCastParameters & parameters) const
+int32_t TownPortalMechanics::movementCost(const AdventureSpellCastParameters & parameters) const
 {
 	return GameConstants::BASE_MOVEMENT_COST * ((parameters.caster->getSpellSchoolLevel(owner) >= 3) ? 2 : 3);
 }
@@ -554,7 +556,7 @@ ESpellCastResult ViewMechanics::applyAdventureEffects(SpellCastEnvironment * env
 
 	pack.player = parameters.caster->getOwner();
 
-	const int spellLevel = parameters.caster->getSpellSchoolLevel(owner);
+	const auto spellLevel = parameters.caster->getSpellSchoolLevel(owner);
 
 	const auto & fowMap = env->getCb()->getPlayerTeam(parameters.caster->getOwner())->fogOfWarMap;
 
@@ -581,7 +583,7 @@ ViewAirMechanics::ViewAirMechanics(const CSpell * s):
 {
 }
 
-bool ViewAirMechanics::filterObject(const CGObjectInstance * obj, const int spellLevel) const
+bool ViewAirMechanics::filterObject(const CGObjectInstance * obj, const int32_t spellLevel) const
 {
 	return (obj->ID == Obj::ARTIFACT) || (spellLevel > 1 && obj->ID == Obj::HERO) || (spellLevel > 2 && obj->ID == Obj::TOWN);
 }
@@ -592,7 +594,7 @@ ViewEarthMechanics::ViewEarthMechanics(const CSpell * s):
 {
 }
 
-bool ViewEarthMechanics::filterObject(const CGObjectInstance * obj, const int spellLevel) const
+bool ViewEarthMechanics::filterObject(const CGObjectInstance * obj, const int32_t spellLevel) const
 {
 	return (obj->ID == Obj::RESOURCE) || (spellLevel > 1 && obj->ID == Obj::MINE);
 }

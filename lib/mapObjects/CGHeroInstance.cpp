@@ -12,6 +12,7 @@
 #include "CGHeroInstance.h"
 
 #include <vcmi/ServerCallback.h>
+#include <vcmi/spells/Spell.h>
 
 #include "../NetPacks.h"
 #include "../CGeneralTextHandler.h"
@@ -612,13 +613,13 @@ int32_t CGHeroInstance::getCasterUnitId() const
 	return -1; //TODO: special value for attacker/defender hero
 }
 
-ui8 CGHeroInstance::getSpellSchoolLevel(const spells::Spell * spell, int * outSelectedSchool) const
+int32_t CGHeroInstance::getSpellSchoolLevel(const spells::Spell * spell, int32_t * outSelectedSchool) const
 {
-	si16 skill = -1; //skill level
+	int32_t skill = -1; //skill level
 
 	spell->forEachSchool([&, this](const spells::SchoolInfo & cnf, bool & stop)
 	{
-		int thisSchool = std::max<int>(
+		int32_t thisSchool = std::max<int32_t>(
 			valOfBonuses(Bonus::SECONDARY_SKILL_PREMY, cnf.skill),
 			valOfBonuses(Bonus::MAGIC_SCHOOL_SKILL, 1 << ((ui8)cnf.id))); //FIXME: Bonus shouldn't be additive (Witchking Artifacts : Crown of Skies)
 		if(thisSchool > skill)
@@ -665,7 +666,7 @@ int64_t CGHeroInstance::getSpecificSpellBonus(const spells::Spell * spell, int64
 	return base;
 }
 
-int CGHeroInstance::getEffectLevel(const spells::Spell * spell) const
+int32_t CGHeroInstance::getEffectLevel(const spells::Spell * spell) const
 {
 	if(hasBonusOfType(Bonus::MAXED_SPELL, spell->getIndex()))
 		return 3;//todo: recheck specialty from where this bonus is. possible bug
@@ -673,12 +674,12 @@ int CGHeroInstance::getEffectLevel(const spells::Spell * spell) const
 		return getSpellSchoolLevel(spell);
 }
 
-int CGHeroInstance::getEffectPower(const spells::Spell * spell) const
+int32_t CGHeroInstance::getEffectPower(const spells::Spell * spell) const
 {
 	return getPrimSkillLevel(PrimarySkill::SPELL_POWER);
 }
 
-int CGHeroInstance::getEnchantPower(const spells::Spell * spell) const
+int32_t CGHeroInstance::getEnchantPower(const spells::Spell * spell) const
 {
 	return getPrimSkillLevel(PrimarySkill::SPELL_POWER) + valOfBonuses(Bonus::SPELL_DURATION);
 }
@@ -982,7 +983,7 @@ void CGHeroInstance::getOutOffsets(std::vector<int3> &offsets) const
 	};
 }
 
-int CGHeroInstance::getSpellCost(const CSpell * sp) const
+int32_t CGHeroInstance::getSpellCost(const spells::Spell * sp) const
 {
 	return sp->getCost(getSpellSchoolLevel(sp));
 }

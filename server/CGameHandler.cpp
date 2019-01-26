@@ -112,12 +112,12 @@ public:
 			return -1;
 	}
 
-	ui8 getSpellSchoolLevel(const Spell * spell, int * outSelectedSchool = nullptr) const override
+	int32_t getSpellSchoolLevel(const Spell * spell, int32_t * outSelectedSchool = nullptr) const override
 	{
 		return obs->spellLevel;
 	}
 
-	int getEffectLevel(const Spell * spell) const override
+	int32_t getEffectLevel(const Spell * spell) const override
 	{
 		return obs->spellLevel;
 	}
@@ -138,12 +138,12 @@ public:
 			return base;
 	}
 
-	int getEffectPower(const Spell * spell) const override
+	int32_t getEffectPower(const Spell * spell) const override
 	{
 		return obs->casterSpellPower;
 	}
 
-	int getEnchantPower(const Spell * spell) const override
+	int32_t getEnchantPower(const Spell * spell) const override
 	{
 		return obs->casterSpellPower;
 	}

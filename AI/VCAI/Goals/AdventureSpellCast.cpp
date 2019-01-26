@@ -73,10 +73,10 @@ void AdventureSpellCast::accept(VCAI * ai)
 
 std::string AdventureSpellCast::name() const
 {
-	return "AdventureSpellCast " + spellID.toSpell()->name;
+	return "AdventureSpellCast " + getSpell()->name;
 }
 
 std::string AdventureSpellCast::completeMessage() const
 {
-	return "Spell casted successfully  " + spellID.toSpell()->name;
+	return "Spell cast successfully " + getSpell()->name;
 }

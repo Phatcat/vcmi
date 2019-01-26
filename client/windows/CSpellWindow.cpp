@@ -522,7 +522,7 @@ void CSpellWindow::SpellArea::clickLeft(tribool down, bool previousState)
 {
 	if(mySpell && !down)
 	{
-		int spellCost = owner->myInt->cb->getSpellCost(mySpell, owner->myHero);
+		auto spellCost = owner->myInt->cb->getSpellCost(mySpell, owner->myHero);
 		if(spellCost > owner->myHero->mana) //insufficient mana
 		{
 			owner->myInt->showInfoDialog(boost::str(boost::format(CGI->generaltexth->allTexts[206]) % spellCost % owner->myHero->mana));
@@ -625,7 +625,7 @@ void CSpellWindow::SpellArea::setSpell(const CSpell * spell)
 	mySpell = spell;
 	if(mySpell)
 	{
-		int whichSchool = 0; //0 - air magic, 1 - fire magic, 2 - water magic, 3 - earth magic,
+		int32_t whichSchool = 0; //0 - air magic, 1 - fire magic, 2 - water magic, 3 - earth magic,
 		schoolLevel = owner->myHero->getSpellSchoolLevel(mySpell, &whichSchool);
 		auto spellCost = owner->myInt->cb->getSpellCost(mySpell, owner->myHero);
 

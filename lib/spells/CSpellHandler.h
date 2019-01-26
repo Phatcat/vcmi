@@ -9,6 +9,9 @@
  */
 
 #pragma once
+
+#include <vcmi/spells/Spell.h>
+#include <vcmi/spells/Service.h>
 #include <vcmi/spells/Magic.h>
 #include "../JsonNode.h"
 #include "../IHandlerBase.h"
@@ -184,7 +187,7 @@ public:
 	 * \return Spell level info structure
 	 *
 	 */
-	const CSpell::LevelInfo & getLevelInfo(const int level) const;
+	const CSpell::LevelInfo & getLevelInfo(const int32_t level) const;
 public:
 	enum ESpellPositiveness
 	{
@@ -201,7 +204,7 @@ public:
 		bool clearAffected;
 		bool clearTarget;
 
-		TargetInfo(const CSpell * spell, const int level, spells::Mode mode);
+		TargetInfo(const CSpell * spell, const int32_t level, spells::Mode mode);
 	};
 
 	using BTVector = std::vector<Bonus::BonusType>;
@@ -248,14 +251,12 @@ public:
 	///calculate spell damage on stack taking caster`s secondary skills and affectedCreature`s bonuses into account
 	int64_t calculateDamage(const spells::Caster * caster) const;
 
-	si32 getCost(const int skillLevel) const;
-
-	/**
-	 * Returns spell level power, base power ignored
-	 */
-	si32 getPower(const int skillLevel) const;
+	int32_t getCost(const int32_t skillLevel) const override;
 
 	si32 getProbability(const TFaction factionId) const;
+
+	int32_t getBasePower() const override;
+	int32_t getLevelPower(const int32_t skillLevel) const override;
 
 	/**
 	 * Calls cb for each school this spell belongs to

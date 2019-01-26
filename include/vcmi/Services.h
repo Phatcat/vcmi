@@ -38,8 +38,8 @@ public:
 	virtual const CreatureService * creatureService() const = 0;
 	virtual const scripting::Service * scriptingService() const = 0;
 	virtual const spells::Service * spellService() const = 0;
-	virtual const spells::effects::Registry * spellEffects() const = 0;
 
+	virtual const spells::effects::Registry * spellEffects() const = 0;
 	virtual spells::effects::Registry * spellEffects() = 0;
 	//TODO: put map object types registry access here
 };

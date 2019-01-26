@@ -11,6 +11,9 @@
 
 #include "Dispel.h"
 #include "Registry.h"
+
+#include <vcmi/spells/Spell.h>
+
 #include "../ISpellMechanics.h"
 
 #include "../../NetPacks.h"
