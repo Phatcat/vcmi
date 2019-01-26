@@ -37,11 +37,40 @@ Dispel::~Dispel() = default;
 
 void Dispel::apply(ServerCallback * server, const Mechanics * m, const EffectTarget & target) const
 {
+	const bool describe = server->describeChanges();
 	SetStackEffect sse;
-	prepareEffects(sse, *server->getRNG(), m, target, server->describeChanges());
+	BattleLogMessage blm;
+
+	for(auto & t : target)
+	{
+		const battle::Unit * unit = t.unitValue;
+		if(unit)
+		{
+			//special case for DISPEL_HELPFUL_SPELLS
+			if(describe && positive && !negative && !neutral)
+			{
+				MetaString line;
+				unit->addText(line, MetaString::GENERAL_TXT, -555, true);
+				unit->addNameReplacement(line, true);
+				blm.lines.push_back(std::move(line));
+			}
+
+			std::vector<Bonus> buffer;
+			auto bl = getBonuses(m, unit);
+
+			for(auto item : *bl)
+				buffer.emplace_back(*item);
+
+			if(!buffer.empty())
+				sse.toRemove.push_back(std::make_pair(unit->unitId(), buffer));
+		}
+	}
 
 	if(!sse.toRemove.empty())
 		server->apply(&sse);
+
+	if(describe && !blm.lines.empty())
+		server->apply(&blm);
 }
 
 bool Dispel::isValidTarget(const Mechanics * m, const battle::Unit * unit) const
@@ -106,34 +135,6 @@ std::shared_ptr<BonusList> Dispel::getBonuses(const Mechanics * m, const battle:
 	CSelector selector(sel);
 
 	return unit->getBonuses(selector);
-}
-
-void Dispel::prepareEffects(SetStackEffect & pack, RNG & rng, const Mechanics * m, const EffectTarget & target, bool describe) const
-{
-	for(auto & t : target)
-	{
-		const battle::Unit * unit = t.unitValue;
-		if(unit)
-		{
-			//special case for DISPEL_HELPFUL_SPELLS
-			if(describe && positive && !negative && !neutral)
-			{
-				MetaString line;
-				unit->addText(line, MetaString::GENERAL_TXT, -555, true);
-				unit->addNameReplacement(line, true);
-				pack.battleLog.push_back(std::move(line));
-			}
-
-			std::vector<Bonus> buffer;
-			auto bl = getBonuses(m, unit);
-
-			for(auto item : *bl)
-				buffer.emplace_back(*item);
-
-			if(!buffer.empty())
-				pack.toRemove.push_back(std::make_pair(unit->unitId(), buffer));
-		}
-	}
 }
 
 }

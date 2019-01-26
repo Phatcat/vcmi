@@ -6,7 +6,7 @@ MF.D = function(self, x, ...)
 end
 
 MF.E = function(self, x, ...)
-	error("MF.E is not implemented")
+	error("!!MF:E is not implemented")
 end
 
 MF.F = function(self, x, p1, ...)
@@ -23,7 +23,7 @@ MF.N = function(self, x, ...)
 end
 
 MF.W = function(self, x, ...)
-	error("MF.W is not implemented")
+	error("!!MF:W is not implemented")
 end
 
 return MF

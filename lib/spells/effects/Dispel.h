@@ -40,8 +40,6 @@ private:
 	bool neutral = false;
 
 	std::shared_ptr<BonusList> getBonuses(const Mechanics * m, const battle::Unit * unit) const;
-
-	void prepareEffects(SetStackEffect & pack, RNG & rng, const Mechanics * m, const EffectTarget & target, bool describe) const;
 };
 
 }

@@ -164,9 +164,9 @@ void CAdventureAI::battleStart(const CCreatureSet * army1, const CCreatureSet * 
 	battleAI->battleStart(army1, army2, tile, hero1, hero2, side);
 }
 
-void CAdventureAI::battleStacksAttacked(const std::vector<BattleStackAttacked> & bsa, const std::vector<MetaString> & battleLog)
+void CAdventureAI::battleStacksAttacked(const std::vector<BattleStackAttacked> & bsa)
 {
-	battleAI->battleStacksAttacked(bsa, battleLog);
+	battleAI->battleStacksAttacked(bsa);
 }
 
 void CAdventureAI::actionStarted(const BattleAction & action)
@@ -215,9 +215,9 @@ void CAdventureAI::battleEnd(const BattleResult * br)
 	battleAI.reset();
 }
 
-void CAdventureAI::battleUnitsChanged(const std::vector<UnitChanges> & units, const std::vector<CustomEffectInfo> & customEffects, const std::vector<MetaString> & battleLog)
+void CAdventureAI::battleUnitsChanged(const std::vector<UnitChanges> & units, const std::vector<CustomEffectInfo> & customEffects)
 {
-	battleAI->battleUnitsChanged(units, customEffects, battleLog);
+	battleAI->battleUnitsChanged(units, customEffects);
 }
 
 BattleAction CAdventureAI::activeStack(const CStack * stack)

@@ -1000,6 +1000,7 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 
 	FireShieldInfo fireShield;
 	BattleAttack bat;
+	BattleLogMessage blm;
 	bat.stackAttacking = attacker->unitId();
 
 	std::shared_ptr<battle::CUnitState> attackerState = attacker->acquireState();
@@ -1044,7 +1045,7 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 	}
 	// only primary target
 	if(defender->alive())
-		applyBattleEffects(bat, attackerState, fireShield, defender, distance, false);
+		applyBattleEffects(bat, blm, attackerState, fireShield, defender, distance, false);
 
 	//multiple-hex normal attack
 	std::set<const CStack*> attackedCreatures = gs->curB->getAttackedCreatures(attacker, targetHex, bat.shot()); //creatures other than primary target
@@ -1052,7 +1053,7 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 	for(const CStack * stack : attackedCreatures)
 	{
 		if(stack != defender && stack->alive()) //do not hit same stack twice
-			applyBattleEffects(bat, attackerState, fireShield, stack, distance, true);
+			applyBattleEffects(bat, blm, attackerState, fireShield, stack, distance, true);
 	}
 
 	const std::shared_ptr<Bonus> bonus = attacker->getBonusLocalFirst(Selector::type(Bonus::SPELL_LIKE_ATTACK));
@@ -1080,7 +1081,7 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 		{
 			if(stack != defender && stack->alive()) //do not hit same stack twice
 			{
-				applyBattleEffects(bat, attackerState, fireShield, stack, distance, true);
+				applyBattleEffects(bat, blm, attackerState, fireShield, stack, distance, true);
 			}
 		}
 
@@ -1106,11 +1107,26 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 
 	sendAndApply(&bat);
 
+	{
+		const bool multipleTargets = bat.bsa.size() > 1;
+
+		int64_t totalDamage = 0;
+		int32_t totalKills = 0;
+
+		for(const BattleStackAttacked & bsa : bat.bsa)
+		{
+			totalDamage += bsa.damageAmount;
+			totalKills += bsa.killedAmount;
+		}
+
+		addGenericDamageLog(blm, attacker, defender, totalDamage, totalKills, multipleTargets);
+	}
+	sendAndApply(&blm);
+
 	if(!fireShield.empty())
 	{
 		//todo: this should be "virtual" spell instead, we only need fire spell school bonus here
 		const CSpell * fireShieldSpell = SpellID(SpellID::FIRE_SHIELD).toSpell();
-		StacksInjured pack;
 		int64_t totalDamage = 0;
 
 		for(const auto & item : fireShield)
@@ -1142,14 +1158,15 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 		bsa.damageAmount = totalDamage;
 		attacker->prepareAttacked(bsa, getRandomGenerator());
 
+		StacksInjured pack;
 		pack.stacks.push_back(bsa);
-
 		sendAndApply(&pack);
+		sendGenericDamageLog(attacker, bsa.killedAmount, false);
 	}
 
 	handleAfterAttackCasting(ranged, attacker, defender);
 }
-void CGameHandler::applyBattleEffects(BattleAttack & bat, std::shared_ptr<battle::CUnitState> attackerState, FireShieldInfo & fireShield, const CStack * def, int distance, bool secondary)
+void CGameHandler::applyBattleEffects(BattleAttack & bat, BattleLogMessage & blm, std::shared_ptr<battle::CUnitState> attackerState, FireShieldInfo & fireShield, const CStack * def, int distance, bool secondary)
 {
 	BattleStackAttacked bsa;
 	if(secondary)
@@ -1195,7 +1212,7 @@ void CGameHandler::applyBattleEffects(BattleAttack & bat, std::shared_ptr<battle
 			attackerState->addNameReplacement(text, false);
 			text.addReplacement(toHeal);
 			def->addNameReplacement(text, true);
-			bat.battleLog.push_back(text);
+			blm.lines.push_back(text);
 		}
 	};
 
@@ -1233,6 +1250,62 @@ void CGameHandler::applyBattleEffects(BattleAttack & bat, std::shared_ptr<battle
 		auto fireShieldDamage = (std::min<int64_t>(def->getAvailableHealth(), bsa.damageAmount) * def->valOfBonuses(Bonus::FIRE_SHIELD)) / 100;
 		fireShield.push_back(std::make_pair(def, fireShieldDamage));
 	}
+}
+
+void CGameHandler::sendGenericDamageLog(const CStack * defender, int32_t killed, bool multiple)
+{
+	if(killed > 0)
+	{
+		boost::format txt;
+		if(killed > 1)
+		{
+			txt = boost::format(VLC->generaltexth->allTexts[379]) % killed % (multiple ? VLC->generaltexth->allTexts[43] : defender->getCreature()->namePl); // creatures perish
+		}
+		else //killed == 1
+		{
+			txt = boost::format(VLC->generaltexth->allTexts[378]) % (multiple ? VLC->generaltexth->allTexts[42] : defender->getCreature()->nameSing); // creature perishes
+		}
+		std::string trimmed = boost::to_string(txt);
+		boost::algorithm::trim(trimmed); // these default h3 texts have unnecessary new lines, so get rid of them before displaying
+
+		MetaString line;
+		line.addReplacement(trimmed);
+		BattleLogMessage blm;
+		blm.lines.push_back(line);
+		sendAndApply(&blm);
+	}
+}
+
+void CGameHandler::addGenericDamageLog(BattleLogMessage & blm, const battle::Unit * attacker, const CStack * defender, int64_t dmg, int32_t killed, bool multiple)
+{
+	std::string formattedText;
+
+	MetaString text;
+	attacker->addText(text, MetaString::GENERAL_TXT, 376);
+	attacker->addNameReplacement(text);
+	text.addReplacement(dmg);
+
+	if(killed > 0)
+	{
+		std::string formattedText = " ";
+
+		boost::format txt;
+		if(killed > 1)
+		{
+			txt = boost::format(VLC->generaltexth->allTexts[379]) % killed % (multiple ? VLC->generaltexth->allTexts[43] : defender->getCreature()->namePl); // creatures perish
+		}
+		else //killed == 1
+		{
+			txt = boost::format(VLC->generaltexth->allTexts[378]) % (multiple ? VLC->generaltexth->allTexts[42] : defender->getCreature()->nameSing); // creature perishes
+		}
+		std::string trimmed = boost::to_string(txt);
+		boost::algorithm::trim(trimmed); // these default h3 texts have unnecessary new lines, so get rid of them before displaying
+		formattedText.append(trimmed);
+	}
+
+	text.addReplacement(formattedText);
+	blm.lines.push_back(text);
+	sendAndApply(&blm);
 }
 
 void CGameHandler::handleClientDisconnection(std::shared_ptr<CConnection> c)
@@ -4419,18 +4492,21 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 				{
 					BattleUnitsChanged pack;
 
+					BattleLogMessage message;
+
 					MetaString text;
 					text.addTxt(MetaString::GENERAL_TXT, 414);
 					healer->addNameReplacement(text, false);
 					destStack->addNameReplacement(text, false);
 					text.addReplacement(toHeal);
-					pack.battleLog.push_back(text);
+					message.lines.push_back(text);
 
 					UnitChanges info(state->unitId(), UnitChanges::EOperation::RESET_STATE);
 					info.healthDelta = toHeal;
 					state->save(info.data);
 					pack.changedStacks.push_back(info);
 					sendAndApply(&pack);
+					sendAndApply(&message);
 				}
 			}
 			break;
@@ -4881,6 +4957,7 @@ bool CGameHandler::handleDamageFromObstacle(const CStack * curStack, bool stackI
 				StacksInjured si;
 				si.stacks.push_back(bsa);
 				sendAndApply(&si);
+				sendGenericDamageLog(curStack, bsa.killedAmount, false);
 			}
 		}
 
@@ -5612,6 +5689,7 @@ void CGameHandler::handleAfterAttackCasting(bool ranged, const CStack * attacker
 		si.stacks.push_back(bsa);
 
 		sendAndApply(&si);
+		sendGenericDamageLog(defender, bsa.killedAmount, false);
 	}
 }
 

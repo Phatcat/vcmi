@@ -187,8 +187,6 @@ private:
 	//force active stack to cast a spell if possible
 	void enterCreatureCastingMode();
 
-	void printConsoleAttacked(const CStack *defender, int dmg, int killed, const CStack *attacker, bool Multiple);
-
 	std::list<ProjectileInfo> projectiles; //projectiles flying on battlefield
 	void giveCommand(EActionType action, BattleHex tile = BattleHex(), si32 additional = -1);
 	void sendCommand(BattleAction *& command, const CStack * actor = nullptr);
@@ -342,7 +340,7 @@ public:
 	void stackActivated(const CStack *stack); //active stack has been changed
 	void stackMoved(const CStack *stack, std::vector<BattleHex> destHex, int distance); //stack with id number moved to destHex
 	void waitForAnims();
-	void stacksAreAttacked(std::vector<StackAttackedInfo> attackedInfos, const std::vector<MetaString> & battleLog); //called when a certain amount of stacks has been attacked
+	void stacksAreAttacked(std::vector<StackAttackedInfo> attackedInfos); //called when a certain amount of stacks has been attacked
 	void stackAttacking(const CStack *attacker, BattleHex dest, const CStack *attacked, bool shooting); //called when stack with id ID is attacking something on hex dest
 	void newRoundFirst( int round );
 	void newRound(int number); //caled when round is ended; number is the number of round

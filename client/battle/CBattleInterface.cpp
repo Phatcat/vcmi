@@ -1052,7 +1052,7 @@ void CBattleInterface::stackMoved(const CStack *stack, std::vector<BattleHex> de
 	waitForAnims();
 }
 
-void CBattleInterface::stacksAreAttacked(std::vector<StackAttackedInfo> attackedInfos, const std::vector<MetaString> & battleLog)
+void CBattleInterface::stacksAreAttacked(std::vector<StackAttackedInfo> attackedInfos)
 {
 	for(auto & attackedInfo : attackedInfos)
 	{
@@ -1096,11 +1096,6 @@ void CBattleInterface::stacksAreAttacked(std::vector<StackAttackedInfo> attacked
 		if (attackedInfo.cloneKilled)
 			stackRemoved(attackedInfo.defender->ID);
 	}
-
-	if(!battleLog.empty())
-		displayBattleLog(battleLog);
-	else
-		printConsoleAttacked(attackedInfos.front().defender, damage, killed, attackedInfos.front().attacker, (targets > 1)); //creatures perish
 }
 
 void CBattleInterface::stackAttacking( const CStack *attacker, BattleHex dest, const CStack *attacked, bool shooting )
@@ -1380,9 +1375,6 @@ void CBattleInterface::spellCast(const BattleSpellCast * sc)
 
 void CBattleInterface::battleStacksEffectsSet(const SetStackEffect & sse)
 {
-	for(const MetaString & line : sse.battleLog)
-		console->addText(line.toString());
-
 	if(activeStack != nullptr)
 		redrawBackgroundWithHexes(activeStack);
 }
@@ -1800,39 +1792,6 @@ void CBattleInterface::getPossibleActionsForStack(const CStack *stack, const boo
 		if (notPriority != INVALID)
 			possibleActions.push_back(notPriority);
 	}
-}
-
-void CBattleInterface::printConsoleAttacked(const CStack * defender, int dmg, int killed, const CStack * attacker, bool multiple)
-{
-	std::string formattedText;
-	if(attacker) //ignore if stacks were killed by spell
-	{
-		MetaString text;
-		attacker->addText(text, MetaString::GENERAL_TXT, 376);
-		attacker->addNameReplacement(text);
-		text.addReplacement(dmg);
-		formattedText = text.toString();
-	}
-
-	if(killed > 0)
-	{
-		if(attacker)
-			formattedText.append(" ");
-
-		boost::format txt;
-		if(killed > 1)
-		{
-			txt = boost::format(CGI->generaltexth->allTexts[379]) % killed % (multiple ? CGI->generaltexth->allTexts[43] : defender->getCreature()->namePl); // creatures perish
-		}
-		else //killed == 1
-		{
-			txt = boost::format(CGI->generaltexth->allTexts[378]) % (multiple ? CGI->generaltexth->allTexts[42] : defender->getCreature()->nameSing); // creature perishes
-		}
-		std::string trimmed = boost::to_string(txt);
-		boost::algorithm::trim(trimmed); // these default h3 texts have unnecessary new lines, so get rid of them before displaying
-		formattedText.append(trimmed);
-	}
-	console->addText(formattedText);
 }
 
 void CBattleInterface::endAction(const BattleAction* action)

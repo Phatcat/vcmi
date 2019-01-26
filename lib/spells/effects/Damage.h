@@ -40,8 +40,6 @@ private:
 	int32_t customEffectId;
 	bool killByPercentage;
 	bool killByCount;
-
-	void prepareEffects(StacksInjured & stacksInjured, RNG & rng, const Mechanics * m, const EffectTarget & target, bool describe) const;
 };
 
 }

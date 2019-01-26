@@ -1451,13 +1451,11 @@ struct BattleUnitsChanged : public CPackForClient
 	void applyCl(CClient *cl);
 
 	std::vector<UnitChanges> changedStacks;
-	std::vector<MetaString> battleLog;
 	std::vector<CustomEffectInfo> customEffects;
 
 	template <typename Handler> void serialize(Handler & h, const int version)
 	{
 		h & changedStacks;
-		h & battleLog;
 		h & customEffects;
 	}
 };
@@ -1543,7 +1541,6 @@ struct BattleAttack : public CPackForClient
 
 	SpellID spellID; //for SPELL_LIKE
 
-	std::vector<MetaString> battleLog;
 	std::vector<CustomEffectInfo> customEffects;
 
 	bool shot() const//distance attack - decrease number of shots
@@ -1580,7 +1577,6 @@ struct BattleAttack : public CPackForClient
 		h & stackAttacking;
 		h & flags;
 		h & spellID;
-		h & battleLog;
 		h & customEffects;
 		h & attackerChanges;
 	}
@@ -1658,13 +1654,11 @@ struct SetStackEffect : public CPackForClient
 	std::vector<std::pair<ui32, std::vector<Bonus>>> toUpdate;
 	std::vector<std::pair<ui32, std::vector<Bonus>>> toRemove;
 
-	std::vector<MetaString> battleLog;
 	template <typename Handler> void serialize(Handler & h, const int version)
 	{
 		h & toAdd;
 		h & toUpdate;
 		h & toRemove;
-		h & battleLog;
 	}
 };
 
@@ -1677,12 +1671,10 @@ struct StacksInjured : public CPackForClient
 	void applyCl(CClient * cl);
 
 	std::vector<BattleStackAttacked> stacks;
-	std::vector<MetaString> battleLog;
 
 	template <typename Handler> void serialize(Handler & h, const int version)
 	{
 		h & stacks;
-		h & battleLog;
 	}
 };
 

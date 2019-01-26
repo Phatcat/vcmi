@@ -126,7 +126,12 @@ public:
 
 	void makeAttack(const CStack * attacker, const CStack * defender, int distance, BattleHex targetHex, bool first, bool ranged, bool counter);
 
-	void applyBattleEffects(BattleAttack & bat, std::shared_ptr<battle::CUnitState> attackerState, FireShieldInfo & fireShield, const CStack * def, int distance, bool secondary); //damage, drain life & fire shield
+	void applyBattleEffects(BattleAttack & bat, BattleLogMessage & blm, std::shared_ptr<battle::CUnitState> attackerState, FireShieldInfo & fireShield, const CStack * def, int distance, bool secondary); //damage, drain life & fire shield
+
+	void sendGenericDamageLog(const CStack * defender, int32_t killed, bool multiple);
+
+	void addGenericDamageLog(BattleLogMessage & blm, const battle::Unit * attacker, const CStack * defender, int64_t dmg, int32_t killed, bool multiple);
+
 	void checkBattleStateChanges();
 	void setupBattle(int3 tile, const CArmedInstance *armies[2], const CGHeroInstance *heroes[2], bool creatureBank, const CGTownInstance *town);
 	void setBattleResult(BattleResult::EResult resultType, int victoriusSide);
@@ -326,12 +331,13 @@ public:
 	bool sacrificeArtifact(const IMarket * m, const CGHeroInstance * hero, const std::vector<ArtifactPosition> & slot);
 	void spawnWanderingMonsters(CreatureID creatureID);
 	void handleCheatCode(std::string & cheat, PlayerColor player, const CGHeroInstance * hero, const CGTownInstance * town, bool & cheated);
-	friend class CVCMIServer;
 
 	CRandomGenerator & getRandomGenerator();
 
 	scripting::Pool * getGlobalContextPool() const override;
 	scripting::Pool * getContextPool() const override;
+
+	friend class CVCMIServer;
 private:
 	std::unique_ptr<events::EventBus> serverEventBus;
 	std::shared_ptr<scripting::PoolImpl> serverScripts;

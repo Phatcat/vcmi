@@ -233,7 +233,6 @@ TEST_F(ERM_BU_S, Summon)
 
 	auto checkApply = [&](BattleUnitsChanged * pack)
 	{
-		EXPECT_TRUE(pack->battleLog.empty());
 		EXPECT_TRUE(pack->customEffects.empty());
 		EXPECT_EQ(pack->changedStacks.size(), 1);
 
