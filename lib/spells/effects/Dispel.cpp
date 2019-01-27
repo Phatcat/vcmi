@@ -109,7 +109,7 @@ std::shared_ptr<BonusList> Dispel::getBonuses(const Mechanics * m, const battle:
 			if(sourceSpell->getIndex() == SpellID::CLONE)
 				return false;
 			//stack may have inherited effects
-			if(sourceSpell->isAdventureSpell())
+			if(sourceSpell->isAdventure())
 				return false;
 
 			if(sourceSpell->getIndex() == m->getSpellIndex())

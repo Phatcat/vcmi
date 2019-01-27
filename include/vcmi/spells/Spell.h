@@ -21,11 +21,22 @@ struct SchoolInfo;
 class DLL_LINKAGE Spell: public EntityT<SpellID>
 {
 public:
+	using SchoolCallback = std::function<void(const SchoolInfo &, bool &)>;
+
 	virtual int32_t getLevel() const = 0;
 	virtual boost::logic::tribool getPositiveness() const = 0;
-	virtual bool isAdventureSpell() const = 0;
+	virtual bool isAdventure() const = 0;
+	virtual bool isCombat() const = 0;
+	virtual bool isCreatureAbility() const = 0;
+	virtual bool isPositive() const = 0;
+	virtual bool isNegative() const = 0;
+	virtual bool isNeutral() const = 0;
 
-	virtual void forEachSchool(const std::function<void (const SchoolInfo &, bool &)> & cb) const = 0;
+	virtual bool isDamage() const = 0;
+	virtual bool isOffensive() const = 0;
+	virtual bool isSpecial() const = 0;
+
+	virtual void forEachSchool(const SchoolCallback & cb) const = 0;
 
 	virtual int32_t getCost(const int32_t skillLevel) const = 0;
 

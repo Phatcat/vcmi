@@ -184,7 +184,7 @@ bool BattleSpellMechanics::canBeCast(Problem & problem) const
 	if(genProblem != ESpellCastProblem::OK)
 		return adaptProblem(genProblem, problem);
 
-	if(!owner->isCombatSpell())
+	if(!owner->isCombat())
 		return adaptProblem(ESpellCastProblem::ADVMAP_SPELL_INSTEAD_OF_BATTLE_SPELL, problem);
 
 	const PlayerColor player = caster->getOwner();

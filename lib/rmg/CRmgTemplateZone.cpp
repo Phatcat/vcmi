@@ -1142,9 +1142,9 @@ void CRmgTemplateZone::initTownType ()
 				town->builtBuildings.insert(BuildingID::FORT);
 			town->builtBuildings.insert(BuildingID::DEFAULT);
 
-			for (auto spell : VLC->spellh->objects) //add all regular spells to town
+			for(auto spell : VLC->spellh->objects) //add all regular spells to town
 			{
-				if (!spell->isSpecialSpell() && !spell->isCreatureAbility())
+				if(!spell->isSpecial() && !spell->isCreatureAbility())
 					town->possibleSpells.push_back(spell->id);
 			}
 
@@ -1192,9 +1192,9 @@ void CRmgTemplateZone::initTownType ()
 		town->builtBuildings.insert(BuildingID::FORT);
 		town->builtBuildings.insert(BuildingID::DEFAULT);
 
-		for (auto spell : VLC->spellh->objects) //add all regular spells to town
+		for(auto spell : VLC->spellh->objects) //add all regular spells to town
 		{
-			if (!spell->isSpecialSpell() && !spell->isCreatureAbility())
+			if(!spell->isSpecial() && !spell->isCreatureAbility())
 				town->possibleSpells.push_back(spell->id);
 		}
 		//towns are big objects and should be centered around visitable position

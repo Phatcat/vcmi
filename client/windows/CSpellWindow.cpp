@@ -120,7 +120,7 @@ CSpellWindow::CSpellWindow(const CGHeroInstance * _myHero, CPlayerInterface * _m
 
 	for(const auto spell : mySpells)
 	{
-		int * sitesPerOurTab = spell->isCombatSpell() ? sitesPerTabBattle : sitesPerTabAdv;
+		int * sitesPerOurTab = spell->isCombat() ? sitesPerTabBattle : sitesPerTabAdv;
 
 		++sitesPerOurTab[4];
 
@@ -332,7 +332,7 @@ void CSpellWindow::computeSpellsPerArea()
 	spellsCurSite.reserve(mySpells.size());
 	for(const CSpell * spell : mySpells)
 	{
-		if(spell->isCombatSpell() ^ !battleSpellsOnly
+		if(spell->isCombat() ^ !battleSpellsOnly
 			&& ((selectedTab == 4) || spell->school.at((ESpellSchool)selectedTab))
 			)
 		{
@@ -531,8 +531,8 @@ void CSpellWindow::SpellArea::clickLeft(tribool down, bool previousState)
 
 		//anything that is not combat spell is adventure spell
 		//this not an error in general to cast even creature ability with hero
-		const bool combatSpell = mySpell->isCombatSpell();
-		if(mySpell->isCombatSpell() != !mySpell->isAdventureSpell())
+		const bool combatSpell = mySpell->isCombat();
+		if(combatSpell == mySpell->isAdventure())
 		{
 			logGlobal->error("Spell have invalid flags");
 			return;

@@ -29,7 +29,7 @@ AdventureSpellMechanics::AdventureSpellMechanics(const CSpell * s):
 
 bool AdventureSpellMechanics::adventureCast(SpellCastEnvironment * env, const AdventureSpellCastParameters & parameters) const
 {
-	if(!owner->isAdventureSpell())
+	if(!owner->isAdventure())
 	{
 		env->complain("Attempt to cast non adventure spell in adventure mode");
 		return false;

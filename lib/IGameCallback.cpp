@@ -139,10 +139,10 @@ void CPrivilegedInfoCallback::getAllowedSpells(std::vector<SpellID> & out, ui16 
 	for (ui32 i = 0; i < gs->map->allowedSpell.size(); i++) //spellh size appears to be greater (?)
 	{
 
-		const CSpell *spell = SpellID(i).toSpell();
-		if (isAllowed (0, spell->id) && spell->level == level)
+		const spells::Spell * spell = SpellID(i).toSpell();
+		if(isAllowed(0, spell->getIndex()) && spell->getLevel() == level)
 		{
-			out.push_back(spell->id);
+			out.push_back(spell->getId());
 		}
 	}
 }

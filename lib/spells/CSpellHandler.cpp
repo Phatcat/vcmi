@@ -103,12 +103,17 @@ CSpell::LevelInfo::~LevelInfo()
 
 ///CSpell
 CSpell::CSpell():
-	id(SpellID::NONE), level(0),
+	id(SpellID::NONE),
+	level(0),
 	power(0),
-	combatSpell(false), creatureAbility(false),
+	combat(false),
+	creatureAbility(false),
 	positiveness(ESpellPositiveness::NEUTRAL),
 	defaultProbability(0),
-	isRising(false), isDamage(false), isOffensive(false), isSpecial(true),
+	rising(false),
+	damage(false),
+	offensive(false),
+	special(true),
 	targetType(spells::AimType::NO_TARGET),
 	mechanics(),
 	adventureMechanics()
@@ -147,7 +152,7 @@ const CSpell::LevelInfo & CSpell::getLevelInfo(const int32_t level) const
 int64_t CSpell::calculateDamage(const spells::Caster * caster) const
 {
 	//check if spell really does damage - if not, return 0
-	if(!isDamageSpell())
+	if(!isDamage())
 		return 0;
 	auto rawDamage = calculateRawEffectValue(caster->getEffectLevel(this), caster->getEffectPower(this), 1);
 
@@ -215,14 +220,14 @@ int32_t CSpell::getLevel() const
 	return level;
 }
 
-bool CSpell::isCombatSpell() const
+bool CSpell::isCombat() const
 {
-	return combatSpell;
+	return combat;
 }
 
-bool CSpell::isAdventureSpell() const
+bool CSpell::isAdventure() const
 {
-	return !combatSpell;
+	return !combat;
 }
 
 bool CSpell::isCreatureAbility() const
@@ -258,24 +263,19 @@ boost::logic::tribool CSpell::getPositiveness() const
 	}
 }
 
-bool CSpell::isRisingSpell() const
+bool CSpell::isDamage() const
 {
-	return isRising;
+	return damage;
 }
 
-bool CSpell::isDamageSpell() const
+bool CSpell::isOffensive() const
 {
-	return isDamage;
+	return offensive;
 }
 
-bool CSpell::isOffensiveSpell() const
+bool CSpell::isSpecial() const
 {
-	return isOffensive;
-}
-
-bool CSpell::isSpecialSpell() const
-{
-	return isSpecial;
+	return special;
 }
 
 bool CSpell::hasEffects() const
@@ -291,6 +291,26 @@ bool CSpell::hasBattleEffects() const
 const std::string & CSpell::getIconImmune() const
 {
 	return iconImmune;
+}
+
+const std::string & CSpell::getIconBook() const
+{
+	return iconBook;
+}
+
+const std::string & CSpell::getIconEffect() const
+{
+	return iconEffect;
+}
+
+const std::string & CSpell::getIconScenarioBonus() const
+{
+	return iconScenarioBonus;
+}
+
+const std::string & CSpell::getIconScroll() const
+{
+	return iconScroll;
 }
 
 const std::string & CSpell::getCastSound() const
@@ -401,18 +421,18 @@ int64_t CSpell::calculateRawEffectValue(int32_t effectLevel, int32_t basePowerMu
 
 void CSpell::setIsOffensive(const bool val)
 {
-	isOffensive = val;
+	offensive = val;
 
 	if(val)
 	{
 		positiveness = CSpell::NEGATIVE;
-		isDamage = true;
+		damage = true;
 	}
 }
 
 void CSpell::setIsRising(const bool val)
 {
-	isRising = val;
+	rising = val;
 
 	if(val)
 	{
@@ -679,12 +699,12 @@ CSpell * CSpellHandler::loadFromJson(const JsonNode & json, const std::string & 
 	if(type == "ability")
 	{
 		spell->creatureAbility = true;
-		spell->combatSpell = true;
+		spell->combat = true;
 	}
 	else
 	{
 		spell->creatureAbility = false;
-		spell->combatSpell = type == "combat";
+		spell->combat = type == "combat";
 	}
 
 	spell->name = json["name"].String();
@@ -742,7 +762,7 @@ CSpell * CSpellHandler::loadFromJson(const JsonNode & json, const std::string & 
 
 	//by default all flags are set to false in constructor
 
-	spell->isDamage = flags["damage"].Bool(); //do this before "offensive"
+	spell->damage = flags["damage"].Bool(); //do this before "offensive"
 
 	if(flags["offensive"].Bool())
 	{
@@ -754,7 +774,7 @@ CSpell * CSpellHandler::loadFromJson(const JsonNode & json, const std::string & 
 		spell->setIsRising(true);
 	}
 
-	const bool implicitPositiveness = spell->isOffensive || spell->isRising; //(!) "damage" does not mean NEGATIVE  --AVS
+	const bool implicitPositiveness = spell->offensive || spell->rising; //(!) "damage" does not mean NEGATIVE  --AVS
 
 	if(flags["indifferent"].Bool())
 	{
@@ -774,7 +794,7 @@ CSpell * CSpellHandler::loadFromJson(const JsonNode & json, const std::string & 
 		logMod->error("Spell %s: no positiveness specified, assumed NEUTRAL.", spell->name);
 	}
 
-	spell->isSpecial = flags["special"].Bool();
+	spell->special = flags["special"].Bool();
 
 	auto findBonus = [&](std::string name, std::vector<Bonus::BonusType> & vec)
 	{
@@ -942,7 +962,7 @@ CSpell * CSpellHandler::loadFromJson(const JsonNode & json, const std::string & 
 		{
 			levelObject.battleEffects = levelNode["battleEffects"];
 
-			if(!levelObject.cumulativeEffects.empty() || !levelObject.effects.empty() || spell->isOffensiveSpell())
+			if(!levelObject.cumulativeEffects.empty() || !levelObject.effects.empty() || spell->isOffensive())
 				logGlobal->error("Mixing %s special effects with old format effects gives unpredictable result", spell->name);
 		}
 	}
@@ -982,7 +1002,7 @@ std::vector<bool> CSpellHandler::getDefaultAllowed() const
 
 	for(const CSpell * s : objects)
 	{
-		allowedSpells.push_back( !(s->isSpecialSpell() || s->isCreatureAbility()));
+		allowedSpells.push_back( !(s->isSpecial() || s->isCreatureAbility()));
 	}
 
 	return allowedSpells;

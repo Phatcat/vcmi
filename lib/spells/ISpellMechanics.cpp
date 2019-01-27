@@ -103,7 +103,7 @@ public:
 			const CSpell::LevelInfo & levelInfo = s->getLevelInfo(level);
 			assert(levelInfo.battleEffects.isNull());
 
-			if(s->isOffensiveSpell())
+			if(s->isOffensive())
 			{
 				//default constructed object should be enough
 				effects->add("directDamage", std::make_shared<effects::Damage>(), level);

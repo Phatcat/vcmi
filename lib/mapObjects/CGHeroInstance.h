@@ -171,7 +171,9 @@ public:
 	int getCurrentLuck(int stack=-1, bool town=false) const;
 	int32_t getSpellCost(const spells::Spell * sp) const; //do not use during battles -> bonuses from army would be ignored
 
-	bool canLearnSpell(const CSpell * spell) const;
+	bool canLearnSpell(const spells::Spell * spell) const;
+	bool canCastThisSpell(const spells::Spell * spell) const; //determines if this hero can cast given spell; takes into account existing spell in spellbook, existing spellbook and artifact bonuses
+
 
 	// ----- primary and secondary skill, experience, level handling -----
 
@@ -209,7 +211,6 @@ public:
 	ui64 getTotalStrength() const; // includes fighting strength and army strength
 	TExpType calculateXp(TExpType exp) const; //apply learning skill
 
-	bool canCastThisSpell(const CSpell * spell) const; //determines if this hero can cast given spell; takes into account existing spell in spellbook, existing spellbook and artifact bonuses
 	CStackBasicDescriptor calculateNecromancy (const BattleResult &battleResult) const;
 	void showNecromancyDialog(const CStackBasicDescriptor &raisedStack, CRandomGenerator & rand) const;
 	EDiggingStatus diggingStatus() const;

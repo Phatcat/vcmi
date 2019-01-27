@@ -221,7 +221,7 @@ public:
 
 	std::map<TFaction, si32> probabilities; //% chance to gain for castles
 
-	bool combatSpell; //is this spell combat (true) or adventure (false)
+	bool combat; //is this spell combat (true) or adventure (false)
 	bool creatureAbility; //if true, only creatures can use this spell
 	si8 positiveness; //1 if spell is positive for influenced stacks, 0 if it is indifferent, -1 if it's negative
 
@@ -233,16 +233,6 @@ public:
 	~CSpell();
 
 	spells::AimType getTargetType() const;
-
-	bool isPositive() const;
-	bool isNegative() const;
-	bool isNeutral() const;
-
-	bool isDamageSpell() const;
-	bool isRisingSpell() const;
-	bool isOffensiveSpell() const;
-
-	bool isSpecialSpell() const;
 
 	bool hasEffects() const;
 	void getEffects(std::vector<Bonus> & lst, const int level, const bool cumulative, const si32 duration, boost::optional<si32 *> maxDuration = boost::none) const;
@@ -274,14 +264,24 @@ public:
 
 	boost::logic::tribool getPositiveness() const override;
 
-	bool isAdventureSpell() const override;
-	bool isCombatSpell() const;
-	bool isCreatureAbility() const;
+	bool isPositive() const override;
+	bool isNegative() const override;
+	bool isNeutral() const override;
 
-	/**
-	 * Returns resource name of icon for SPELL_IMMUNITY bonus
-	 */
-	const std::string & getIconImmune() const;
+	bool isDamage() const override;
+	bool isOffensive() const override;
+
+	bool isSpecial() const override;
+
+	bool isAdventure() const override;
+	bool isCombat() const override;
+	bool isCreatureAbility() const override;
+
+	const std::string & getIconImmune() const; ///< Returns resource name of icon for SPELL_IMMUNITY bonus
+	const std::string & getIconBook() const;
+	const std::string & getIconEffect() const;
+	const std::string & getIconScenarioBonus() const;
+	const std::string & getIconScroll() const;
 
 	const std::string & getCastSound() const;
 
@@ -294,13 +294,13 @@ public:
 		h & power;
 		h & probabilities;
 		h & attributes;
-		h & combatSpell;
+		h & combat;
 		h & creatureAbility;
 		h & positiveness;
 		h & counteredSpells;
-		h & isRising;
-		h & isDamage;
-		h & isOffensive;
+		h & rising;
+		h & damage;
+		h & offensive;
 		h & targetType;
 
 		if(version >= 780)
@@ -325,7 +325,7 @@ public:
 
 		h & iconImmune;
 		h & defaultProbability;
-		h & isSpecial;
+		h & special;
 		h & castSound;
 		h & iconBook;
 		h & iconEffect;
@@ -379,10 +379,10 @@ private:
 private:
 	si32 defaultProbability;
 
-	bool isRising;
-	bool isDamage;
-	bool isOffensive;
-	bool isSpecial;
+	bool rising;
+	bool damage;
+	bool offensive;
+	bool special;
 
 	std::string attributes; //reference only attributes //todo: remove or include in configuration format, currently unused
 

@@ -46,7 +46,7 @@ const PlayerSettings * CGameInfoCallback::getPlayerSettings(PlayerColor color) c
 	return &gs->scenarioOps->getIthPlayersSettings(color);
 }
 
-bool CGameInfoCallback::isAllowed( int type, int id )
+bool CGameInfoCallback::isAllowed(int32_t type, int32_t id)
 {
 	switch(type)
 	{

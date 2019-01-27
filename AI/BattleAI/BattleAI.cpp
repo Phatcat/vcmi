@@ -29,10 +29,10 @@ enum class SpellTypes
 
 SpellTypes spellType(const CSpell * spell)
 {
-	if(!spell->isCombatSpell() || spell->isCreatureAbility())
+	if(!spell->isCombat() || spell->isCreatureAbility())
 		return SpellTypes::OTHER;
 
-	if(spell->isOffensiveSpell() || spell->hasEffects() || spell->hasBattleEffects())
+	if(spell->isOffensive() || spell->hasEffects() || spell->hasBattleEffects())
 		return SpellTypes::BATTLE;
 
 	return SpellTypes::OTHER;

@@ -725,12 +725,12 @@ void CGHeroInstance::spendMana(ServerCallback * server, const int spellCost) con
 	}
 }
 
-bool CGHeroInstance::canCastThisSpell(const CSpell * spell) const
+bool CGHeroInstance::canCastThisSpell(const spells::Spell * spell) const
 {
-	const bool isAllowed = IObjectInterface::cb->isAllowed(0, spell->id);
+	const bool isAllowed = IObjectInterface::cb->isAllowed(0, spell->getIndex());
 
-	const bool inSpellBook = vstd::contains(spells, spell->id) && hasSpellbook();
-	const bool specificBonus = hasBonusOfType(Bonus::SPELL, spell->id);
+	const bool inSpellBook = vstd::contains(spells, spell->getId()) && hasSpellbook();
+	const bool specificBonus = hasBonusOfType(Bonus::SPELL, spell->getIndex());
 
 	bool schoolBonus = false;
 
@@ -742,13 +742,13 @@ bool CGHeroInstance::canCastThisSpell(const CSpell * spell) const
 		}
 	});
 
-	const bool levelBonus = hasBonusOfType(Bonus::SPELLS_OF_LEVEL, spell->level);
+	const bool levelBonus = hasBonusOfType(Bonus::SPELLS_OF_LEVEL, spell->getLevel());
 
-	if(spell->isSpecialSpell())
+	if(spell->isSpecial())
 	{
 		if(inSpellBook)
 		{//hero has this spell in spellbook
-			logGlobal->error("Special spell %s in spellbook.", spell->name);
+			logGlobal->error("Special spell %s in spellbook.", spell->getLevel());
 		}
 		return specificBonus;
 	}
@@ -758,7 +758,7 @@ bool CGHeroInstance::canCastThisSpell(const CSpell * spell) const
 		{
 			//hero has this spell in spellbook
 			//it is normal if set in map editor, but trace it to possible debug of magic guild
-			logGlobal->trace("Banned spell %s in spellbook.", spell->name);
+			logGlobal->trace("Banned spell %s in spellbook.", spell->getName());
 		}
 		return inSpellBook || specificBonus || schoolBonus || levelBonus;
 	}
@@ -768,32 +768,32 @@ bool CGHeroInstance::canCastThisSpell(const CSpell * spell) const
 	}
 }
 
-bool CGHeroInstance::canLearnSpell(const CSpell * spell) const
+bool CGHeroInstance::canLearnSpell(const spells::Spell * spell) const
 {
     if(!hasSpellbook())
 		return false;
 
-	if(spell->level > maxSpellLevel()) //not enough wisdom
+	if(spell->getLevel() > maxSpellLevel()) //not enough wisdom
 		return false;
 
-	if(vstd::contains(spells, spell->id))//already known
+	if(vstd::contains(spells, spell->getId()))//already known
 		return false;
 
-	if(spell->isSpecialSpell())
+	if(spell->isSpecial())
 	{
-		logGlobal->warn("Hero %s try to learn special spell %s", nodeName(), spell->name);
+		logGlobal->warn("Hero %s try to learn special spell %s", nodeName(), spell->getName());
 		return false;//special spells can not be learned
 	}
 
 	if(spell->isCreatureAbility())
 	{
-		logGlobal->warn("Hero %s try to learn creature spell %s", nodeName(), spell->name);
+		logGlobal->warn("Hero %s try to learn creature spell %s", nodeName(), spell->getName());
 		return false;//creature abilities can not be learned
 	}
 
-	if(!IObjectInterface::cb->isAllowed(0, spell->id))
+	if(!IObjectInterface::cb->isAllowed(0, spell->getIndex()))
 	{
-		logGlobal->warn("Hero %s try to learn banned spell %s", nodeName(), spell->name);
+		logGlobal->warn("Hero %s try to learn banned spell %s", nodeName(), spell->getName());
 		return false;//banned spells should not be learned
 	}
 
