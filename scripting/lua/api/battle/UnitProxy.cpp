@@ -28,6 +28,22 @@ VCMI_REGISTER_SCRIPT_API(UnitProxy, "battle.Unit")
 const std::vector<UnitProxy::RegType> UnitProxy::REGISTER =
 {
 	{
+		"getMinDamage",
+		LuaCallWrapper<const IBonusBearer>::createFunctor(&IBonusBearer::getMinDamage)
+	},
+	{
+		"getMaxDamage",
+		LuaCallWrapper<const IBonusBearer>::createFunctor(&IBonusBearer::getMaxDamage)
+	},
+	{
+		"getAttack",
+		LuaCallWrapper<const IBonusBearer>::createFunctor(&IBonusBearer::getAttack)
+	},
+	{
+		"getDefence",
+		LuaCallWrapper<const IBonusBearer>::createFunctor(&IBonusBearer::getDefence)
+	},
+	{
 		"isAlive",
 		LuaCallWrapper<const Unit>::createFunctor(&Unit::alive)
 	},

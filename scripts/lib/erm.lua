@@ -1,4 +1,3 @@
-
 DATA = DATA or {}
 
 local ERM = {}
@@ -26,28 +25,26 @@ end
 
 local Receivers = {}
 
-local function getReceiverLoader(name)
-	local name = name
-
-	local loader = function(...)
-		Receivers[name] = Receivers[name] or require("core:erm."..name)
-
-		local receiver = Receivers[name]
-		receiver.ERM = ERM
+local function createReceiverLoader(name)
+	local loader = function(x, ...)
+		if not Receivers[name] then
+			Receivers[name] = require("core:erm."..name)
+			Receivers[name].ERM = ERM
+		end
+		local receiver = Receivers[name]:new(x, ...)
 		return receiver
 	end
 	return loader
 end
 
-ERM.BU = getReceiverLoader("BU")
-ERM.IF = getReceiverLoader("IF")
-ERM.MF = getReceiverLoader("MF")
+ERM.BM = createReceiverLoader("BM")
+ERM.BU = createReceiverLoader("BU")
+ERM.IF = createReceiverLoader("IF")
+ERM.MF = createReceiverLoader("MF")
 
 local Triggers = {}
 
-local function getTriggerLoader(name)
-	local name = name
-
+local function createTriggerLoader(name)
 	local loader = function(...)
 		Triggers[name] = Triggers[name] or require("core:erm."..name.."_T")
 
@@ -60,8 +57,8 @@ end
 
 local TriggerLoaders = {}
 
-TriggerLoaders.PI = getTriggerLoader("PI")
-TriggerLoaders.MF = getTriggerLoader("MF")
+TriggerLoaders.PI = createTriggerLoader("PI")
+TriggerLoaders.MF = createTriggerLoader("MF")
 
 
 ERM.addTrigger = function(self, t)

@@ -76,7 +76,7 @@ protected:
 		effects->serializeJson(VLC->spellEffects(), deser, level);
 	}
 private:
-	std::shared_ptr<TargetCondition> targetCondition;
+	std::shared_ptr<IReceptiveCheck> targetCondition;
 };
 
 class ConfigurableMechanicsFactory : public CustomMechanicsFactory

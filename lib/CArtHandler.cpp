@@ -574,44 +574,6 @@ ArtifactID CArtHandler::pickRandomArtifact(CRandomGenerator & rand, int flags)
 	return pickRandomArtifact(rand, flags, [](ArtifactID){ return true;});
 }
 
-std::shared_ptr<Bonus> createBonus(Bonus::BonusType type, int val, int subtype, Bonus::ValueType valType, std::shared_ptr<ILimiter> limiter = std::shared_ptr<ILimiter>(), int additionalInfo = 0)
-{
-	auto added = std::make_shared<Bonus>(Bonus::PERMANENT,type,Bonus::ARTIFACT,val,-1,subtype);
-	added->additionalInfo = additionalInfo;
-	added->valType = valType;
-	added->limiter = limiter;
-	return added;
-}
-
-std::shared_ptr<Bonus> createBonus(Bonus::BonusType type, int val, int subtype, std::shared_ptr<IPropagator> propagator = std::shared_ptr<IPropagator>(), int additionalInfo = 0)
-{
-	auto added = std::make_shared<Bonus>(Bonus::PERMANENT,type,Bonus::ARTIFACT,val,-1,subtype);
-	added->additionalInfo = additionalInfo;
-	added->valType = Bonus::BASE_NUMBER;
-	added->propagator = propagator;
-	return added;
-}
-
-void CArtHandler::giveArtBonus( ArtifactID aid, Bonus::BonusType type, int val, int subtype, Bonus::ValueType valType, std::shared_ptr<ILimiter> limiter, int additionalInfo)
-{
-	giveArtBonus(aid, createBonus(type, val, subtype, valType, limiter, additionalInfo));
-}
-
-void CArtHandler::giveArtBonus(ArtifactID aid, Bonus::BonusType type, int val, int subtype, std::shared_ptr<IPropagator> propagator, int additionalInfo)
-{
-	giveArtBonus(aid, createBonus(type, val, subtype, propagator, additionalInfo));
-}
-
-void CArtHandler::giveArtBonus(ArtifactID aid, std::shared_ptr<Bonus> bonus)
-{
-	bonus->sid = aid;
-	if(bonus->subtype == Bonus::MORALE || bonus->type == Bonus::LUCK)
-		bonus->description = artifacts[aid]->getName()  + (bonus->val > 0 ? " +" : " ") + boost::lexical_cast<std::string>(bonus->val);
-	else
-		bonus->description = artifacts[aid]->getName();
-
-	artifacts[aid]->addNewBonus(bonus);
-}
 void CArtHandler::makeItCreatureArt(CArtifact * a, bool onlyCreature)
 {
 	if (onlyCreature)
@@ -620,12 +582,6 @@ void CArtHandler::makeItCreatureArt(CArtifact * a, bool onlyCreature)
 		a->possibleSlots[ArtBearer::COMMANDER].clear();
 	}
 	a->possibleSlots[ArtBearer::CREATURE].push_back(ArtifactPosition::CREATURE_SLOT);
-}
-
-void CArtHandler::makeItCreatureArt(ArtifactID aid, bool onlyCreature)
-{
-	CArtifact *a = artifacts[aid];
-	makeItCreatureArt (a, onlyCreature);
 }
 
 void CArtHandler::makeItCommanderArt(CArtifact * a, bool onlyCommander)
@@ -637,12 +593,6 @@ void CArtHandler::makeItCommanderArt(CArtifact * a, bool onlyCommander)
 	}
 	for (int i = ArtifactPosition::COMMANDER1; i <= ArtifactPosition::COMMANDER6; ++i)
 		a->possibleSlots[ArtBearer::COMMANDER].push_back(ArtifactPosition(i));
-}
-
-void CArtHandler::makeItCommanderArt(ArtifactID aid, bool onlyCommander)
-{
-	CArtifact *a = artifacts[aid];
-	makeItCommanderArt (a, onlyCommander);
 }
 
 bool CArtHandler::legalArtifact(ArtifactID id)
@@ -790,8 +740,7 @@ void CArtifactInstance::init()
 	setNodeType(ARTIFACT_INSTANCE);
 }
 
-std::string CArtifactInstance::getEffectiveDescription(
-	const CGHeroInstance *hero) const
+std::string CArtifactInstance::getEffectiveDescription(const CGHeroInstance * hero) const
 {
 	std::string text = artType->getDescription();
 	if (!vstd::contains(text, '{'))
@@ -802,7 +751,7 @@ std::string CArtifactInstance::getEffectiveDescription(
 		// we expect scroll description to be like this: This scroll contains the [spell name] spell which is added into your spell book for as long as you carry the scroll.
 		// so we want to replace text in [...] with a spell name
 		// however other language versions don't have name placeholder at all, so we have to be careful
-		int spellID = getGivenSpellID();
+		int32_t spellID = getGivenSpellID();
 		size_t nameStart = text.find_first_of('[');
 		size_t nameEnd = text.find_first_of(']', nameStart);
 		if(spellID >= 0)
@@ -811,14 +760,14 @@ std::string CArtifactInstance::getEffectiveDescription(
 				text = text.replace(nameStart, nameEnd - nameStart + 1, VLC->spellh->objects[spellID]->name);
 		}
 	}
-	else if (hero && artType->constituentOf.size()) //display info about set
+	else if(hero && artType->constituentOf.size()) //display info about set
 	{
 		std::string artList;
 		auto combinedArt = artType->constituentOf[0];
 		text += "\n\n";
 		text += "{" + combinedArt->getName() + "}";
 		int wornArtifacts = 0;
-		for (auto a : *combinedArt->constituents) //TODO: can the artifact be a part of more than one set?
+		for(auto a : *combinedArt->constituents) //TODO: can the artifact be a part of more than one set?
 		{
 			artList += "\n" + a->getName();
 			if (hero->hasArt(a->id, true))
@@ -1066,7 +1015,7 @@ bool CCombinedArtifactInstance::canBeDisassembled() const
 }
 
 CCombinedArtifactInstance::CCombinedArtifactInstance(CArtifact *Art)
-	: CArtifactInstance(Art) //TODO: seems unued, but need to be written
+	: CArtifactInstance(Art) //TODO: seems unused, but need to be written
 {
 }
 

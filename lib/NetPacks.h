@@ -447,8 +447,7 @@ struct SetCommanderProperty : public CPackForClient
 	void applyCl(CClient *cl){};
 	DLL_LINKAGE void applyGs(CGameState *gs);
 
-	ObjectInstanceID heroid; //for commander attached to hero
-	StackLocation sl; //for commander not on the hero?
+	ObjectInstanceID heroid;
 
 	ECommanderProperty which;
 	TExpType amount; //0 for dead, >0 for alive
@@ -458,7 +457,6 @@ struct SetCommanderProperty : public CPackForClient
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
 		h & heroid;
-		h & sl;
 		h & which;
 		h & amount;
 		h & additionalInfo;
@@ -715,7 +713,7 @@ struct OpenWindow : public CPackForClient
 	}
 };
 
-struct NewObject  : public CPackForClient
+struct NewObject : public CPackForClient
 {
 	NewObject():subID(0){}
 	void applyCl(CClient *cl);
@@ -735,7 +733,7 @@ struct NewObject  : public CPackForClient
 	}
 };
 
-struct SetAvailableArtifacts  : public CPackForClient
+struct SetAvailableArtifacts : public CPackForClient
 {
 	SetAvailableArtifacts():id(0){}
 	void applyCl(CClient *cl);
@@ -766,10 +764,6 @@ struct NewArtifact : public CPackForClient
 };
 
 struct CGarrisonOperationPack : CPackForClient
-{
-};
-
-struct CArtifactOperationPack : CPackForClient
 {
 };
 
@@ -902,6 +896,10 @@ struct GetEngagedHeroIds : boost::static_visitor<boost::optional<ObjectInstanceI
 			return s->armyObj->id;
 		return boost::optional<ObjectInstanceID>();
 	}
+};
+
+struct CArtifactOperationPack : CPackForClient
+{
 };
 
 struct PutArtifact : CArtifactOperationPack

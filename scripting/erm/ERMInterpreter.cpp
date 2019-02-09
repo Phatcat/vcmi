@@ -497,7 +497,8 @@ namespace ERMConverter
 			}
 			else if(name == "FU")
 			{
-				//TODO:
+				//TODO: FU receiver
+				throw EScriptExecError("FU receiver is not implemented");
 			}
 			else if(name == "DO")
 			{

@@ -42,6 +42,10 @@ const std::vector<BattleCbProxy::RegType> BattleCbProxy::REGISTER =
 		&BattleCbProxy::getTerrainType
 	},
 	{
+		"getUnitById",
+		LuaCallWrapper<const BattleCb>::createFunctor(&BattleCb::battleGetUnitByID)
+	},
+	{
 		"getUnitByPos",
 		&BattleCbProxy::getUnitByPos
 	},

@@ -9,12 +9,12 @@
  */
 #pragma once
 
-#include "../../lib/ConstTransitivePtr.h" //may be reundant
+#include <vcmi/spells/Magic.h>
+
+#include "../../lib/ConstTransitivePtr.h" //may be redundant
 #include "../../lib/GameConstants.h"
 
 #include "CBattleAnimations.h"
-
-#include "../../lib/spells/CSpellHandler.h" //CSpell::TAnimation
 
 class CLabel;
 class CCreatureSet;
@@ -49,6 +49,7 @@ class CBattleGameInterface;
 struct CustomEffectInfo;
 class CAnimation;
 class IImage;
+class CSpell;
 
 /// Small struct which contains information about the id of the attacked stack, the damage dealt,...
 struct StackAttackedInfo
@@ -360,8 +361,6 @@ public:
 	void displaySpellCast(SpellID spellID, BattleHex destinationTile); //displays spell`s cast animation
 	void displaySpellEffect(SpellID spellID, BattleHex destinationTile); //displays spell`s affected animation
 	void displaySpellHit(SpellID spellID, BattleHex destinationTile); //displays spell`s affected animation
-
-	void displaySpellAnimation(const CSpell::TAnimation & animation, BattleHex destinationTile);
 
 	void battleTriggerEffect(const BattleTriggerEffect & bte);
 	void setBattleCursor(const int myNumber); //really complex and messy, sets attackingHex

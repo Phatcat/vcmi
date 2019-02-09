@@ -1469,28 +1469,19 @@ void CBattleInterface::displayEffect(ui32 effect, BattleHex destTile)
 	addNewAnim(new CEffectAnimation(this, customAnim, destTile));
 }
 
-void CBattleInterface::displaySpellAnimation(const CSpell::TAnimation & animation, BattleHex destinationTile)
-{
-	if (animation.pause > 0)
-	{
-		addNewAnim(new CDummyAnimation(this, animation.pause));
-	}
-	else
-	{
-		addNewAnim(new CEffectAnimation(this, animation.resourceName, destinationTile, false, animation.verticalPosition == VerticalPosition::BOTTOM));
-	}
-}
-
 void CBattleInterface::displaySpellCast(SpellID spellID, BattleHex destinationTile)
 {
-	const CSpell *spell = spellID.toSpell();
+	const CSpell * spell = spellID.toSpell();
 
-	if (spell == nullptr)
+	if(spell == nullptr)
 		return;
 
-	for (const CSpell::TAnimation & animation : spell->animationInfo.cast)
+	for(const CSpell::TAnimation & animation : spell->animationInfo.cast)
 	{
-		displaySpellAnimation(animation, destinationTile);
+		if(animation.pause > 0)
+			addNewAnim(new CDummyAnimation(this, animation.pause));
+		else
+			addNewAnim(new CEffectAnimation(this, animation.resourceName, destinationTile, false, animation.verticalPosition == VerticalPosition::BOTTOM));
 	}
 }
 
@@ -1498,25 +1489,32 @@ void CBattleInterface::displaySpellEffect(SpellID spellID, BattleHex destination
 {
 	const CSpell *spell = spellID.toSpell();
 
-	if (spell == nullptr)
+	if(spell == nullptr)
 		return;
 
-	for (const CSpell::TAnimation & animation : spell->animationInfo.affect)
+	for(const CSpell::TAnimation & animation : spell->animationInfo.affect)
 	{
-		displaySpellAnimation(animation, destinationTile);
+		if(animation.pause > 0)
+			addNewAnim(new CDummyAnimation(this, animation.pause));
+		else
+			addNewAnim(new CEffectAnimation(this, animation.resourceName, destinationTile, false, animation.verticalPosition == VerticalPosition::BOTTOM));
+
 	}
 }
 
 void CBattleInterface::displaySpellHit(SpellID spellID, BattleHex destinationTile)
 {
-	const CSpell *spell = spellID.toSpell();
+	const CSpell * spell = spellID.toSpell();
 
-	if (spell == nullptr)
+	if(spell == nullptr)
 		return;
 
-	for (const CSpell::TAnimation & animation : spell->animationInfo.hit)
+	for(const CSpell::TAnimation & animation : spell->animationInfo.hit)
 	{
-		displaySpellAnimation(animation, destinationTile);
+		if(animation.pause > 0)
+			addNewAnim(new CDummyAnimation(this, animation.pause));
+		else
+			addNewAnim(new CEffectAnimation(this, animation.resourceName, destinationTile, false, animation.verticalPosition == VerticalPosition::BOTTOM));
 	}
 }
 

@@ -2433,7 +2433,6 @@ void CRmgTemplateZone::addAllPossibleObjects()
 			std::vector <CSpell *> spells;
 			for (auto spell : VLC->spellh->objects)
 			{
-
 				if (gen->isAllowedSpell(spell->id) && spell->school[(ESpellSchool)i])
 					spells.push_back(spell);
 			}

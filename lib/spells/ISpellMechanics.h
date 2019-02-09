@@ -174,7 +174,6 @@ protected:
 class DLL_LINKAGE Mechanics
 {
 public:
-	Mechanics();
 	virtual ~Mechanics();
 
 	virtual bool adaptProblem(ESpellCastProblem::ESpellCastProblem source, Problem & target) const = 0;
@@ -246,12 +245,14 @@ public:
 	const Caster * caster;
 
 	ui8 casterSide;
+
+protected:
+	Mechanics();
 };
 
 class DLL_LINKAGE BaseMechanics : public Mechanics
 {
 public:
-	BaseMechanics(const IBattleCast * event);
 	virtual ~BaseMechanics();
 
 	bool adaptProblem(ESpellCastProblem::ESpellCastProblem source, Problem & target) const override;
@@ -302,6 +303,8 @@ public:
 protected:
 	const CSpell * owner;
 	Mode mode;
+
+	BaseMechanics(const IBattleCast * event);
 
 private:
     IBattleCast::Value rangeLevel;

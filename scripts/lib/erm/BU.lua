@@ -1,13 +1,15 @@
 require("battle.Unit")
 
+local ReceiverBase = require("core:erm.ReceiverBase")
+
+local BU = ReceiverBase:new()
+
 local BattleLogMessage = require("netpacks.BattleLogMessage")
 local BattleUnitsChanged = require("netpacks.BattleUnitsChanged")
 
 local battle = BATTLE
 
-local BU = {}
-
-BU.C = function(self, x, p1, ...)
+function BU:C(x, p1)
 	assert(type(p1) == "nil", "!!BU:C can only check value")
 
 	local ret = battle:isFinished()
@@ -19,7 +21,7 @@ BU.C = function(self, x, p1, ...)
 	end
 end
 
-BU.D = function(self, x, hex, p1, ...)
+function BU:D(x, hex, p1)
 	assert(type(p1) == "nil", "!!BU:D can only check value")
 
 	local unit = battle:getUnitByPos(hex, false)
@@ -35,7 +37,7 @@ BU.D = function(self, x, hex, p1, ...)
 	end
 end
 
-BU.E = function(self, x, hex, p1, ...)
+function BU:E(x, hex, p1)
 	assert(type(p1) == "nil", "!!BU:E can only check value")
 
 	local unit = battle:getUnitByPos(hex, false)
@@ -61,7 +63,7 @@ SPECIAL_FIELDS[15] = 8
 SPECIAL_FIELDS[16] = 9
 
 
-BU.G = function(self, x, p1, ...)
+function BU:G(x, p1)
 	assert(type(p1) == "nil", "!!BU:G? is not implemented")
 
 	local bfield = SPECIAL_FIELDS[battle:getBattlefieldType()]
@@ -73,21 +75,21 @@ BU.G = function(self, x, p1, ...)
 	end
 end
 
-BU.M = function(self, x, message, ...)
+function BU:M(x, message)
 	local pack = BattleLogMessage.new()
 	pack:addText(message)
 	SERVER:addToBattleLog(pack)
 end
 
-BU.O = function(self, x, ...)
+function BU:O(x, ...)
 	error("!!BU:O is not implemented")
 end
 
-BU.R = function(self, x, ...)
+function BU:R(x, ...)
 	error("!!BU:R is not implemented")
 end
 
-BU.S = function(self, x, typ, count, hex, side, slot, ...)
+function BU:S(x, typ, count, hex, side, slot)
 	local pack = BattleUnitsChanged.new()
 
 	local id = battle:getNextUnitId()
@@ -107,7 +109,7 @@ BU.S = function(self, x, typ, count, hex, side, slot, ...)
 	SERVER:changeUnits(pack)
 end
 
-BU.T = function(self, x, ...)
+function BU:T(x)
 	local tacticDistance = battle:getTacticDistance()
 
 	if tacticDistance == 0 then
@@ -117,7 +119,7 @@ BU.T = function(self, x, ...)
 	end
 end
 
-BU.V = function(self, x, ...)
+function BU:V(x, ...)
 	error("!!BU:V is not implemented")
 end
 

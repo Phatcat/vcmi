@@ -21,6 +21,7 @@
 #include "CSkillHandler.h"
 #include "CStack.h"
 #include "CArtHandler.h"
+#include "CModHandler.h"
 #include "StringConstants.h"
 #include "battle/BattleInfo.h"
 
@@ -1293,10 +1294,10 @@ JsonNode subtypeToJson(Bonus::BonusType type, int subtype)
 	case Bonus::SPECIAL_BLESS_DAMAGE:
 	case Bonus::MAXED_SPELL:
 	case Bonus::SPECIAL_PECULIAR_ENCHANT:
-		return JsonUtils::stringNode("spell." + (*VLC->spellh)[SpellID::ESpellID(subtype)]->identifier);
+		return JsonUtils::stringNode(CModHandler::makeFullIdentifier("", "spell", SpellID::encode(subtype)));
 	case Bonus::IMPROVED_NECROMANCY:
 	case Bonus::SPECIAL_UPGRADE:
-		return JsonUtils::stringNode("creature." + CreatureID::encode(subtype));
+		return JsonUtils::stringNode(CModHandler::makeFullIdentifier("", "creature", CreatureID::encode(subtype)));
 	case Bonus::GENERATE_RESOURCE:
 		return JsonUtils::stringNode("resource." + GameConstants::RESOURCE_NAMES[subtype]);
 	default:
@@ -1309,7 +1310,7 @@ JsonNode additionalInfoToJson(Bonus::BonusType type, CAddInfo addInfo)
 	switch(type)
 	{
 	case Bonus::SPECIAL_UPGRADE:
-		return JsonUtils::stringNode("creature." + CreatureID::encode(addInfo[0]));
+		return JsonUtils::stringNode(CModHandler::makeFullIdentifier("", "creature", CreatureID::encode(addInfo[0])));
 	default:
 		return addInfo.toJsonNode();
 	}

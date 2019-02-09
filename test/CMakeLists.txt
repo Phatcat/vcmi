@@ -24,6 +24,7 @@ set(test_SRCS
 		battle/CUnitStateMagicTest.cpp
 		battle/battle_UnitTest.cpp
 
+		erm/ERM_BM.cpp
 		erm/ERM_BU.cpp
 		erm/ERM_MF.cpp
 		erm/ERMPersistenceTest.cpp

@@ -1,15 +1,18 @@
 require("battle.Unit")
-local MF = {}
 
-MF.D = function(self, x, ...)
+local ReceiverBase = require("core:erm.ReceiverBase")
+
+local MF = ReceiverBase:new()
+
+function MF:D(x)
 	return self.ERM.activeEvent:getInitalDamage()
 end
 
-MF.E = function(self, x, ...)
+function MF:E(x, ...)
 	error("!!MF:E is not implemented")
 end
 
-MF.F = function(self, x, p1, ...)
+function MF:F(x, p1)
 	if p1 then
 		self.ERM.activeEvent:setDamage(p1)
 		return nil
@@ -18,11 +21,11 @@ MF.F = function(self, x, p1, ...)
 	end
 end
 
-MF.N = function(self, x, ...)
+function MF:N(x)
 	return self.ERM.activeEvent:getTarget():unitId()
 end
 
-MF.W = function(self, x, ...)
+function MF:W(x, ...)
 	error("!!MF:W is not implemented")
 end
 

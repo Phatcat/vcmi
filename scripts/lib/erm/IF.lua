@@ -1,6 +1,8 @@
 local InfoWindow = require("netpacks.InfoWindow")
 
-local IF = {}
+local ReceiverBase = require("core:erm.ReceiverBase")
+
+local IF = ReceiverBase:new()
 
 --[[
 according to the ERM help:
@@ -18,9 +20,11 @@ according to the ERM help:
 "%Da" -> current day from beginning of the game
 "%Gc" -> the color of current gamer in text
 ]]
-local IF_M = function(x, message)
 
+function IF:M(x, message)
 	local pack = InfoWindow.new()
+
+	local _self = self
 
 	local onMatch1 = function (key1, key2)
 
@@ -29,15 +33,15 @@ local IF_M = function(x, message)
 		end
 
 		if key1 == 'V' then
-			return IF.ERM.v[key2]
+			return _self.ERM.v[key2]
 		end
 
 		if key1 == 'Z' then
-			return IF.ERM.z[key2]
+			return _self.ERM.z[key2]
 		end
 
 		if key1 == 'F' then
-			return IF.ERM.flag[key2]
+			return _self.ERM.flag[key2]
 		end
 
 		return nil
@@ -50,15 +54,6 @@ local IF_M = function(x, message)
 	pack:addText(message)
 
 	SERVER:commitPackage(pack)
-
-end
-
-IF.M = function(self, x, ...)
-	local argc = select('#', ...)
-
-	if argc == 1 then
-		return IF_M(x, ...)
-	end
 end
 
 return IF
