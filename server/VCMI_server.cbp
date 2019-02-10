@@ -50,6 +50,7 @@
 				<Compiler>
 					<Add option="-Og" />
 					<Add option="-ggdb" />
+					<Add option="-DBOOST_UUID_RANDOM_PROVIDER_FORCE_WINCRYPT" />
 					<Add directory="$(#zlib64.include)" />
 				</Compiler>
 				<Linker>
@@ -80,6 +81,7 @@
 			<Add option="-lole32" />
 			<Add option="-loleaut32" />
 			<Add option="-lws2_32" />
+			<Add option="-ladvapi32" />
 			<Add option="-lmswsock" />
 			<Add option="-lboost_program_options$(#boost.libsuffix)" />
 			<Add option="-lboost_filesystem$(#boost.libsuffix)" />

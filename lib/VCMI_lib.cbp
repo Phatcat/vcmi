@@ -81,6 +81,7 @@
 				<Compiler>
 					<Add option="-Og" />
 					<Add option="-g" />
+					<Add option="-DBOOST_UUID_RANDOM_PROVIDER_FORCE_WINCRYPT" />
 					<Add directory="$(#zlib64.include)" />
 					<Add directory="lib/" />
 				</Compiler>

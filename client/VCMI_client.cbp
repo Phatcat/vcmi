@@ -52,6 +52,7 @@
 				<Compiler>
 					<Add option="-Og" />
 					<Add option="-g" />
+					<Add option="-DBOOST_UUID_RANDOM_PROVIDER_FORCE_WINCRYPT" />
 				</Compiler>
 				<Linker>
 					<Add directory="$(#sdl2.lib64)" />
@@ -84,6 +85,7 @@
 			<Add option="-lole32" />
 			<Add option="-loleaut32" />
 			<Add option="-lws2_32" />
+			<Add option="-ladvapi32" />
 			<Add option="-lboost_program_options$(#boost.libsuffix)" />
 			<Add option="-lboost_filesystem$(#boost.libsuffix)" />
 			<Add option="-lboost_system$(#boost.libsuffix)" />
